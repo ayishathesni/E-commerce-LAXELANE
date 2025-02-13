@@ -10,13 +10,10 @@ const productSchema = new Schema({
         type:String,
         required:true
     },
-    price:{
-        type:Number,
-        required:true
-    },
+   
     brand:{
         type:String,
-        required:true,
+        required:false,
     },
     category:{
         type:Schema.Types.ObjectId,
@@ -35,10 +32,19 @@ const productSchema = new Schema({
         type:Number,
         default:0
     },
-    quantity:{
-        type:Number,
-        default:0,
-    },
+    sizes: [{
+        size: {
+            type: String,
+            enum: ["XS", "S", "M", "L", "XL", "XXL"],
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true,
+            min: 0,
+            default: 0
+        }
+    }],
     color:{
         type:String,
         required:true
@@ -66,3 +72,6 @@ const productSchema = new Schema({
 const Product = mongoose.model('Product',productSchema);
 
 module.exports=Product;
+
+
+

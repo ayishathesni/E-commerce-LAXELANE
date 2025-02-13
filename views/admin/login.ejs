@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - LaxeLane</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .site-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .site-logo a {
+            font-size: 28px;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .login-btn:hover {
+            background: #444;
+        }
+
+        .error-message {
+            color: #d9534f;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="site-logo">
+            <a href="index.html" class="js-logo-clone">LaxeLane - Admin</a>
+        </div>
+
+        <form id="loginform" method="post" action="/admin/login" novalidate>
+            <div class="form-group">
+                <label for="username">Email</label>
+                <input type="email" id="username" required placeholder="Enter your username" name="email">
+            </div>
+            <div id="error1" class="error-message"></div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Enter your password" name="password">
+            </div>
+            <div id="error2" class="error-message"></div>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+    </div>
+
+    <script>
+        const usernameId = document.getElementById('username');
+        const passId = document.getElementById('password');
+        const error1 = document.getElementById('error1');
+        const error2 = document.getElementById('error2');
+        const loginform = document.getElementById('loginform');
+
+        // Username validation
+        function usernameValidateChecking() {
+            const usernameval = usernameId.value;
+
+            if (usernameval.trim() === '') {
+                error1.style.display = 'block';
+                error1.innerHTML = 'Please enter your username';
+            } else {
+                error1.style.display = 'none';
+                error1.innerHTML = '';
+            }
+        }
+
+        // Password validation
+        function passValidateChecking() {
+            const passval = passId.value;
+
+            if (passval.trim() === '') {
+                error2.style.display = 'block';
+                error2.innerHTML = 'Please enter your password';
+            } else {
+                error2.style.display = 'none';
+                error2.innerHTML = '';
+            }
+        }
+
+        loginform.addEventListener('submit', function (e) {
+            usernameValidateChecking();
+            passValidateChecking();
+
+            if (error1.innerHTML || error2.innerHTML) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

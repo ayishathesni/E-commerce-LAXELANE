@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/category.html  22 Nov 2019 10:02:48 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>LAXELANE- Lane to Your Style</title>
+    <meta name="keywords" content="HTML5 Template">
+    <meta name="description" content="Molla - Bootstrap eCommerce Template">
+    <meta name="author" content="p-themes">
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/icons/favicon-16x16.png">
+    <link rel="manifest" href="assets/images/icons/site.html">
+    <link rel="mask-icon" href="assets/images/icons/safari-pinned-tab.svg" color="#666666">
+    <link rel="shortcut icon" href="assets/images/icons/favicon.ico">
+    <meta name="apple-mobile-web-app-title" content="Molla">
+    <meta name="application-name" content="Molla">
+    <meta name="msapplication-TileColor" content="#cc9966">
+    <meta name="msapplication-config" content="assets/images/icons/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <!-- Plugins CSS File -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <!-- Main CSS File -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/plugins/owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="assets/css/plugins/magnific-popup/magnific-popup.css">
+    <link rel="stylesheet" href="assets/css/plugins/nouislider/nouislider.css">
+</head>
+
+<body>
+    <div class="page-wrapper">
+
+        <%-include("../../views/partials/user/header")%> 
+
+       
+        <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title"><span>Shop</span></h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+     
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+                <div class="container">
+                	<div class="row">
+                		<div class="col-lg-9">
+                			<div class="toolbox">
+                				<div class="toolbox-left">
+                					<div class="toolbox-info">
+                						<!-- Showing <span>9 of 56</span> Products -->
+                					</div><!-- End .toolbox-info -->
+                				</div><!-- End .toolbox-left -->
+
+                				<div class="toolbox-right">
+                					<!-- <div class="toolbox-sort">
+                						<label for="sortby">Sort by:</label>
+                						<div class="select-custom">
+											<select name="sortby" id="sortby" class="form-control">
+												<option value="popularity" selected="selected">Most Popular</option>
+												<option value="rating">Most Rated</option>
+												<option value="date">Date</option>
+											</select>
+										</div>
+                					</div> -->
+    
+                				</div><!-- End .toolbox-right -->
+                			</div><!-- End .toolbox -->
+
+                            <div class="products mb-3">
+                                <div class="row justify-content-start">
+                                    <% product.forEach(product => { %>
+                                        <div class="col-6 col-md-4 col-lg-4">
+                                            <div class="product product-7 text-center">
+                                                <figure class="product-media">
+                                                    <% if (product.isNew) { %>
+                                                        <span class="product-label label-new">New</span>
+                                                    <% } %>
+                                                    <a href="/productDetails/<%= product._id %>">
+                                                        <img src="/uploads/re-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" class="product-image">
+                                                    </a>
+                            
+                                                    <div class="product-action-vertical">
+                                                        <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                                                        <a href="/productDetails/<%= product._id %>" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                                                        <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
+                                                    </div>
+                            
+                                                    <div class="product-action">
+                                                        <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                                                    </div>
+                                                </figure>
+                            
+                                                <div class="product-body">
+                                                    <div class="product-cat">
+                                                        <a href="#"> <%= product.category.name %> </a>
+                                                    </div>
+                                                    <h3 class="product-title"><a href="/productDetails/<%= product._id %>"><%= product.productName %></a></h3>
+                                                    <div class="product-price">
+                                                        ₹<%= product.salePrice %>
+                                                    </div>
+                                                    <div class="ratings-container">
+                                                        <div class="ratings">
+                                                            <div class="ratings-val"></div>
+                                                        </div>
+                                                        <span class="ratings-text">( <%= product.reviews %> Reviews )</span>
+                                                    </div>
+                            
+        
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                            
+
+							<nav aria-label="Page navigation">
+								<ul class="pagination justify-content-center">
+									<% if (hasPrevPage) { %>
+										<li class="page-item">
+											<a class="page-link page-link-prev" href="/shop?page=<%= prevPage %>" aria-label="Previous">
+												<span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+											</a>
+										</li>
+									<% } else { %>
+										<li class="page-item disabled">
+											<span class="page-link page-link-prev">
+												<span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+											</span>
+										</li>
+									<% } %>
+									
+									<% for(let i = 1; i <= totalPages; i++) { %>
+										<li class="page-item <%= currentPage === i ? 'active' : '' %>">
+											<a class="page-link" href="/shop?page=<%= i %>"><%= i %></a>
+										</li>
+									<% } %>
+									
+									<li class="page-item-total">of <%= totalPages %></li>
+									
+									<% if (hasNextPage) { %>
+										<li class="page-item">
+											<a class="page-link page-link-next" href="/shop?page=<%= nextPage %>" aria-label="Next">
+												Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+											</a>
+										</li>
+									<% } else { %>
+										<li class="page-item disabled">
+											<span class="page-link page-link-next">
+												Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+											</span>
+										</li>
+									<% } %>
+								</ul>
+							</nav>
+                		</div><!-- End .col-lg-9 -->
+						<aside class="col-lg-3 order-lg-first">
+							<div class="sidebar sidebar-shop">
+								<div class="widget widget-clean">
+									<label>Filters:</label>
+									<a href="#" id="clear-filters" class="sidebar-filter-clear">Clean All</a>
+								</div><!-- End .widget widget-clean -->
+						
+								<!-- Category Filter -->
+								<div class="widget widget-collapsible">
+									<h3 class="widget-title">
+										<a data-toggle="collapse" href="#widget-category" role="button" aria-expanded="true" aria-controls="widget-category">
+											Category
+										</a>
+									</h3>
+									<div class="collapse show" id="widget-category">
+										<div class="widget-body">
+											<% let uniqueCategories = [...new Set(product.map(p => p.category.name))]; %>
+											<% uniqueCategories.forEach(category => { %>
+												<div class="filter-item">
+													<div class="custom-control custom-checkbox">
+														<input type="checkbox" class="custom-control-input category-filter" id="cat-<%= category %>" value="<%= category %>">
+														<label class="custom-control-label" for="cat-<%= category %>"><%= category %></label>
+													</div>
+												</div>
+											<% }); %>
+										</div>
+									</div>
+								</div>
+						
+								<!-- Color Filter -->
+								<div class="widget widget-collapsible">
+									<h3 class="widget-title">
+										<a data-toggle="collapse" href="#widget-color" role="button" aria-expanded="true" aria-controls="widget-color">
+											Colour
+										</a>
+									</h3>
+									<div class="collapse show" id="widget-color">
+										<div class="widget-body">
+											<% let uniqueColors = [...new Set(product.map(p => p.color))]; %>
+											<% uniqueColors.forEach(color => { %>
+												<div class="filter-item">
+													<div class="custom-control custom-checkbox">
+														<input type="checkbox" class="custom-control-input color-filter" id="color-<%= color %>" value="<%= color %>">
+														<label class="custom-control-label" for="color-<%= color %>"><%= color %></label>
+													</div>
+												</div>
+											<% }); %>
+										</div>
+									</div>
+								</div>
+						
+								<!-- Price Filter -->
+								<div class="widget widget-collapsible">
+									<h3 class="widget-title">Price</h3>
+									<div class="widget-body">
+										<div class="filter-price">
+											<input type="range" id="price-range" class="form-range" min="0" max="5000" step="100" value="2500"
+												oninput="updatePrice(this.value)">
+											<p>Price: ₹<span id="price-value">2500</span></p>
+										</div>
+									</div>
+								</div>
+								</div>
+							</div>
+						</aside>
+						
+						
+						
+                	</div><!-- End .row -->
+                </div><!-- End .container -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+        
+        <%-include("../../views/partials/user/footer")%> 
+        
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+    
+    <!-- Mobile Menu -->
+    
+    <%-include("../../views/partials/user/mobileView")%> 
+
+    <!-- Plugins JS File -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="assets/js/jquery.waypoints.min.js"></script>
+    <script src="assets/js/superfish.min.js"></script>
+    <script src="assets/js/owl.carousel.min.js"></script>
+    <script src="assets/js/wNumb.js"></script>
+    <script src="assets/js/bootstrap-input-spinner.js"></script>
+    <script src="assets/js/jquery.magnific-popup.min.js"></script>
+    <script src="assets/js/nouislider.min.js"></script>
+    <!-- Main JS File -->
+    <script src="assets/js/main.js"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		  
+		  function applyFilters() {
+			const selectedPrice = document.querySelector("#priceFilter").value; // Get price filter value
+		
+			fetch(`/filterPrice?lt=${selectedPrice}`)
+			  .then(response => {
+				if (!response.ok) {
+				  throw new Error("Network response was not ok");
+				}
+				return response.json();
+			  })
+			  .then(data => {
+				if (data.success) {
+				  updateProductList(data.products); // Call function to update UI
+				} else {
+				  console.error("No products found");
+				}
+			  })
+			  .catch(error => console.error("Error filtering products:", error));
+		  }
+		
+		  function updateProductList(products) {
+			const productContainer = document.querySelector("#productContainer"); // Target your product list
+			productContainer.innerHTML = ""; // Clear existing products
+		
+			products.forEach(product => {
+			  const productHTML = `
+				<div class="product-card">
+				  <img src="${product.productImage[0]}" alt="${product.productName}">
+				  <h3>${product.productName}</h3>
+				  <p>Price: ${product.salePrice}</p>
+				</div>
+			  `;
+			  productContainer.innerHTML += productHTML;
+			});
+		  }
+		
+		  // Attach event listener to filter button
+		  const filterBtn = document.querySelector("#applyFilterBtn");
+		  if (filterBtn) {
+			filterBtn.addEventListener("click", applyFilters);
+		  } else {
+			console.error("Filter button not found.");
+		  }
+		});
+
+
+
+
+		//page
+
+		document.addEventListener('DOMContentLoaded', function() {
+    // Get current URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Add event listeners to filter checkboxes
+    const filterCheckboxes = document.querySelectorAll('.category-filter, .color-filter');
+    filterCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            // Preserve current page and add filters
+            urlParams.set('page', '1'); // Reset to first page when filter changes
+            
+            // Get all selected filters
+            const selectedCategories = [...document.querySelectorAll('.category-filter:checked')]
+                .map(cb => cb.value);
+            const selectedColors = [...document.querySelectorAll('.color-filter:checked')]
+                .map(cb => cb.value);
+            
+            if(selectedCategories.length) {
+                urlParams.set('categories', selectedCategories.join(','));
+            } else {
+                urlParams.delete('categories');
+            }
+            
+            if(selectedColors.length) {
+                urlParams.set('colors', selectedColors.join(','));
+            } else {
+                urlParams.delete('colors');
+            }
+            
+            // Update URL and reload page
+            window.location.search = urlParams.toString();
+        });
+    });
+    
+    // Handle price filter
+    const priceRange = document.getElementById('price-range');
+    if(priceRange) {
+        priceRange.addEventListener('change', function() {
+            urlParams.set('page', '1');
+            urlParams.set('maxPrice', this.value);
+            window.location.search = urlParams.toString();
+        });
+    }
+    
+    // Clear all filters
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    if(clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/shop';
+        });
+    }
+});
+		</script>
+		
+</body>
+
+
+
+
+<!-- molla/category.html  22 Nov 2019 10:02:52 GMT -->
+</html>
+
+
+

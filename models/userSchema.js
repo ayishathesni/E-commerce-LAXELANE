@@ -13,7 +13,7 @@ const userSchema=new Schema({
         unique:true,
     },
     phone:{
-        type:String,
+        type:Number,
         required:false,
         unique:false,
         sparse:true,
@@ -21,7 +21,9 @@ const userSchema=new Schema({
     },
     googleId:{
         type:String,
-        unique:true
+        unique:true,
+        index: true,
+        sparse: true,
         },
     password:{
         type:String,
@@ -29,11 +31,11 @@ const userSchema=new Schema({
         },
     isBlocked:{
             type:Boolean,
-            required:false
+            default:false,
         },
     isAdmin:{
             type:Boolean,
-            required:false
+            default:false
         },
     cart:[{
         type:Schema.Types.ObjectId,
@@ -51,10 +53,7 @@ const userSchema=new Schema({
         type:Schema.Types.ObjectId,
         ref:"Order",
     }],
-    createdOn:{
-        type:Date,
-        default:Date.now,
-    },
+    
     referalCode:{
         type:String
     },
@@ -76,9 +75,14 @@ const userSchema=new Schema({
         searchOn:{
             type:Date,
             default:Date.now
-        }
-    }]
-})
+        },
+    },
+],
+},
+    {
+        timestamps: true,
+    }
+);
 
 const User=mongoose.model("User",userSchema);
 
