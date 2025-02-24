@@ -1,0 +1,550 @@
+<%- include("../../views/partials/user/header") %>
+
+<style>
+
+.main {
+    padding: 30px 0;
+    background-color: #fdf7f0;
+    min-height: calc(100vh - 100px);
+}
+
+
+.breadcrumb-nav {
+    background-color: #fff;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.breadcrumb {
+    margin: 0;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: #CC9966;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #b37a50;
+}
+
+
+.dashboard-menu {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.dashboard-menu .nav-link {
+    color: #555;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-menu .nav-link:hover,
+.dashboard-menu .nav-link.active {
+    background-color: #CC9966;
+    color: #fff;
+    transform: translateX(5px);
+}
+
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #CC9966;
+    color: #fff;
+    padding: 15px 20px;
+    border-bottom: none;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+.profile-card {
+    background: linear-gradient(135deg, #CC9966 0%, #b37a50 100%);
+    color: #fff;
+}
+
+.profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    border: 4px solid rgba(255,255,255,0.3);
+}
+
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-pending { background-color: #ffe0b3; color: #995c2d; }
+.status-processing { background-color: #ffcc99; color: #804d26; }
+.status-delivered { background-color: #ffb366; color: #663300; }
+.status-cancelled { background-color: #ff6666; color: #660000; }
+
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-success {
+    background-color: #CC9966;
+    border-color: #CC9966;
+}
+
+.btn-success:hover {
+    background-color: #b37a50;
+    border-color: #b37a50;
+    transform: translateY(-2px);
+}
+
+.address-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.address-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.address-actions {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.modal-dialog {
+    max-width: 500px;
+}
+
+.modal-content {
+    border-radius: 12px;
+}
+
+.modal-header {
+    background-color: #CC9966;
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-header .btn-close {
+    color: white;
+}
+
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .main {
+        padding: 15px 0;
+    }
+    
+    .dashboard-menu {
+        margin-bottom: 20px;
+    }
+}
+</style>
+
+<main class="main">
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"> Home</a></li>
+                <li class="breadcrumb-item active">Dashboard</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar Menu -->
+            <div class="col-lg-3">
+                <div class="dashboard-menu">
+                    <ul class="nav flex-column" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="dashboard-tab" role="tab" href="/userProfile">
+                                My Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="orders-tab" role="tab" href="/orders">
+                                Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="address-tab" role="tab"  href="/addAddress">
+                                Address
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="wallet-tab" role="tab" href="/wallet">
+                                Wallet
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="coupons-tab" role="tab"  href="/coupons">
+                                Coupons
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="/logout">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="tab-content">
+                    <!-- Profile Tab -->
+                    <div class="tab-pane fade show active" id="dashboard">
+                        <div class="card profile-card fade-in">
+                            <div class="card-body text-center">
+                                <% if (userData.avatar) { %>
+                                    <img src="<%= userData.avatar %>" alt="Profile" class="profile-image">
+                                <% } else { %>
+                                    <div class="profile-image d-flex align-items-center justify-content-center bg-light">
+                                        <i class="fas fa-user fa-2x text-muted"></i>
+                                    </div>
+                                <% } %>
+                                <h2 class="mb-3 "><%= userData.name %></h2>
+                                <p class="mb-1 text-white"> <strong>Email: </strong><%= userData.email %></p>
+                                <% if (userData.phone) { %>
+                                    <p class="mb-3 text-white"><strong>Phone: </strong><%= userData.phone %></p>
+                                <% } %>
+                                <div class="mt-4">
+                                    <button class="btn btn-light me-2" onclick="editProfile()">
+                                        Edit Profile
+                                    </button>
+                                    <% if (userData.password && userData.password.trim() !== "") { %>
+                                        <button class="btn btn-light" onclick="changePassword()">
+                                            Change Password
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card text-center fade-in">
+                                    <div class="card-body">
+                                        <h5>Total Orders</h5>
+                                        <h3><%= userData.orderHistory.length %></h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-center fade-in">
+                                    <div class="card-body">
+                                        <h5>Wallet Balance</h5>
+                                        <h3>₹<%= userData.wallet.toFixed(2) %></h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-center fade-in">
+                                    <div class="card-body">
+                                        <h5>Total Users</h5>
+                                        <h3><%= userData.redeemedUsers.length %></h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-3">
+                <form id="editProfileForm">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" value="<%= userData.name %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" value="<%= userData.phone %>">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="saveProfile()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closePasswordModal()" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-3"> 
+                <form id="changePasswordForm">
+                    <div class="mb-3">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" class="form-control" name="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control" name="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" name="confirmPassword" required>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="savePassword()">Update Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+
+// Get modal instances
+// Get modal instances
+const editProfileModal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+const changePasswordModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+
+// Edit Profile Functions
+function editProfile() {
+    editProfileModal.show();
+}
+
+function changePassword() {
+    changePasswordModal.show();
+}
+
+function saveProfile() {
+    const form = document.getElementById('editProfileForm');
+    const formData = new FormData(form);
+    
+    // Create data object
+    const data = {
+        name: formData.get('name'),
+        phone: formData.get('phone')
+    };
+
+    // Validate input
+    if (!data.name || !data.phone) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Please fill in all fields',
+            icon: 'error'
+        });
+        return;
+    }
+
+    // Send request to server
+    fetch('/edit-profile', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            editProfileModal.hide();
+            Swal.fire({
+                title: 'Success',
+                text: 'Profile updated successfully',
+                icon: 'success'
+            }).then(() => {
+                window.location.reload();
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: result.message || 'Failed to update profile',
+                icon: 'error'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'Something went wrong',
+            icon: 'error'
+        });
+    });
+}
+
+function savePassword() {
+    const form = document.getElementById('changePasswordForm');
+    const formData = new FormData(form);
+    
+    // Create data object
+    const data = {
+        currentPassword: formData.get('currentPassword'),
+        newPassword: formData.get('newPassword'),
+        confirmPassword: formData.get('confirmPassword')
+    };
+
+    // Validate input
+    if (!data.currentPassword || !data.newPassword || !data.confirmPassword) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Please fill in all fields',
+            icon: 'error'
+        });
+        return;
+    }
+   
+    if (data.currentPassword === data.newPassword) {
+        Swal.fire({
+            title: 'Error',
+            text: 'New password must be different from current password',
+            icon: 'error'
+        });
+        return;
+    }
+    if (data.newPassword !== data.confirmPassword) {
+        Swal.fire({
+            title: 'Error',
+            text: 'New passwords do not match',
+            icon: 'error'
+        });
+        return;
+    }
+
+    // Send request to server
+    fetch('/update-password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            changePasswordModal.hide();
+            Swal.fire({
+                title: 'Success',
+                text: 'Password updated successfully',
+                icon: 'success'
+            }).then(() => {
+                form.reset();
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: result.message || 'Failed to update password',
+                icon: 'error'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'Something went wrong',
+            icon: 'error'
+        });
+    });
+}
+
+// Add these elements to your error display
+document.addEventListener('DOMContentLoaded', function() {
+    // Add error message elements if they don't exist
+    const editProfileForm = document.getElementById('editProfileForm');
+    if (!document.getElementById('nameError')) {
+        const nameErrorDiv = document.createElement('div');
+        nameErrorDiv.id = 'nameError';
+        nameErrorDiv.className = 'text-danger';
+        editProfileForm.querySelector('[name="name"]').parentNode.appendChild(nameErrorDiv);
+    }
+    if (!document.getElementById('phoneError')) {
+        const phoneErrorDiv = document.createElement('div');
+        phoneErrorDiv.id = 'phoneError';
+        phoneErrorDiv.className = 'text-danger';
+        editProfileForm.querySelector('[name="phone"]').parentNode.appendChild(phoneErrorDiv);
+    }
+    
+    // Add password error element if it doesn't exist
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    if (!document.getElementById('passwordError')) {
+        const passwordErrorDiv = document.createElement('div');
+        passwordErrorDiv.id = 'passwordError';
+        passwordErrorDiv.className = 'text-danger';
+        changePasswordForm.appendChild(passwordErrorDiv);
+    }
+});
+</script>
+<%- include("../../views/partials/user/footer") %>
+</body>
+ 
+</html>

@@ -186,13 +186,22 @@
         .text-center {
             text-align: center;
         }
+        .forgot-password-link{
+            font-size: 0.875rem;
+            color:black;
+            text-decoration: none;
+        }
+        .forgot-password-link:hover{
+            color:blue;
+            text-decoration:underline;
+        }
     </style>
 </head>
 
 <body>
     <div class="login-container">
         <div class="site-logo">
-            <!-- <a href="index.html" class="js-logo-clone">LaxeLane</a> -->
+          
             <img src="/assets/images/logo.png" alt="Molla Logo" width="150px" height="75px">
         </div>
 
@@ -216,7 +225,7 @@
                     <div id="error2" class="error-message"></div>
 
                     <div class="forgot-password">
-                        <a href="forgot-password.html">Forgot Password?</a>
+                        <a href="/forgot-password" class="forgot-password-link ms-auto">Forgot Password?</a>
                     </div>
 
                     <button type="submit" class="login-btn">Login</button>
@@ -289,7 +298,6 @@
             }
         }
 
-        // Add event listeners for form submission
         document.addEventListener('DOMContentLoaded', function () {
             loginform.addEventListener('submit', function (e) {
                 const isEmailValid = emailValidateChecking();

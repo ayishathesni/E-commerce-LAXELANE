@@ -21,71 +21,7 @@ const getProductAddPage = async(req,res)=>{
 }
 
 
-// const addProducts = async(req,res)=>{
-//     try {
-//         const products = req.body;
-//         const productExists = await Product.findOne({
-//             productName:products.productName,
-//         });
 
-//         if(!productExists){
-//             const images = [];
-
-//             if(req.files && req.files.length>0){
-//                 for(let i=0;i<req.files.length;i++){
-//                     const OriginalImagesPath = req.files[i].path;
-
-//                     const resizedImagePath = path.join('public','uploads','product-image',req.files[i].filename);
-//                     await Sharp(OriginalImagesPath).resize({width:440,height:440}).toFile(resizedImagePath);
-//                     images.push(req.files[i].filename);
-
-//                 }
-//             }
-
-//             const categoryId = await Category.findOne({name:products.category});
-//             if(!categoryId){
-//                 return res.status(400).join("Invalid category name")
-//             }
-
-//             // Process size variants
-//             const sizes = JSON.parse(products.sizes); // Expecting sizes as a JSON string from frontend
-//             const formattedSizes = sizes.map(size => ({
-//                 size: size.name, 
-//                 price: size.price, 
-//                 stock: size.stock 
-//             }));
-
-//             const newProduct = new Product({
-//                 productName:products.productName,
-//                 description:products.description,
-//                 brand:products.brand,
-//                 category:categoryId._id,
-//                 regularPrice:products.regularPrice,
-//                 salePrice:products.salePrice,
-//                 sizes: formattedSizes,
-//                 // createdOn:new Date(),
-//                 quantity:products.quantity,
-//                 size:products.size,
-//                 color:products.color,
-//                 productImage:images,
-//                 status:'Available',
-
-//             });
-
-//             await newProduct.save();
-//             return res.redirect("/admin/addProducts");
-//         }else{
-//             return res.status(400).json("Product already exist,please try with another name");
-//         }
-
-
-
-//     } catch (error) {
-//         console.log("Error saving product",error);
-//         return res.redirect("/admin/pageerror")
-        
-//     }
-// }
 
 const addProducts = async (req, res) => {
     try {
@@ -97,7 +33,6 @@ const addProducts = async (req, res) => {
         if (!productExists) {
             const images = [];
 
-            // Handle image processing
             if (req.files && req.files.length > 0) {
                 for (let i = 0; i < req.files.length; i++) {
                     const OriginalImagesPath = req.files[i].path;
@@ -109,20 +44,20 @@ const addProducts = async (req, res) => {
                 }
             }
 
-            // Get category ID
+       
             const categoryId = await Category.findOne({ name: products.category });
             if (!categoryId) {
                 return res.status(400).json({ message: "Invalid category name" });
             }
 
-            // Process sizes data
+         
             let formattedSizes = [];
             if (products.sizes) {
                 try {
                     const sizesData = JSON.parse(products.sizes);
                     formattedSizes = sizesData.map(sizeData => ({
                         size: sizeData.size,
-                        quantity: parseInt(sizeData.quantity) // Changed from stock to quantity to match schema
+                        quantity: parseInt(sizeData.quantity) 
                     }));
                 } catch (error) {
                     console.error("Error parsing sizes:", error);
@@ -133,7 +68,7 @@ const addProducts = async (req, res) => {
                 }
             }
 
-            // Create new product
+          
             const newProduct = new Product({
                 productName: products.productName,
                 description: products.description,
@@ -149,7 +84,7 @@ const addProducts = async (req, res) => {
             console.log|("newproducts nfjrnffnknr",newProduct)
             await newProduct.save();
             
-            // Send success response
+           
             if (req.xhr || req.headers.accept.indexOf('json') > -1) {
                 return res.json({ success: true });
             } else {

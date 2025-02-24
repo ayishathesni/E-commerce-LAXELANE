@@ -2,22 +2,27 @@ const User = require("../models/userSchema")
 
 const userAuth = async (req, res, next) => {
   try {
-    // Allow access to login page without redirecting
     if (req.path === "/login") {
       return next();
     }
 
     if (!req.session.user) {
-      return res.redirect("/login"); // Redirect only if user is not logged in
+      if (req.xhr || req.headers.accept?.includes('application/json')) {
+        return res.status(401).json({
+            success: false,
+            message: 'Please login to continue'
+        });
+    }
+      return res.redirect("/login"); 
     }
 
     const user = await User.findById(req.session.user);
     if (!user || user.isBlocked) {
-      req.session.destroy(); // Destroy session to prevent looping
+      req.session.destroy(); 
       return res.redirect("/login");
     }
 
-    next(); // Proceed if user is valid and not blocked
+    next(); 
   } catch (error) {
     console.error("Error in user auth middleware:", error);
     return res.status(500).send("Internal Server Error");

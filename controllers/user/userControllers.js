@@ -8,29 +8,14 @@ const bcrypt=require("bcrypt");
 
 const pageNotFound=async (req,res)=>{
     try{
-       return res.render("page404");
+       return res.render("user/page404");
     }catch(error){
       res.redirect("/pageNotFound");
     }
 }
 
-// const loadShoppingPage = async (req,res) => {
-//   try {
-//     const user = req.session.user;
-   
 
-//     const product = await Product.find({isBlocked:false}).populate('category')    
-    
-//     res.render("user/shop",{
-//       product:product,
-    
-//       login:user
-//     })
-//   } catch (error) {
-//     res.redirect("/pageNotFound")
-//   }
-  
-// }
+
 
 const loadShoppingPage = async (req, res) => {
   try {

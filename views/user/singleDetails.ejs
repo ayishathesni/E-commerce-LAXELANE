@@ -1,36 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
-<!-- molla/category.html  22 Nov 2019 10:02:48 GMT -->
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>LAXELANE-Lane to your style</title>
     <meta name="keywords" content="HTML5 Template">
-    <meta name="description" content="Molla - Bootstrap eCommerce Template">
-    <meta name="author" content="p-themes">
+    <meta name="description" content="LAXELANE - Fashion eCommerce Template">
+    <meta name="author" content="LAXELANE">
+    
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/icons/favicon-16x16.png">
-    <link rel="manifest" href="/assets/images/icons/site.html">
+    <link rel="manifest" href="/assets/images/icons/site.webmanifest">
     <link rel="mask-icon" href="/assets/images/icons/safari-pinned-tab.svg" color="#666666">
     <link rel="shortcut icon" href="/assets/images/icons/favicon.ico">
-    <meta name="apple-mobile-web-app-title" content="Molla">
-    <meta name="application-name" content="Molla">
-    <meta name="msapplication-TileColor" content="#cc9966">
-    <meta name="msapplication-config" content="assets/images/icons/browserconfig.xml">
-    <meta name="theme-color" content="#ffffff">
-    <!-- Plugins CSS File -->
+    
+    <!-- CSS Files -->
     <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-    <!-- Main CSS File -->
     <link rel="stylesheet" href="/assets/css/jquery.zoom.css">
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/plugins/owl-carousel/owl.carousel.css">
     <link rel="stylesheet" href="/assets/css/plugins/magnific-popup/magnific-popup.css">
     <link rel="stylesheet" href="/assets/css/plugins/nouislider/nouislider.css">
+    
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-zoom/1.7.21/jquery.zoom.min.js"></script>
     
@@ -38,636 +33,1228 @@
         .product-price {
             display: flex;
             align-items: center;
-            gap: 10px; /* Space between prices */
+            gap: 10px;
         }
         
         .current-price {
             font-size: 20px;
             font-weight: bold;
-            color: #e60023; /* Highlighted sale price color */
+            color: #e60023;
         }
         
         .original-price {
             font-size: 16px;
-            color: #777; /* Greyed-out original price */
-            text-decoration: line-through; /* Strikethrough effect */
+            color: #777;
+            text-decoration: line-through;
         }
-        </style>
-        
-    
-</head>
 
+        .imf {
+            overflow: hidden;
+        }
+
+        .imf img {
+            transform: scale(var(--zoom, 1));
+            object-fit: cover;
+            transform-origin: var(--x) var(--y);
+            transition: cubic-bezier(0.18, 0.9, 0.33, 1.01) 1s;
+        }
+
+        .imf:hover {
+            --zoom: 1.8;
+            cursor: crosshair;
+        }
+
+        body::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .product-gallery-item:before {
+            opacity: 0;
+            visibility: hidden !important;
+            border: 0.1rem solid #c96;
+        }
+         
+      
+        
+    </style>
+</head>
 
 <body>
     <div class="page-wrapper">
+        <%- include("../../views/partials/user/header") %>
 
-<%-include("../../views/partials/user/header")%> 
+        <main class="main">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+                <div class="container d-flex align-items-center">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Product Details</li>
+                    </ol>
 
-<main class="main">
-    <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
-        <div class="container d-flex align-items-center">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Home</a></li>
-                <li class="breadcrumb-item"><a href="/shop">shop</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><a href="#">Product Details</a></li>
-            </ol>
+                    <nav class="product-pager ml-auto" aria-label="Product">
+                        <a class="product-pager-link product-pager-prev" href="#" aria-label="Previous" tabindex="-1">
+                            <i class="icon-angle-left"></i>
+                            <span>Prev</span>
+                        </a>
 
-            <nav class="product-pager ml-auto" aria-label="Product">
-                <a class="product-pager-link product-pager-prev" href="#" aria-label="Previous" tabindex="-1">
-                    <i class="icon-angle-left"></i>
-                    <span>Prev</span>
-                </a>
+                        <a class="product-pager-link product-pager-next" href="#" aria-label="Next" tabindex="-1">
+                            <span>Next</span>
+                            <i class="icon-angle-right"></i>
+                        </a>
+                    </nav>
+                </div>
+            </nav>
 
-                <a class="product-pager-link product-pager-next" href="#" aria-label="Next" tabindex="-1">
-                    <span>Next</span>
-                    <i class="icon-angle-right"></i>
-                </a>
-            </nav><!-- End .pager-nav -->
-        </div><!-- End .container -->
-    </nav><!-- End .breadcrumb-nav -->
+            <div class="page-content">
+                <div class="container">
+                    <div class="product-details-top">
+                        <div class="row">
+                            <!-- Product Gallery -->
+                            <div class="col-md-6">
+                                <div class="product-gallery product-gallery-vertical">
+                                    <div class="row">
+                                        <figure class="product-main-image imf">
+                                            <img id="product-zoom" 
+                                                 src="/uploads/re-image/<%= product.productImage[0] %>" 
+                                                 data-zoom-image="/uploads/re-image/<%= product.productImage[0] %>" 
+                                                 alt="<%= product.productName %>">
+                                            
+                                            <a href="#" id="btn-product-gallery" class="btn-product-gallery">
+                                                <i class="icon-arrows"></i>
+                                            </a>
+                                        </figure>
 
-    <div class="page-content">
-        <div class="container">
-            <div class="product-details-top">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="product-gallery product-gallery-vertical">
-                            <div class="row">
-                                <figure class="product-main-image imf">
-                                    <img id="product-zoom" src="/uploads/re-image/<%= product.productImage[0] %>" data-zoom-image="/uploads/re-image/<%= product.productImage[0] %>" alt="product image">
-                                  
-                                    <a href="#" id="btn-product-gallery" class="btn-product-gallery">
-                                        <i class="icon-arrows"></i>
-                                    </a>
-                                   
-                                </figure><!-- End .product-main-image -->
-
-                                <div id="product-zoom-gallery" class="product-image-gallery">
-                                    <a class="product-gallery-item active" href="#" data-image="assets/images/products/single/1.jpg" data-zoom-image="assets/images/products/single/1-big.jpg">
-                                        <img src="/uploads/re-image/<%= product.productImage[0] %>" alt="product side">
-                                    </a>
-
-                                    <a class="product-gallery-item" href="#" data-image="assets/images/products/single/2.jpg" data-zoom-image="assets/images/products/single/2-big.jpg">
-                                        <img src="/uploads/re-image/<%= product.productImage[1] %>" alt="product cross">
-                                    </a>
-
-                                    <a class="product-gallery-item" href="#" data-image="assets/images/products/single/3.jpg" data-zoom-image="assets/images/products/single/3-big.jpg">
-                                        <img src="/uploads/re-image/<%= product.productImage[2] %>" alt="product with model">
-                                    </a>
-
-                                    <a class="product-gallery-item" href="#" data-image="assets/images/products/single/4.jpg" data-zoom-image="assets/images/products/single/4-big.jpg">
-                                        <img src="/uploads/re-image/<%= product.productImage[3] %>" alt="product back">
-                                    </a>
-                                </div><!-- End .product-image-gallery -->
-                            </div><!-- End .row -->
-                        </div><!-- End .product-gallery -->
-                    </div><!-- End .col-md-6 -->
-
-                    <div class="col-md-6">
-                        <div class="product-details">
-                            <h1 class="product-title"><%= product.productName %></h1><!-- End .product-title -->
-                    
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" ></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <!-- <a class="ratings-text" href="#product-review-link" id="review-link">( <%= //product.reviews.length %> Reviews )</a> -->
-                            </div><!-- End .rating-container -->
-                    
-                            <div class="product-price">
-                                <span class="current-price">₹<%=product.salePrice.toLocaleString('en-IN')%></span>
-                                <span class="original-price">₹<%=product.regularPrice.toLocaleString('en-IN')%></span>
-                            </div>
-                    
-                            <div class="product-content">
-                                <p><%= product.description %></p>
-                            </div><!-- End .product-content -->
-                    
-                            <div class="details-filter-row details-row-size">
-
-                                <label>Color:</label>
-                                <div class="product-nav product-nav-thumbs">
-                                <%=product.color%>
-                                </div><!-- End .product-nav -->
-                            </div><!-- End .details-filter-row -->
-                    
-                            <div class="details-filter-row details-row-size">
-                                <label for="size">Size:</label>
-                                <div class="select-custom">
-                                    <select name="size" id="size" class="form-control">
-                                        <option value="#" selected>Select a size</option>
-                                        <% product.sizes.forEach(sizeObj => { %>
-                                            <option value="<%= sizeObj.size %>"><%= sizeObj.size %></option>
-                                        <% }) %>
-                                    </select>
-                                </div><!-- End .select-custom -->
-                                <a href="#" class="size-guide"><i class="icon-th-list"></i> Size Guide</a>
-                            </div><!-- End .details-filter-row -->
-                            
-                            <!-- Quantity Section -->
-                            <div class="details-filter-row details-row-size">
-                                <label for="qty">Qty:</label>
-                                <div class="product-details-quantity">
-                                    <input type="number" id="qty" class="form-control" min="1" max="1" step="1" disabled>
-                                </div><!-- End .product-details-quantity -->
-                                <span id="stock-message" style="color: red;"></span>
-                            </div><!-- End .details-filter-row -->
-                            
-                            <!-- Pass Stock Data -->
-                            <script id="stock-data" type="application/json">
-                                <%- JSON.stringify(
-                                    product.sizes.reduce((acc, sizeObj) => {
-                                        acc[sizeObj.size] = sizeObj.quantity;
-                                        return acc;
-                                    }, {})
-                                ) %>
-                            </script>
-                            
-
-
-
-                            <div class="product-details-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                    
-                                <div class="details-action-wrapper">
-                                    <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
-                                    <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a>
-                                </div><!-- End .details-action-wrapper -->
-                            </div><!-- End .product-details-action -->
-                    
-                            <div class="product-details-footer">
-                                <div class="product-cat">
-                                    <span>Category:</span>
-                                    <a href="#"> <%= product.category %> </a>
-                                </div><!-- End .product-cat -->
-                    
-                                <div class="social-icons social-icons-sm">
-                                    <span class="social-label">Share:</span>
-                                    <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
-                                    <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
-                                    <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
-                                    <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+                                        <div id="product-zoom-gallery" class="product-image-gallery">
+                                            <% product.productImage.forEach((image, index) => { %>
+                                                <a class="product-gallery-item <%= index === 0 ? 'active' : '' %>" 
+                                                   href="#" 
+                                                   data-image="/uploads/re-image/<%= image %>" 
+                                                   data-zoom-image="/uploads/re-image/<%= image %>">
+                                                    <img src="/uploads/re-image/<%= image %>" 
+                                                         alt="<%= product.productName %> view <%= index + 1 %>">
+                                                </a>
+                                            <% }); %>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div><!-- End .product-details-footer -->
-                        </div><!-- End .product-details -->
-                    </div><!-- End .col-md-6 -->
-                    
-                </div><!-- End .row -->
-            </div><!-- End .product-details-top -->
+                            </div>
 
-            <div class="product-details-tab">
-                <ul class="nav nav-pills justify-content-center" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="product-desc-link" data-toggle="tab" href="#product-desc-tab" role="tab" aria-controls="product-desc-tab" aria-selected="true">Description</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="product-info-link" data-toggle="tab" href="#product-info-tab" role="tab" aria-controls="product-info-tab" aria-selected="false">Additional information</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="product-shipping-link" data-toggle="tab" href="#product-shipping-tab" role="tab" aria-controls="product-shipping-tab" aria-selected="false">Shipping & Returns</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="product-review-link" data-toggle="tab" href="#product-review-tab" role="tab" aria-controls="product-review-tab" aria-selected="false">Reviews (2)</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane fade show active" id="product-desc-tab" role="tabpanel" aria-labelledby="product-desc-link">
-                        <div class="product-desc-content">
-                            <h3>Product Information</h3>
-                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede. Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. Aenean dignissim pellentesque felis. Phasellus ultrices nulla quis nibh. Quisque a lectus. Donec consectetuer ligula vulputate sem tristique cursus. </p>
-                            <ul>
-                                <li>Nunc nec porttitor turpis. In eu risus enim. In vitae mollis elit. </li>
-                                <li>Vivamus finibus vel mauris ut vehicula.</li>
-                                <li>Nullam a magna porttitor, dictum risus nec, faucibus sapien.</li>
-                            </ul>
+                            <!-- Product Details -->
+                            <div class="col-md-6">
+                                <div class="product-details">
+                                    <h1 class="product-title"><%= product.productName %></h1>
 
-                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede. Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. Aenean dignissim pellentesque felis. Phasellus ultrices nulla quis nibh. Quisque a lectus. Donec consectetuer ligula vulputate sem tristique cursus. </p>
-                        </div><!-- End .product-desc-content -->
-                    </div><!-- .End .tab-pane -->
-                    <div class="tab-pane fade" id="product-info-tab" role="tabpanel" aria-labelledby="product-info-link">
-                        <div class="product-desc-content">
-                            <h3>Information</h3>
-                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede. Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. </p>
+                                    <div class="ratings-container">
+                                        <div class="ratings">
+                                            <div class="ratings-val"></div>
+                                        </div>
+                                    </div>
 
-                            <h3>Fabric & care</h3>
-                            <ul>
-                                <li>Faux suede fabric</li>
-                                <li>Gold tone metal hoop handles.</li>
-                                <li>RI branding</li>
-                                <li>Snake print trim interior </li>
-                                <li>Adjustable cross body strap</li>
-                                <li> Height: 31cm; Width: 32cm; Depth: 12cm; Handle Drop: 61cm</li>
-                            </ul>
+                                    <div class="product-price">
+                                        <span class="current-price">₹<%= product.salePrice.toLocaleString('en-IN') %></span>
+                                        <span class="original-price">₹<%= product.regularPrice.toLocaleString('en-IN') %></span>
+                                    </div>
 
-                            <h3>Size</h3>
-                            <p>one size</p>
-                        </div><!-- End .product-desc-content -->
-                    </div><!-- .End .tab-pane -->
-                    <div class="tab-pane fade" id="product-shipping-tab" role="tabpanel" aria-labelledby="product-shipping-link">
-                        <div class="product-desc-content">
-                            <h3>Delivery & returns</h3>
-                            <p>We deliver to over 100 countries around the world. For full details of the delivery options we offer, please view our <a href="#">Delivery information</a><br>
-                            We hope you’ll love every purchase, but if you ever need to return an item you can do so within a month of receipt. For full details of how to make a return, please view our <a href="#">Returns information</a></p>
-                        </div><!-- End .product-desc-content -->
-                    </div><!-- .End .tab-pane -->
-                    <div class="tab-pane fade" id="product-review-tab" role="tabpanel" aria-labelledby="product-review-link">
-                        <div class="reviews">
-                            <h3>Reviews (2)</h3>
-                            <div class="review">
-                                <div class="row no-gutters">
-                                    <div class="col-auto">
-                                        <h4><a href="#">Samanta J.</a></h4>
-                                        <div class="ratings-container">
-                                            <div class="ratings">
-                                                <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
-                                            </div><!-- End .ratings -->
-                                        </div><!-- End .rating-container -->
-                                        <span class="review-date">6 days ago</span>
-                                    </div><!-- End .col -->
-                                    <div class="col">
-                                        <h4>Good, perfect size</h4>
+                                    <!-- Color Selection -->
+                                    <div class="details-filter-row details-row-size">
+                                        <label>Color:</label>
+                                        <div class="product-nav product-nav-thumbs">
+                                            <%= product.color %>
+                                        </div>
+                                    </div>
 
-                                        <div class="review-content">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus cum dolores assumenda asperiores facilis porro reprehenderit animi culpa atque blanditiis commodi perspiciatis doloremque, possimus, explicabo, autem fugit beatae quae voluptas!</p>
-                                        </div><!-- End .review-content -->
+                                    <!-- Size Selection -->
+                                    <div class="details-filter-row details-row-size">
+                                        <label for="size">Size:</label>
+                                        <div class="select-custom">
+                                            <select name="size" id="size" class="form-control">
+                                                <option value="" selected>Select a size</option>
+                                                <% product.sizes.forEach(sizeObj => { %>
+                                                    <option value="<%= sizeObj.size %>"><%= sizeObj.size %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                        <a href="#" class="size-guide"><i class="icon-th-list"></i>Size Guide</a>
+                                    </div>
 
-                                        <div class="review-action">
-                                            <a href="#"><i class="icon-thumbs-up"></i>Helpful (2)</a>
-                                            <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a>
-                                        </div><!-- End .review-action -->
-                                    </div><!-- End .col-auto -->
-                                </div><!-- End .row -->
-                            </div><!-- End .review -->
+                                    <!-- Quantity Selection -->
+                                    <div class="details-filter-row details-row-size">
+                                        <label for="qty">Qty:</label>
+                                        <div class="product-details-quantity">
+                                            <input type="number" id="qty" class="form-control" value="1" min="1" max="10" step="1" disabled>
+                                        </div>
+                                        <span id="stock-message" style="color: red;"></span>
+                                    </div>
+                                    <script>
+                                        document.getElementById('qty').addEventListener('input', function () {
+                                            let qty = parseInt(this.value);
+                                            let maxLimit = 10;
+                                    
+                                            if (qty > maxLimit) {
+                                                this.value = maxLimit;
+                                                document.getElementById('stock-message').textContent = "Maximum limit reached!";
+                                            } else {
+                                                document.getElementById('stock-message').textContent = "";
+                                            }
+                                        });
+                                    </script>
+                                  <!-- Stock Data (JSON) -->
+<script id="stock-data" type="application/json">
+    <%- JSON.stringify(
+        product.sizes.reduce((acc, sizeObj) => {
+            acc[sizeObj.size] = sizeObj.quantity;
+            return acc;
+        }, {})
+    ) %>
+</script>
+                                   
+                                    
+                               <div class="details-filter-row details-row-size" >
 
-                            <div class="review">
-                                <div class="row no-gutters">
-                                    <div class="col-auto">
-                                        <h4><a href="#">John Doe</a></h4>
-                                        <div class="ratings-container">
-                                            <div class="ratings">
-                                                <div class="ratings-val" style="width: 100%;"></div><!-- End .ratings-val -->
-                                            </div><!-- End .ratings -->
-                                        </div><!-- End .rating-container -->
-                                        <span class="review-date">5 days ago</span>
-                                    </div><!-- End .col -->
-                                    <div class="col">
-                                        <h4>Very good</h4>
+                                <label for="qty">Stock:</label>
 
-                                        <div class="review-content">
-                                            <p>Sed, molestias, tempore? Ex dolor esse iure hic veniam laborum blanditiis laudantium iste amet. Cum non voluptate eos enim, ab cumque nam, modi, quas iure illum repellendus, blanditiis perspiciatis beatae!</p>
-                                        </div><!-- End .review-content -->
+                                <div class="product-details-quantity">
 
-                                        <div class="review-action">
-                                            <a href="#"><i class="icon-thumbs-up"></i>Helpful (0)</a>
-                                            <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a>
-                                        </div><!-- End .review-action -->
-                                    </div><!-- End .col-auto -->
-                                </div><!-- End .row -->
-                            </div><!-- End .review -->
-                        </div><!-- End .reviews -->
-                    </div><!-- .End .tab-pane -->
-                </div><!-- End .tab-content -->
-            </div><!-- End .product-details-tab -->
+                                    <input type="number" id="stock" class="form-control" value="<%= product.stock %>" disabled>
 
-            <h2 class="title text-center mb-4">You May Also Like</h2><!-- End .title text-center -->
+                                </div><!-- End .product-stock -->
 
-            <div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl" 
-                data-owl-options='{
-                    "nav": false, 
-                    "dots": true,
-                    "margin": 20,
-                    "loop": false,
-                    "responsive": {
-                        "0": {
-                            "items":1
-                        },
-                        "480": {
-                            "items":2
-                        },
-                        "768": {
-                            "items":3
-                        },
-                        "992": {
-                            "items":4
-                        },
-                        "1200": {
-                            "items":4,
-                            "nav": true,
-                            "dots": false
-                        }
-                    }
-                }'>
-                <div class="product product-7 text-center">
-                    <figure class="product-media">
-                        <span class="product-label label-new">New</span>
-                        <a href="product.html">
-                            <img src="assets/images/products/product-4.jpg" alt="Product image" class="product-image">
-                        </a>
+                                </div>
+                                </div>
+                                    <!-- Action Buttons -->
+                                    <div class="product-details-action">
+                                        <!-- <button id="btns" class="btn-product btn-cart" onclick="handleAddToCart()"><span id="crt">add to cart</span>
+                                        </button>    
+                                                    -->
+                                                    <button class="btn-product btn-cart" data-product-id="<%=product._id%>">Add to cart</button>
 
-                        <div class="product-action-vertical">
-                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                            <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
-                        </div><!-- End .product-action-vertical -->
+                                        <div class="details-action-wrapper">
+                                            <a href="/wishlist" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                                        </div>
+                                    </div>
 
-                        <div class="product-action">
-                            <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                        </div><!-- End .product-action -->
-                    </figure><!-- End .product-media -->
+                                    <!-- Product Meta -->
+                                    <div class="product-details-footer">
+                                        <div class="product-cat">
+                                            <span>Category:</span>
+                                            <a href="/category/<%= product.category._id %>"><%= product.category.name %></a>
+                                        </div>
 
-                    <div class="product-body">
-                        <div class="product-cat">
-                            <a href="#">Women</a>
-                        </div><!-- End .product-cat -->
-                        <h3 class="product-title"><a href="product.html">Brown paperbag waist <br>pencil skirt</a></h3><!-- End .product-title -->
-                        <div class="product-price">
-                            $60.00
-                        </div><!-- End .product-price -->
-                        <div class="ratings-container">
-                            <div class="ratings">
-                                <div class="ratings-val" style="width: 20%;"></div><!-- End .ratings-val -->
-                            </div><!-- End .ratings -->
-                            <span class="ratings-text">( 2 Reviews )</span>
-                        </div><!-- End .rating-container -->
+                                        <div class="social-icons social-icons-sm">
+                                            <span class="social-label">Share:</span>
+                                            <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                                            <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                                            <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+                                            <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                        <div class="product-nav product-nav-thumbs">
-                            <a href="#" class="active">
-                                <img src="assets/images/products/product-4-thumb.jpg" alt="product desc">
-                            </a>
-                            <a href="#">
-                                <img src="assets/images/products/product-4-2-thumb.jpg" alt="product desc">
-                            </a>
+                    <!-- Product Description -->
+                    <div class="product-details-tab">
+                        <ul class="nav nav-pills justify-content-center" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="product-desc-link" data-toggle="tab" href="#product-desc-tab" role="tab" aria-controls="product-desc-tab" aria-selected="true">Description</a>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="product-desc-tab" role="tabpanel" aria-labelledby="product-desc-link">
+                                <div class="product-desc-content">
+                                    <h3>Product Information</h3>
+                                    <p><%= product.description %></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                            <a href="#">
-                                <img src="assets/images/products/product-4-3-thumb.jpg" alt="product desc">
-                            </a>
-                        </div><!-- End .product-nav -->
-                    </div><!-- End .product-body -->
-                </div><!-- End .product -->
+                    <!-- Related Products -->
+                    <% if (relatedProducts && relatedProducts.length > 0) { %>
+                        <div class="container">
+                            <h2 class="title text-center mb-4">Related Products</h2>
+                            <div class="owl-carousel owl-theme products-carousel">
+                                <% relatedProducts.forEach(function(relatedProduct) { %>
+                                    <% if (relatedProduct._id.toString() !== product._id.toString()) { %>
+                                        <div class="product">
+                                            <figure class="product-media">
+                                                <a href="/product/<%= relatedProduct._id %>">
+                                                    <img src="/uploads/re-image/<%= relatedProduct.productImage[0] %>" 
+                                                         alt="<%= relatedProduct.productName %>"
+                                                         class="product-image">
+                                                </a>
+                                                <div class="product-action">
+                                                    <button class="btn-product btn-cart" data-product-id="<%= relatedProduct._id %>">
+                                                        <span>Add to Cart</span>
+                                                    </button>
+                                                </div>
+                                            </figure>
+                                            <div class="product-body">
+                                                <div class="product-cat">
+                                                    <a href="/category/<%= relatedProduct.category._id %>">
+                                                        <%= relatedProduct.category.name %>
+                                                    </a>
+                                                </div>
+                                                <h3 class="product-title">
+                                                    <a href="/product/<%= relatedProduct._id %>">
+                                                        <%= relatedProduct.productName %>
+                                                    </a>
+                                                </h3>
+                                                <div class="product-price">
+                                                    <span class="current-price">₹<%= relatedProduct.salePrice.toLocaleString('en-IN') %></span>
+                                                    <span class="original-price">₹<%= relatedProduct.regularPrice.toLocaleString('en-IN') %></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                <% }); %>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </main>
 
-                <div class="product product-7 text-center">
-                    <figure class="product-media">
-                        <span class="product-label label-out">Out of Stock</span>
-                        <a href="product.html">
-                            <img src="assets/images/products/product-6.jpg" alt="Product image" class="product-image">
-                        </a>
+        <%- include("../../views/partials/user/footer") %>
+    </div>
 
-                        <div class="product-action-vertical">
-                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                            <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
-                        </div><!-- End .product-action-vertical -->
-
-                        <div class="product-action">
-                            <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                        </div><!-- End .product-action -->
-                    </figure><!-- End .product-media -->
-
-                    <div class="product-body">
-                        <div class="product-cat">
-                            <a href="#">Jackets</a>
-                        </div><!-- End .product-cat -->
-                        <h3 class="product-title"><a href="product.html">Khaki utility boiler jumpsuit</a></h3><!-- End .product-title -->
-                        <div class="product-price">
-                            <span class="out-price">$120.00</span>
-                        </div><!-- End .product-price -->
-                        <div class="ratings-container">
-                            <div class="ratings">
-                                <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
-                            </div><!-- End .ratings -->
-                            <span class="ratings-text">( 6 Reviews )</span>
-                        </div><!-- End .rating-container -->
-                    </div><!-- End .product-body -->
-                </div><!-- End .product -->
-
-                <div class="product product-7 text-center">
-                    <figure class="product-media">
-                        <span class="product-label label-top">Top</span>
-                        <a href="product.html">
-                            <img src="assets/images/products/product-11.jpg" alt="Product image" class="product-image">
-                        </a>
-
-                        <div class="product-action-vertical">
-                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                            <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
-                        </div><!-- End .product-action-vertical -->
-
-                        <div class="product-action">
-                            <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                        </div><!-- End .product-action -->
-                    </figure><!-- End .product-media -->
-
-                    <div class="product-body">
-                        <div class="product-cat">
-                            <a href="#">Shoes</a>
-                        </div><!-- End .product-cat -->
-                        <h3 class="product-title"><a href="product.html">Light brown studded Wide fit wedges</a></h3><!-- End .product-title -->
-                        <div class="product-price">
-                            $110.00
-                        </div><!-- End .product-price -->
-                        <div class="ratings-container">
-                            <div class="ratings">
-                                <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
-                            </div><!-- End .ratings -->
-                            <span class="ratings-text">( 1 Reviews )</span>
-                        </div><!-- End .rating-container -->
-
-                        <div class="product-nav product-nav-thumbs">
-                            <a href="#" class="active">
-                                <img src="assets/images/products/product-11-thumb.jpg" alt="product desc">
-                            </a>
-                            <a href="#">
-                                <img src="assets/images/products/product-11-2-thumb.jpg" alt="product desc">
-                            </a>
-
-                            <a href="#">
-                                <img src="assets/images/products/product-11-3-thumb.jpg" alt="product desc">
-                            </a>
-                        </div><!-- End .product-nav -->
-                    </div><!-- End .product-body -->
-                </div><!-- End .product -->
-
-                <div class="product product-7 text-center">
-                    <figure class="product-media">
-                        <a href="product.html">
-                            <img src="assets/images/products/product-10.jpg" alt="Product image" class="product-image">
-                        </a>
-
-                        <div class="product-action-vertical">
-                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                            <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
-                        </div><!-- End .product-action-vertical -->
-
-                        <div class="product-action">
-                            <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                        </div><!-- End .product-action -->
-                    </figure><!-- End .product-media -->
-
-                    <div class="product-body">
-                        <div class="product-cat">
-                            <a href="#">Jumpers</a>
-                        </div><!-- End .product-cat -->
-                        <h3 class="product-title"><a href="product.html">Yellow button front tea top</a></h3><!-- End .product-title -->
-                        <div class="product-price">
-                            $56.00
-                        </div><!-- End .product-price -->
-                        <div class="ratings-container">
-                            <div class="ratings">
-                                <div class="ratings-val" style="width: 0%;"></div><!-- End .ratings-val -->
-                            </div><!-- End .ratings -->
-                            <span class="ratings-text">( 0 Reviews )</span>
-                        </div><!-- End .rating-container -->
-                    </div><!-- End .product-body -->
-                </div><!-- End .product -->
-
-                <div class="product product-7 text-center">
-                    <figure class="product-media">
-                        <a href="product.html">
-                            <img src="assets/images/products/product-7.jpg" alt="Product image" class="product-image">
-                        </a>
-
-                        <div class="product-action-vertical">
-                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                            <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
-                        </div><!-- End .product-action-vertical -->
-
-                        <div class="product-action">
-                            <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                        </div><!-- End .product-action -->
-                    </figure><!-- End .product-media -->
-
-                    <div class="product-body">
-                        <div class="product-cat">
-                            <a href="#">Jeans</a>
-                        </div><!-- End .product-cat -->
-                        <h3 class="product-title"><a href="product.html">Blue utility pinafore denim dress</a></h3><!-- End .product-title -->
-                        <div class="product-price">
-                            $76.00
-                        </div><!-- End .product-price -->
-                        <div class="ratings-container">
-                            <div class="ratings">
-                                <div class="ratings-val" style="width: 20%;"></div><!-- End .ratings-val -->
-                            </div><!-- End .ratings -->
-                            <span class="ratings-text">( 2 Reviews )</span>
-                        </div><!-- End .rating-container -->
-                    </div><!-- End .product-body -->
-                </div><!-- End .product -->
-            </div><!-- End .owl-carousel -->
-        </div><!-- End .container -->
-    </div><!-- End .page-content -->
-</main><!-- End .main -->
-   <%-include("../../views/partials/user/footer")%> 
-        
-    </div><!-- End .page-wrapper -->
     <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
-    
-    <!-- Mobile Menu -->
-    
-    <%-include("../../views/partials/user/mobileView")%> 
 
-    <!-- Plugins JS File -->
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/jquery.hoverIntent.min.js"></script>
-    <script src="assets/js/jquery.waypoints.min.js"></script>
-    <script src="assets/js/superfish.min.js"></script>
-    <script src="assets/js/owl.carousel.min.js"></script>
-    <script src="assets/js/wNumb.js"></script>
-    <script src="assets/js/bootstrap-input-spinner.js"></script>
-    <script src="assets/js/jquery.magnific-popup.min.js"></script>
-    <script src="assets/js/nouislider.min.js"></script>
-    <!-- Main JS File -->
-    <script src="assets/js/main.js"></script>
+    <%- include("../../views/partials/user/mobileView") %>
+
+    <!-- Scripts -->
+    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="/assets/js/jquery.waypoints.min.js"></script>
+    <script src="/assets/js/superfish.min.js"></script>
+    <script src="/assets/js/owl.carousel.min.js"></script>
+    <script src="/assets/js/wNumb.js"></script>
+    <script src="/assets/js/bootstrap-input-spinner.js"></script>
+    <script src="/assets/js/jquery.magnific-popup.min.js"></script>
+    <script src="/assets/js/nouislider.min.js"></script>
+
+   <!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <script>
-       
+        document.addEventListener("DOMContentLoaded", function() {
+    // Initialize variables
+    const stockData = JSON.parse(document.getElementById('stock-data')?.textContent || '{}');
+    const sizeSelect = document.getElementById('size');
+    const qtyInput = document.getElementById('qty');
+    const stockInput = document.getElementById('stock');
+    const stockMessage = document.getElementById('stock-message');
+    const MAX_PURCHASE_LIMIT = 10;
 
-       document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("size").addEventListener("change", function () {
-        let selectedSize = this.value;
-
-        // Get the stock data from the EJS template
-        let stockData = JSON.parse(document.getElementById("stock-data").textContent); // Get JSON data
-
-        let qtyInput = document.getElementById("qty");
-        let stockMessage = document.getElementById("stock-message");
-
-        if (stockData[selectedSize] > 0) {
-            qtyInput.value = 1;
-            qtyInput.max = stockData[selectedSize];
-            qtyInput.disabled = false;
-            stockMessage.textContent = ""; // Clear out-of-stock message
-        } else {
-            qtyInput.value = 0;
-            qtyInput.disabled = true;
-            stockMessage.textContent = "Selected size is out of stock!";
+    // Product carousel initialization
+    if (typeof jQuery !== 'undefined' && typeof jQuery.fn.owlCarousel !== 'undefined') {
+        const carouselElement = $('.products-carousel');
+        if (carouselElement.length > 0) {
+            carouselElement.owlCarousel({
+                loop: true,
+                margin: 20,
+                nav: true,
+                navText: ['<i class="icon-angle-left"></i>', '<i class="icon-angle-right"></i>'],
+                dots: false,
+                responsive: {
+                    0: { items: 1 },
+                    576: { items: 2 },
+                    992: { items: 3 },
+                    1200: { items: 4 }
+                },
+                autoplay: false
+            });
         }
+    }
+
+    // Helper function for showing alerts
+    function showAlert(title, text, icon = "warning") {
+        return Swal.fire({
+            title,
+            text,
+            icon,
+            confirmButtonColor: "#3085d6",
+            showConfirmButton: true
+        });
+    }
+
+    // Size selection handler
+    sizeSelect?.addEventListener('change', function() {
+        const selectedSize = this.value;
+        const availableStock = stockData[selectedSize] || 0;
+
+        if (stockInput) stockInput.value = availableStock;
+
+        if (availableStock > 0) {
+            qtyInput.disabled = false;
+            qtyInput.max = Math.min(availableStock, MAX_PURCHASE_LIMIT);
+            qtyInput.value = 1;
+            stockMessage.textContent = "";
+        } else {
+            qtyInput.disabled = true;
+            qtyInput.value = 0;
+            stockMessage.textContent = "Out of stock!";
+        }
+    });
+
+    // Quantity input handler
+    qtyInput?.addEventListener('input', function() {
+        if (!sizeSelect.value) {
+            showAlert("Size Required", "Please select a size first", "error");
+            this.value = 0;
+            return;
+        }
+
+        let qty = parseInt(this.value) || 0;
+        const selectedSize = sizeSelect.value;
+        const availableStock = stockData[selectedSize] || 0;
+
+        if (qty > MAX_PURCHASE_LIMIT) {
+            this.value = MAX_PURCHASE_LIMIT;
+            showAlert("Purchase Limit", `Maximum ${MAX_PURCHASE_LIMIT} items per order`);
+            qty = MAX_PURCHASE_LIMIT;
+        } else if (qty > availableStock) {
+            this.value = availableStock;
+            showAlert("Stock Limit", `Only ${availableStock} items available`);
+            qty = availableStock;
+        }
+
+        if (stockMessage) {
+            stockMessage.textContent = qty === MAX_PURCHASE_LIMIT ? "Maximum purchase limit reached!" :
+                                     qty === availableStock ? "Maximum available stock reached!" : "";
+        }
+    });
+
+    // Add to cart handler
+    // async function handleAddToCart(productId, selectedSize, quantity) {
+    //     try {
+    //         // Validation checks
+    //         if (!selectedSize) {
+    //             throw new Error("Please select a size");
+    //         }
+
+    //         if (!quantity || quantity === 0) {
+    //             throw new Error("Please select a valid quantity");
+    //         }
+
+    //         const availableStock = stockData[selectedSize] || 0;
+    //         if (quantity > availableStock) {
+    //             throw new Error(`Only ${availableStock} items available in stock`);
+    //         }
+
+    //         if (quantity > MAX_PURCHASE_LIMIT) {
+    //             throw new Error(`Maximum ${MAX_PURCHASE_LIMIT} items per order`);
+    //         }
+
+    //         const response = await fetch('/add-to-cart', {
+    //             console.log("this is the response",response),
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Accept': 'application/json'
+    //             },
+    //             body: JSON.stringify({ productId, size: selectedSize, quantity })
+                
+    //         });
+
+    //         if (!response.ok) {
+    //             throw new Error('Failed to add item to cart');
+    //         }
+
+    //         const data = await response.json();
+
+    //         if (data.success) {
+    //             showAlert("Success", "Item added to cart", "success");
+                
+    //             // Update cart count if available
+    //             const cartCount = document.querySelector('.cart-count');
+    //             if (cartCount && data.cartCount) {
+    //                 cartCount.textContent = data.cartCount;
+    //             }
+    //         } else if (data.exist) {
+    //             showAlert("Notice", "Item already in cart", "info");
+    //         } else {
+    //             throw new Error(data.message || 'Failed to add item to cart');
+    //         }
+
+    //     } catch (error) {
+    //         showAlert("Error", error.message, "error");
+    //         console.error('Add to cart error:', error);
+    //     }
+    // }
+
+    // // Add click handlers to all add-to-cart buttons
+    // document.querySelectorAll('.btn-cart').forEach(button => {
+    //     button.addEventListener('click', function(e) {
+    //         e.preventDefault();
+    //         const productId = this.dataset.productId;
+    //         const selectedSize = sizeSelect?.value;
+    //         const quantity = parseInt(qtyInput?.value) || 0;
+    //         handleAddToCart(productId, selectedSize, quantity);
+    //     });
+    // });
+
+    async function handleAddToCart(productId, selectedSize, quantity) {
+    try {
+        // Validation checks
+        if (!selectedSize) {
+            throw new Error("Please select a size");
+        }
+
+        if (!quantity || quantity === 0) {
+            throw new Error("Please select a valid quantity");
+        }
+
+        const availableStock = stockData[selectedSize] || 0;
+        if (quantity > availableStock) {
+            throw new Error(`Only ${availableStock} items available in stock`);
+        }
+
+        if (quantity > MAX_PURCHASE_LIMIT) {
+            throw new Error(`Maximum ${MAX_PURCHASE_LIMIT} items per order`);
+        }
+
+        const response = await fetch('/add-to-cart', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ productId, size: selectedSize, quantity })
+});
+
+// Ensure the response is read only once
+const responseText = await response.text();
+console.log("Fetch response status:", response.status);
+console.log("Fetch response text:", responseText);
+
+let data;
+try {
+    data = JSON.parse(responseText); // Parse manually since we already read it as text
+} catch (e) {
+    throw new Error("Invalid JSON response from server");
+}
+
+if (!response.ok) {
+    throw new Error(data.message || 'Failed to add item to cart');
+}
+
+if (data.success) {
+    showAlert("Success", "Item added to cart", "success");
+
+    const cartCount = document.querySelector('.cart-count');
+    if (cartCount && data.cartCount) {
+        cartCount.textContent = data.cartCount;
+    }
+} else if (data.exist) {
+    showAlert("Notice", "Item already in cart", "info");
+} else {
+    throw new Error(data.message || 'Failed to add item to cart');
+}
+
+    } catch (error) {
+        showAlert("Error", error.message, "error");
+        console.error('Add to cart error:', error);
+    }
+}
+
+// Make the function accessible globally
+window.handleAddToCart = handleAddToCart;
+
+// Add click handlers to all add-to-cart buttons
+document.querySelectorAll('.btn-cart').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const productId = this.dataset.productId;
+        const selectedSize = sizeSelect?.value;
+        const quantity = parseInt(qtyInput?.value) || 0;
+        handleAddToCart(productId, selectedSize, quantity);
     });
 });
 
-        const elem = document.querySelector('.imf');
 
-        let x, y, height, width;
-        elem.onmouseenter = () => {
+    // Image zoom functionality
+    const imageContainer = document.querySelector('.imf');
+    if (imageContainer) {
+        let x, y, width, height;
 
-            const size = elem.getBoundingClientRect();
+        imageContainer.addEventListener('mouseenter', () => {
+            const size = imageContainer.getBoundingClientRect();
             x = size.x;
             y = size.y;
             width = size.width;
             height = size.height;
-
-        }
-
-        elem.onmousemove = e => {
-
-            const horizontel = (e.clientX - x) / width * 100;
-            const vertical = (e.clientY - y) / height * 100;
-            console.log(vertical);
-
-            elem.style.setProperty('--x', horizontel + '%')
-            elem.style.setProperty('--y', vertical + '%')
-            console.log(elem);
-        }
-
-        const thumbnails = document.querySelectorAll('.product-image-gallery .product-gallery-item img');
-
-        thumbnails.forEach(thumbnail => {
-
-            thumbnail.addEventListener('click', changeMainImage);
-
         });
-        
-        function changeMainImage(event) {
 
+        imageContainer.addEventListener('mousemove', (e) => {
+            const horizontal = ((e.clientX - x) / width) * 100;
+            const vertical = ((e.clientY - y) / height) * 100;
+            imageContainer.style.setProperty('--x', `${horizontal}%`);
+            imageContainer.style.setProperty('--y', `${vertical}%`);
+        });
+    }
+
+    // Thumbnail gallery
+    const thumbnails = document.querySelectorAll('.product-image-gallery .product-gallery-item img');
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', (e) => {
+            e.preventDefault();
             const mainImage = document.querySelector('.product-main-image img');
+            const newSrc = e.target.src;
+            
+            mainImage.src = newSrc;
+            mainImage.setAttribute('data-zoom-image', newSrc);
 
-            mainImage.src = event.target.src;
+            thumbnails.forEach(thumb => {
+                thumb.parentElement.classList.remove('active');
+            });
+            e.target.parentElement.classList.add('active');
+        });
+    });
+});
+//         document.addEventListener("DOMContentLoaded", function() {
+           
+//             if (typeof jQuery !== 'undefined' && typeof jQuery.fn.owlCarousel !== 'undefined') {
+//                 const carouselElement = $('.products-carousel');
+                
+//                 if (carouselElement.length > 0) {
+//                     carouselElement.owlCarousel({
+//                         loop: true,
+//                         margin: 20,
+//                         nav: true,
+//                         navText: ['<i class="icon-angle-left"></i>', '<i class="icon-angle-right"></i>'],
+//                         dots: false,
+//                         responsive: {
+//                             0: { items: 1 },
+//                             576: { items: 2 },
+//                             992: { items: 3 },
+//                             1200: { items: 4 }
+//                         },
+//                         autoplay: false
+//                     });
+                
+//                 }
+//             }
 
-        }
-        
+//             // Size and Stock Management
+//             const sizeSelect = document.getElementById("size");
+//             if (sizeSelect) {
+//                 sizeSelect.addEventListener("change", function() {
+//                     const selectedSize = this.value;
+//                     const stockData = JSON.parse(document.getElementById("stock-data").textContent);
+//                     const qtyInput = document.getElementById("qty");
+//                     const stockMessage = document.getElementById("stock-message");
+
+//                     if (stockData[selectedSize] > 0) {
+//                         qtyInput.value = 1;
+//                         qtyInput.max = stockData[selectedSize];
+//                         qtyInput.disabled = false;
+//                         stockMessage.textContent = "";
+//                     } else {
+//                         qtyInput.value = 0;
+//                         qtyInput.disabled = true;
+//                         stockMessage.textContent = "Selected size is out of stock!";
+//                     }
+//                 });
+//             }
+
+//             // Image Zoom Functionality
+//             const imageContainer = document.querySelector('.imf');
+//             if (imageContainer) {
+//                 let x, y, width, height;
+
+//                 imageContainer.addEventListener('mouseenter', () => {
+//                     const size = imageContainer.getBoundingClientRect();
+//                     x = size.x;
+//                     y = size.y;
+//                     width = size.width;
+//                     height = size.height;
+//                 });
+
+//                 imageContainer.addEventListener('mousemove', (e) => {
+//                     const horizontal = ((e.clientX - x) / width) * 100;
+//                     const vertical = ((e.clientY - y) / height) * 100;
+                    
+//                     imageContainer.style.setProperty('--x', `${horizontal}%`);
+//                     imageContainer.style.setProperty('--y', `${vertical}%`);
+//                 });
+//             }
+
+//             // Thumbnail Gallery
+//             const thumbnails = document.querySelectorAll('.product-image-gallery .product-gallery-item img');
+//             thumbnails.forEach(thumbnail => {
+//                 thumbnail.addEventListener('click', (event) => {
+//                     event.preventDefault();
+//                     const mainImage = document.querySelector('.product-main-image img');
+//                     const newSrc = event.target.src;
+                    
+//                     // Update main image
+//                     mainImage.src = newSrc;
+//                     mainImage.setAttribute('data-zoom-image', newSrc);
+
+//                     // Update active state
+//                     thumbnails.forEach(thumb => {
+//                         thumb.parentElement.classList.remove('active');
+//                     });
+//                     event.target.parentElement.classList.add('active');
+//                 });
+//             });
+
+//             // Cart Functionality
+//             const addToCartButton = document.querySelector('.btn-cart');
+//             if (addToCartButton) {
+//                 addToCartButton.addEventListener('click', async (e) => {
+//                     e.preventDefault();
+                    
+//                     const productId = addToCartButton.dataset.productId;
+//                     const selectedSize = document.getElementById('size').value;
+//                     const quantity = parseInt(document.getElementById('qty').value);
+
+//                     if (!selectedSize) {
+//                         alert('Please select a size');
+//                         return;
+//                     }
+
+//                     if (!quantity || quantity < 1) {
+//                         alert('Please select a valid quantity');
+//                         return;
+//                     }
+
+//                     try {
+//                         const response = await fetch('/cart/add', {
+//                             method: 'POST',
+//                             headers: {
+//                                 'Content-Type': 'application/json'
+//                             },
+//                             body: JSON.stringify({
+//                                 productId,
+//                                 size: selectedSize,
+//                                 quantity
+//                             })
+//                         });
+
+//                         const data = await response.json();
+//                         if (data.success) {
+//                             alert('Product added to cart successfully!');
+                         
+//                             const cartCount = document.querySelector('.cart-count');
+//                             if (cartCount) {
+//                                 cartCount.textContent = data.cartCount;
+//                             }
+//                         } else {
+//                             alert(data.message || 'Failed to add product to cart');
+//                         }
+//                     } catch (error) {
+//                         console.error('Error adding to cart:', error);
+//                         alert('Failed to add product to cart');
+//                     }
+//                 });
+//             }
+//         });
+
+//         //cart
+//      // Add to Cart functionality
+// document.addEventListener('DOMContentLoaded', () => {
+//     document.querySelectorAll('.btn-cart').forEach(button => {
+//         button.addEventListener('click', async (e) => {
+//             e.preventDefault();
+            
+//             const productId = button.dataset.productId;
+//             const selectedSize = document.getElementById('size')?.value;
+//             const quantity = parseInt(document.getElementById('qty')?.value) || 1;
+
+//             // Validate size selection
+//             if (!selectedSize) {
+//                 Swal.fire({
+//                     title: "Size Required",
+//                     text: "Please select a size before adding to cart",
+//                     icon: "warning",
+//                     confirmButtonColor: "#3085d6"
+//                 });
+//                 return;
+//             }
+
+//             // Validate quantity
+//             if (!quantity || quantity < 1) {
+//                 Swal.fire({
+//                     title: "Invalid Quantity",
+//                     text: "Please select a valid quantity",
+//                     icon: "warning",
+//                     confirmButtonColor: "#3085d6"
+//                 });
+//                 return;
+//             }
+
+//             try {
+//                 const response = await fetch('/add-to-cart', {
+//                     method: 'POST',
+//                     headers: { 'Content-Type': 'application/json' },
+//                     body: JSON.stringify({ productId, size: selectedSize, quantity })
+//                 });
+
+//                 const data = await response.json();
+
+//                 // Show appropriate SweetAlert based on response
+//                 if (data.alert) {
+//                     Swal.fire({
+//                         title: data.alert.title,
+//                         text: data.alert.text,
+//                         icon: data.alert.icon,
+//                         confirmButtonColor: "#3085d6",
+//                         timer: data.success ? 2000 : undefined,
+//                         timerProgressBar: data.success
+//                     });
+
+//                     // Update cart count if success
+//                     if (data.success) {
+//                         const cartCount = document.querySelector('.cart-count');
+//                         if (cartCount) {
+//                             cartCount.textContent = data.cartCount;
+//                         }
+//                     }
+//                 }
+//             } catch (error) {
+//                 console.error('Error:', error);
+//                 Swal.fire({
+//                     title: "Error",
+//                     text: "Something went wrong! Please try again.",
+//                     icon: "error",
+//                     confirmButtonColor: "#3085d6"
+//                 });
+//             }
+//         });
+//     });
+// });
+
+// // Stock validation with SweetAlert
+// function validateStock(quantity, availableStock, maxPurchaseLimit) {
+//     if (quantity > maxPurchaseLimit) {
+//         Swal.fire({
+//             title: "Purchase Limit Exceeded",
+//             text: `You can only purchase up to ${maxPurchaseLimit} items per order`,
+//             icon: "warning",
+//             confirmButtonColor: "#3085d6"
+//         });
+//         return false;
+//     }
+    
+//     if (quantity > availableStock) {
+//         Swal.fire({
+//             title: "Insufficient Stock",
+//             text: `Only ${availableStock} items available in stock`,
+//             icon: "warning",
+//             confirmButtonColor: "#3085d6"
+//         });
+//         return false;
+//     }
+    
+//     return true;
+// }
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     // Stock management initialization
+//     const stockData = JSON.parse(document.getElementById('stock-data').textContent);
+//     const sizeSelect = document.getElementById('size');
+//     const qtyInput = document.getElementById('qty');
+//     const stockInput = document.getElementById('stock');
+//     const stockMessage = document.getElementById('stock-message');
+//     const MAX_PURCHASE_LIMIT = 10;
+
+//     function showStockAlert(message, icon = "warning") {
+//         Swal.fire({
+//             title: icon === "error" ? "Error" : "Warning",
+//             text: message,
+//             icon: icon,
+//             confirmButtonColor: "#3085d6"
+//         });
+//     }
+
+//     // Size selection handler
+//     sizeSelect?.addEventListener('change', function() {
+//         let selectedSize = sizeSelect.value;
+//         let availableStock = stockData[selectedSize] || 0;
+
+//         stockInput.value = availableStock;
+
+//         if (availableStock > 0) {
+//             qtyInput.disabled = false;
+//             qtyInput.max = Math.min(availableStock, MAX_PURCHASE_LIMIT);
+//             qtyInput.value = 1;
+//             stockMessage.textContent = "";
+//         } else {
+//             qtyInput.disabled = true;
+//             qtyInput.value = 0;
+//             stockMessage.textContent = "Out of stock!";
+//         }
+//     });
+
+//     // Quantity input handler
+//     qtyInput?.addEventListener('input', function() {
+//         if (!sizeSelect.value) {
+//             showStockAlert("Please select a size first", "error");
+//             this.value = 0;
+//             return;
+//         }
+
+//         let qty = parseInt(this.value) || 0;
+//         let selectedSize = sizeSelect.value;
+//         let availableStock = stockData[selectedSize] || 0;
+
+//         if (qty > MAX_PURCHASE_LIMIT) {
+//             this.value = MAX_PURCHASE_LIMIT;
+//             showStockAlert(`You can only purchase up to ${MAX_PURCHASE_LIMIT} items per order.`);
+//         } else if (qty > availableStock) {
+//             this.value = availableStock;
+//             showStockAlert(`Only ${availableStock} items available in stock.`);
+//         }
+
+//         stockMessage.textContent = qty === MAX_PURCHASE_LIMIT ? "Maximum purchase limit reached!" :
+//                                  qty === availableStock ? "Maximum available stock reached!" : "";
+//     });
+
+//     // Add to cart functionality
+//     document.querySelectorAll('.btn-cart').forEach(button => {
+//         button.addEventListener('click', async (e) => {
+//             e.preventDefault();
+            
+//             const productId = button.dataset.productId;
+//             const selectedSize = sizeSelect?.value;
+//             const quantity = parseInt(qtyInput?.value) || 0;
+//             const availableStock = stockData[selectedSize] || 0;
+
+//             // Validation checks
+//             if (!selectedSize) {
+//                 showStockAlert("Please select a size before adding to cart.", "error");
+//                 return;
+//             }
+
+//             if (quantity === 0) {
+//                 showStockAlert("Please select a valid quantity.", "error");
+//                 return;
+//             }
+
+//             if (quantity > availableStock) {
+//                 showStockAlert(`Only ${availableStock} items available in stock.`, "error");
+//                 return;
+//             }
+
+//             if (quantity > MAX_PURCHASE_LIMIT) {
+//                 showStockAlert(`You can only purchase up to ${MAX_PURCHASE_LIMIT} items per order.`, "error");
+//                 return;
+//             }
+
+//             try {
+//                 const response = await fetch('/add-to-cart', {
+//                     method: 'POST',
+//                     headers: { 'Content-Type': 'application/json' },
+//                     body: JSON.stringify({ productId, size: selectedSize, quantity })
+//                 });
+
+//                 const data = await response.json();
+
+//                 if (data.alert) {
+//                     Swal.fire({
+//                         title: data.alert.title,
+//                         text: data.alert.text,
+//                         icon: data.alert.icon,
+//                         confirmButtonColor: "#3085d6",
+//                         timer: data.success ? 2000 : undefined,
+//                         timerProgressBar: data.success
+//                     });
+
+//                     if (data.success) {
+//                         const cartCount = document.querySelector('.cart-count');
+//                         if (cartCount) {
+//                             cartCount.textContent = data.cartCount;
+//                         }
+//                     }
+//                 }
+//             } catch (error) {
+//                 console.error('Error:', error);
+//                 showStockAlert("Something went wrong! Please try again.", "error");
+//             }
+//         });
+//     });
+// });
+//     const stockData = JSON.parse(document.getElementById('stock-data').textContent);
+//     const sizeSelect = document.getElementById('size');
+//     const qtyInput = document.getElementById('qty');
+//     const stockInput = document.getElementById('stock');
+//     const stockMessage = document.getElementById('stock-message');
+//     const cartButton = document.querySelector('.btn-cart');
+//     const MAX_PURCHASE_LIMIT = 10;
+
+//     function showStockAlert(message, availableStock) {
+//         Swal.fire({
+//             icon: "warning",
+//             title: "Purchase Limit Reached",
+//             text: message,
+//             confirmButtonColor: "#d33",
+//             showConfirmButton: true
+//         });
+//     }
+
+//     sizeSelect.addEventListener('change', function () {
+//         let selectedSize = sizeSelect.value;
+//         let availableStock = stockData[selectedSize] || 0;
+
+//         stockInput.value = availableStock;
+
+//         if (availableStock > 0) {
+//             qtyInput.disabled = false;
+//             // Set max to either stock limit or purchase limit, whichever is lower
+//             qtyInput.max = Math.min(availableStock, MAX_PURCHASE_LIMIT);
+//             qtyInput.value = 1;
+//             stockMessage.textContent = "";
+//         } else {
+//             qtyInput.disabled = true;
+//             qtyInput.value = 0;
+//             stockMessage.textContent = "Out of stock!";
+//         }
+//     });
+
+//     qtyInput.addEventListener('input', function () {
+//         if (!sizeSelect.value) {
+//             Swal.fire({
+//                 icon: "error",
+//                 title: "Size Not Selected",
+//                 text: "Please select a size first",
+//                 confirmButtonColor: "#d33"
+//             });
+//             this.value = 0;
+//             return;
+//         }
+
+//         let qty = parseInt(this.value) || 0;
+//         let selectedSize = sizeSelect.value;
+//         let availableStock = stockData[selectedSize] || 0;
+
+//         // Check against both MAX_PURCHASE_LIMIT and available stock
+//         if (qty > MAX_PURCHASE_LIMIT) {
+//             this.value = MAX_PURCHASE_LIMIT;
+//             showStockAlert(`You can only purchase up to ${MAX_PURCHASE_LIMIT} items per order.`, availableStock);
+//         } else if (qty > availableStock) {
+//             this.value = availableStock;
+//             showStockAlert(`Only ${availableStock} items available in stock.`, availableStock);
+//         }
+
+//         // Update stock message
+//         if (qty === MAX_PURCHASE_LIMIT) {
+//             stockMessage.textContent = "Maximum purchase limit reached!";
+//         } else if (qty === availableStock) {
+//             stockMessage.textContent = "Maximum available stock reached!";
+//         } else {
+//             stockMessage.textContent = "";
+//         }
+//     });
+
+//     cartButton.addEventListener('click', async (e) => {
+//         e.preventDefault();
+
+//         const selectedSize = sizeSelect.value;
+//         const quantity = parseInt(qtyInput.value) || 0;
+//         const availableStock = stockData[selectedSize] || 0;
+
+//         if (!selectedSize) {
+//             Swal.fire({
+//                 icon: "error",
+//                 title: "Size Not Selected",
+//                 text: "Please select a size before adding to cart.",
+//                 confirmButtonColor: "#d33"
+//             });
+//             return;
+//         }
+
+//         if (quantity === 0) {
+//             Swal.fire({
+//                 icon: "error",
+//                 title: "Invalid Quantity",
+//                 text: "Please select a valid quantity.",
+//                 confirmButtonColor: "#d33"
+//             });
+//             return;
+//         }
+
+//         if (quantity > availableStock) {
+//             Swal.fire({
+//                 icon: "error",
+//                 title: "Not Enough Stock",
+//                 text: `Only ${availableStock} items available in stock.`,
+//                 confirmButtonColor: "#d33"
+//             });
+//             return;
+//         }
+
+//         if (quantity > MAX_PURCHASE_LIMIT) {
+//             Swal.fire({
+//                 icon: "error",
+//                 title: "Purchase Limit Exceeded",
+//                 text: `You can only purchase up to ${MAX_PURCHASE_LIMIT} items per order.`,
+//                 confirmButtonColor: "#d33"
+//             });
+//             return;
+//         }
+
+//         // Proceed with your existing add to cart logic here
+//     });
+
+
+//     // Define the addCart function globally
+// function addCart(event, productId) {
+//     event.preventDefault();
+    
+//     const button = event.target.closest('.btn-cart');
+//     if (!button) return;
+
+//     const sizeSelect = document.getElementById('size');
+//     const qtyInput = document.getElementById('qty');
+//     const selectedSize = sizeSelect?.value;
+//     const quantity = parseInt(qtyInput?.value) || 0;
+
+//     handleAddToCart(productId, selectedSize, quantity);
+// }
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     // Stock management initialization
+//     const stockData = JSON.parse(document.getElementById('stock-data')?.textContent || '{}');
+//     const sizeSelect = document.getElementById('size');
+//     const qtyInput = document.getElementById('qty');
+//     const stockInput = document.getElementById('stock');
+//     const stockMessage = document.getElementById('stock-message');
+//     const MAX_PURCHASE_LIMIT = 10;
+
+//     function showStockAlert(message, icon = "warning") {
+//         Swal.fire({
+//             title: icon === "error" ? "Error" : "Warning",
+//             text: message,
+//             icon: icon,
+//             confirmButtonColor: "#3085d6"
+//         });
+//     }
+
+//     // Size selection handler
+//     sizeSelect?.addEventListener('change', function() {
+//         let selectedSize = sizeSelect.value;
+//         let availableStock = stockData[selectedSize] || 0;
+
+//         if (stockInput) stockInput.value = availableStock;
+
+//         if (availableStock > 0) {
+//             qtyInput.disabled = false;
+//             qtyInput.max = Math.min(availableStock, MAX_PURCHASE_LIMIT);
+//             qtyInput.value = 1;
+//             if (stockMessage) stockMessage.textContent = "";
+//         } else {
+//             qtyInput.disabled = true;
+//             qtyInput.value = 0;
+//             if (stockMessage) stockMessage.textContent = "Out of stock!";
+//         }
+//     });
+
+//     // Quantity input handler
+//     qtyInput?.addEventListener('input', function() {
+//         if (!sizeSelect.value) {
+//             showStockAlert("Please select a size first", "error");
+//             this.value = 0;
+//             return;
+//         }
+
+//         let qty = parseInt(this.value) || 0;
+//         let selectedSize = sizeSelect.value;
+//         let availableStock = stockData[selectedSize] || 0;
+
+//         if (qty > MAX_PURCHASE_LIMIT) {
+//             this.value = MAX_PURCHASE_LIMIT;
+//             showStockAlert(`You can only purchase up to ${MAX_PURCHASE_LIMIT} items per order.`);
+//         } else if (qty > availableStock) {
+//             this.value = availableStock;
+//             showStockAlert(`Only ${availableStock} items available in stock.`);
+//         }
+
+//         if (stockMessage) {
+//             stockMessage.textContent = qty === MAX_PURCHASE_LIMIT ? "Maximum purchase limit reached!" :
+//                                      qty === availableStock ? "Maximum available stock reached!" : "";
+//         }
+//     });
+// });
+
+// // Separated add to cart handling function
+// async function handleAddToCart(productId, selectedSize, quantity) {
+//     const stockData = JSON.parse(document.getElementById('stock-data')?.textContent || '{}');
+//     const availableStock = stockData[selectedSize] || 0;
+//     const MAX_PURCHASE_LIMIT = 10;
+
+//     function showStockAlert(message, icon = "warning") {
+//         Swal.fire({
+//             title: icon === "error" ? "Error" : "Warning",
+//             text: message,
+//             icon: icon,
+//             confirmButtonColor: "#3085d6"
+//         });
+//     }
+
+//     // Validation checks
+//     if (!selectedSize) {
+//         showStockAlert("Please select a size before adding to cart.", "error");
+//         return;
+//     }
+
+//     if (!quantity || quantity === 0) {
+//         showStockAlert("Please select a valid quantity.", "error");
+//         return;
+//     }
+
+//     if (quantity > availableStock) {
+//         showStockAlert(`Only ${availableStock} items available in stock.`, "error");
+//         return;
+//     }
+
+//     if (quantity > MAX_PURCHASE_LIMIT) {
+//         showStockAlert(`You can only purchase up to ${MAX_PURCHASE_LIMIT} items per order.`, "error");
+//         return;
+//     }
+
+//     try {
+//         const response = await fetch('/add-to-cart', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({ productId, size: selectedSize, quantity })
+//         });
+
+//         const data = await response.json();
+
+//         if (data.alert) {
+//             Swal.fire({
+//                 title: data.alert.title,
+//                 text: data.alert.text,
+//                 icon: data.alert.icon,
+//                 confirmButtonColor: "#3085d6",
+//                 timer: data.success ? 2000 : undefined,
+//                 timerProgressBar: data.success
+//             });
+
+//             if (data.success) {
+//                 const cartCount = document.querySelector('.cart-count');
+//                 if (cartCount) {
+//                     cartCount.textContent = data.cartCount;
+//                 }
+//             }
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//         showStockAlert("Something went wrong! Please try again.", "error");
+//     }
+// }
+
+
+// // Ensure functions run after the page loads
+// document.addEventListener('DOMContentLoaded', initializeStockCheck);
+  
     </script>
-
    
-        <script>
-    // $(document).ready(function(){
-    //     $('#product-zoom').zoom({
-    //         url: $('#product-zoom').attr('data-zoom-image')
-    //     });
-
-    //     $('.product-gallery-item').on('click', function(e){
-    //         e.preventDefault();
-    //         var image = $(this).data('image');
-    //         var zoomImage = $(this).data('zoom-image');
-
-    //         $('#product-zoom').attr('src', image);
-    //         $('#product-zoom').attr('data-zoom-image', zoomImage);
-    //         $('#product-zoom').zoom({ url: zoomImage });
-    //     });
-    // });
-</script>
+   
 
 <style>
 

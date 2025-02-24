@@ -25,11 +25,16 @@ const addressSchema=new Schema({
             type:String,
             required:true
         },
+
         state:{
             type:String,
             required:true
         },
         pincode:{
+            type:String,
+            required:true
+        },
+        phone:{
             type:String,
             required:true
         },

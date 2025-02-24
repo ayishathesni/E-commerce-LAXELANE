@@ -1,5 +1,6 @@
 const express=require("express");
 const app=express();
+const flash = require('express-flash');
 const path=require("path");
 const passport=require("./config/passport");
 const env=require("dotenv").config();
@@ -24,6 +25,7 @@ app.use(session({
     }
 }))
 //
+app.use(flash());
 app.use((req, res, next) => {
     res.locals.login = !!req.session.user;  
     res.locals.user = req.session.user || null;
@@ -48,5 +50,11 @@ const port = process.env.PORT;
 app.listen(port,()=>{
     console.log(`Server is running at port ${port}`)
 })
+
+app.use((req, res, next) => {
+    res.status(404).render('user/page404');
+});
+
+console.log('Views directory:', app.get('views'));
 
 module.exports=app;

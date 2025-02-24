@@ -363,14 +363,13 @@ async function deleteSingleImage(imageId, productId) {
 }
 
 
-// Form validation and submission
 async function validateAndSubmit() {
     if (validateForm()) {
         try {
             const form = document.querySelector('form');
             const formData = new FormData(form);
             
-            // Format sizes data
+          
             const sizesData = [];
             const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
             
@@ -386,7 +385,7 @@ async function validateAndSubmit() {
                 }
             });
 
-            // Remove individual size fields and add the formatted data
+          
             formData.delete('sizes[]');
             formData.append('sizes', JSON.stringify(sizesData));
 
@@ -400,7 +399,7 @@ async function validateAndSubmit() {
                     body: formData
                 });
 
-                // Check if response is JSON
+             
                 const contentType = response.headers.get('content-type');
                 if (contentType && contentType.includes('application/json')) {
                     const result = await response.json();
@@ -411,13 +410,13 @@ async function validateAndSubmit() {
                         throw new Error(result.message || result.error || 'Error updating product');
                     }
                 } else {
-                    // Handle non-JSON response
+                  
                     const textResponse = await response.text();
                     if (response.ok) {
-                        // If response is successful but not JSON, assume success
+                     
                         window.location.href = '/admin/products';
                     } else {
-                        // Check if response contains HTML error page
+                      
                         if (textResponse.includes('<!DOCTYPE html>')) {
                             throw new Error('Server error occurred. Please try again.');
                         } else {
@@ -438,11 +437,11 @@ async function validateAndSubmit() {
     }
 }
 
-// Add this helper function to create and display a form-level error message
+
 function displayErrorMessage(elementId, message) {
     let errorElement = document.getElementById(elementId);
     
-    // If the form-error element doesn't exist, create it
+ 
     if (!errorElement && elementId === 'form-error') {
         errorElement = document.createElement('div');
         errorElement.id = 'form-error';
@@ -454,12 +453,12 @@ function displayErrorMessage(elementId, message) {
     if (errorElement) {
         errorElement.textContent = message;
         errorElement.style.display = 'block';
-        // Scroll to error message
+      
         errorElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
-// Modified image cropping function
+
 function viewImage(event, index) {
     const input = event.target;
     const reader = new FileReader();
@@ -472,7 +471,7 @@ function viewImage(event, index) {
         image.src = dataURL;
         image.style.display = 'block';
         
-        // Destroy existing cropper if any
+    
         if (image.cropper) {
             image.cropper.destroy();
         }
@@ -504,17 +503,17 @@ function viewImage(event, index) {
                         croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
                     }
 
-                    // Convert canvas to blob
+                
                     const blob = await new Promise(resolve => {
                         croppedCanvas.toBlob(resolve, 'image/jpeg', 0.8);
                     });
 
-                    // Create file from blob
+                
                     const timestamp = new Date().getTime();
                     const fileName = `product_image_${timestamp}_${index}.jpg`;
                     const imageFile = new File([blob], fileName, { type: 'image/jpeg' });
 
-                    // Update the file input
+                  
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(imageFile);
                     input.files = dataTransfer.files;
@@ -525,7 +524,6 @@ function viewImage(event, index) {
                     cropper.destroy();
                     image.cropper = null;
 
-                    // Show success message
                     const successMessage = document.createElement('div');
                     successMessage.className = 'alert alert-success mt-2';
                     successMessage.textContent = 'Image cropped and saved successfully';
@@ -549,7 +547,7 @@ function validateForm() {
     clearErrorMessages();
     let isValid = true;
 
-    // Get form elements
+  
     const formElements = {
         name: document.querySelector('input[name="productName"]'),
         description: document.querySelector('textarea[name="description"]'),
@@ -558,7 +556,7 @@ function validateForm() {
         color: document.querySelector('input[name="color"]')
     };
 
-    // Validate product name
+
     const nameValue = formElements.name?.value?.trim() || '';
     if (!nameValue) {
         displayErrorMessage('productName-error', 'Please enter a product name');
@@ -568,14 +566,14 @@ function validateForm() {
         isValid = false;
     }
 
-    // Validate description
+
     const descriptionValue = formElements.description?.value?.trim() || '';
     if (!descriptionValue) {
         displayErrorMessage('description-error', 'Please enter a description');
         isValid = false;
     }
 
-    // Validate regular price
+   
     const regularPriceValue = formElements.regularPrice?.value || '';
     const regularPriceNum = parseFloat(regularPriceValue);
     if (!regularPriceValue || isNaN(regularPriceNum) || regularPriceNum <= 0) {
@@ -583,7 +581,7 @@ function validateForm() {
         isValid = false;
     }
 
-    // Validate sale price if provided
+
     const salePriceValue = formElements.salePrice?.value || '';
     if (salePriceValue) {
         const salePriceNum = parseFloat(salePriceValue);
@@ -596,14 +594,14 @@ function validateForm() {
         }
     }
 
-    // Validate color
+   
     const colorValue = formElements.color?.value?.trim() || '';
     if (!colorValue) {
         displayErrorMessage('color-error', 'Please enter a color');
         isValid = false;
     }
 
-    // Validate sizes
+
     let hasSelectedSize = false;
     const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
     
@@ -645,7 +643,7 @@ function clearErrorMessages() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize existing sizes
+  
     const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
     sizes.forEach(size => {
         const checkbox = document.getElementById(`size${size}`);
@@ -653,8 +651,6 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleQuantity(size);
         }
     });
-
-    // Initialize image inputs
     const imageInputs = document.querySelectorAll('input[type="file"]');
     imageInputs.forEach(input => {
         input.addEventListener('change', function(event) {
@@ -662,8 +658,6 @@ document.addEventListener('DOMContentLoaded', function() {
             viewImage(event, index);
         });
     });
-
-    // Initialize any Bootstrap components if needed
     if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -672,327 +666,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
-<!-- <script>
-    // Image preview functions
-    function viewImage1(event) {
-        const img = document.getElementById("imgView1");
-        img.src = URL.createObjectURL(event.target.files[0]);
-        img.style.display = "block";
-    }
-    
-    function viewImage2(event) {
-        const img = document.getElementById("imgView2");
-        img.src = URL.createObjectURL(event.target.files[0]);
-        img.style.display = "block";
-    }
-    
-    function viewImage3(event) {
-        const img = document.getElementById("imgView3");
-        img.src = URL.createObjectURL(event.target.files[0]);
-        img.style.display = "block";
-    }
-    
-    function viewImage4(event) {
-        const img = document.getElementById("imgView4");
-        img.src = URL.createObjectURL(event.target.files[0]);
-        img.style.display = "block";
-    }
-    
-    // Initialize existing sizes and quantities
-    document.addEventListener('DOMContentLoaded', function() {
-        const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
-        sizes.forEach(size => {
-            const checkbox = document.getElementById(`size${size}`);
-            if (checkbox.checked) {
-                toggleQuantity(size);
-            }
-        });
-    });
-    
-    // Size quantity toggle function
-    function toggleQuantity(size) {
-        const checkbox = document.getElementById(`size${size}`);
-        const quantityInput = document.getElementById(`quantity${size}`);
-        
-        if (checkbox.checked) {
-            quantityInput.style.display = "block";
-            quantityInput.required = true;
-        } else {
-            quantityInput.style.display = "none";
-            quantityInput.required = false;
-            quantityInput.value = "";
-            // Clear any error messages when unchecking
-            const errorElement = document.getElementById(`quantity-${size}-error`);
-            if (errorElement) {
-                errorElement.textContent = '';
-                errorElement.style.display = 'none';
-            }
-        }
-    }
-    
-    // Image cropping function
-    function viewImage(event, index) {
-        const input = event.target;
-        const reader = new FileReader();
-        
-        reader.onload = function() {
-            const dataURL = reader.result;
-            const image = document.getElementById("imgView" + index);
-            image.src = dataURL;
-            
-            // Destroy existing cropper if any
-            if (image.cropper) {
-                image.cropper.destroy();
-            }
-            
-            const cropper = new Cropper(image, {
-                aspectRatio: 1,
-                viewMode: 1,
-                guides: true,
-                background: false,
-                autoCropArea: 1,
-                zoomable: true
-            });
-            
-            image.cropper = cropper;
-    
-            const cropperContainer = document.querySelector("#croppedImg" + index).parentNode;
-            cropperContainer.style.display = 'block';
-    
-            const saveButton = document.querySelector("#saveButton" + index);
-            saveButton.onclick = async function() {
-                const croppedCanvas = cropper.getCroppedCanvas();
-                const croppedImage = document.getElementById("croppedImg" + index);
-                croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
-    
-                const timestamp = new Date().getTime();
-                const fileName = `cropped_img_${timestamp}.${index}.png`;
-    
-                await croppedCanvas.toBlob(blob => {
-                    const input = document.getElementById('input' + index);
-                    const imgFile = new File([blob], fileName, { type: blob.type });
-                    const fileList = new DataTransfer();
-                    fileList.items.add(imgFile);
-                    input.files = fileList.files;
-                });
-    
-                cropperContainer.style.display = 'none';
-                cropper.destroy();
-                image.cropper = null;
-            };
-        };
-    
-        reader.readAsDataURL(input.files[0]);
-    }
-    
-    // Delete single image
-    function deleteSingleImage(imageId, productId) {
-        if (confirm('Are you sure you want to delete this image?')) {
-            fetch('/admin/deleteImage', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    imageNameToServer: imageId,
-                    productIdToServer: productId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === true) {
-                    window.location.reload();
-                } else {
-                    alert('Failed to delete image. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while deleting the image.');
-            });
-        }
-    }
-    
-    // Form validation and submission
-    function validateAndSubmit() {
-        if (validateForm()) {
-            const form = document.querySelector('form');
-            const formData = new FormData(form);
-            
-            // Format sizes data
-            const sizesData = [];
-            const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
-            
-            sizes.forEach(size => {
-                const checkbox = document.getElementById(`size${size}`);
-                const quantityInput = document.getElementById(`quantity${size}`);
-                
-                if (checkbox && checkbox.checked && quantityInput && quantityInput.value) {
-                    sizesData.push({
-                        size: size,
-                        quantity: parseInt(quantityInput.value)
-                    });
-                }
-            });
-            
-            // Remove existing size data and add formatted data
-            formData.delete('sizes[]');
-            formData.append('sizes', JSON.stringify(sizesData));
-    
-            // Submit form
-            const submitButton = document.querySelector('button[type="button"]');
-            submitButton.disabled = true;
-            submitButton.textContent = 'Updating...';
-    
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = '/admin/products';
-                } else {
-                    return response.json().then(data => {
-                        throw new Error(data.message || 'Error updating product');
-                    });
-                }
-            })
-            .catch(error => {
-                displayErrorMessage('form-error', error.message);
-                submitButton.disabled = false;
-                submitButton.textContent = 'Update Product';
-            });
-        }
-    }
-    
-    function validateForm() {
-    clearErrorMessages();
-    let isValid = true;
-
-    // Get form elements
-    const formElements = {
-        name: document.querySelector('input[name="productName"]'),
-        description: document.querySelector('textarea[name="description"]'),
-        regularPrice: document.querySelector('input[name="regularPrice"]'),
-        salePrice: document.querySelector('input[name="salePrice"]'),
-        color: document.querySelector('input[name="color"]')
-    };
-
-    // Check if all form elements exist before validation
-    for (const [key, element] of Object.entries(formElements)) {
-        if (!element) {
-            console.error(`${key} form field not found`);
-            isValid = false;
-            continue;
-        }
-    }
-
-    // Only proceed with validation if all elements exist
-    if (isValid) {
-        // Validate product name
-        const nameValue = formElements.name.value || '';
-        if (!nameValue.trim()) {
-            displayErrorMessage('productName-error', 'Please enter a product name');
-            isValid = false;
-        } else if (!/^[a-zA-Z0-9\s'-]{3,50}$/.test(nameValue.trim())) {
-            displayErrorMessage('productName-error', 'Invalid product name format');
-            isValid = false;
-        }
-
-        // Validate description
-        const descriptionValue = formElements.description.value || '';
-        if (!descriptionValue.trim()) {
-            displayErrorMessage('description-error', 'Please enter a description');
-            isValid = false;
-        }
-
-        // Validate regular price
-        const regularPriceValue = formElements.regularPrice.value || '';
-        const regularPriceNum = parseFloat(regularPriceValue);
-        if (!regularPriceValue || isNaN(regularPriceNum) || regularPriceNum <= 0) {
-            displayErrorMessage('regularPrice-error', 'Please enter a valid price');
-            isValid = false;
-        }
-
-        // Validate sale price if provided
-        const salePriceValue = formElements.salePrice.value || '';
-        if (salePriceValue) {
-            const salePriceNum = parseFloat(salePriceValue);
-            if (isNaN(salePriceNum) || salePriceNum <= 0) {
-                displayErrorMessage('salePrice-error', 'Please enter a valid sale price');
-                isValid = false;
-            } else if (salePriceNum >= regularPriceNum) {
-                displayErrorMessage('salePrice-error', 'Sale price must be less than regular price');
-                isValid = false;
-            }
-        }
-
-        // Validate color
-        const colorValue = formElements.color.value || '';
-        if (!colorValue.trim()) {
-            displayErrorMessage('color-error', 'Please enter a color');
-            isValid = false;
-        }
-
-        // Validate sizes
-        let hasSelectedSize = false;
-    const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
-    
-    sizes.forEach(size => {
-        const checkbox = document.getElementById(`size${size}`);
-        const quantityInput = document.getElementById(`quantity${size}`);
-        
-        if (checkbox && checkbox.checked) {
-            hasSelectedSize = true;
-            if (!quantityInput || !quantityInput.value || parseInt(quantityInput.value) <= 0) {
-                displayErrorMessage(`quantity-${size}-error`, `Please enter a valid quantity for size ${size}`);
-                isValid = false;
-            }
-        }
-    });
-
-    if (!hasSelectedSize) {
-        displayErrorMessage('size-error', 'Please select at least one size');
-        isValid = false;
-    }
-
-    return isValid;
-}
-   
-    function displayErrorMessage(elementId, message) {
-        const errorElement = document.getElementById(elementId);
-        if (errorElement) {
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-        }
-    }
-    
-    function clearErrorMessages() {
-        const errorElements = document.getElementsByClassName('error-message');
-        Array.from(errorElements).forEach(element => {
-            element.textContent = '';
-            element.style.display = 'none';
-        });
-    }
-    
-    // Add event listeners when document loads
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize tooltips if using Bootstrap
-        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        }
-    
-        // Initialize any existing croppers
-        const imageInputs = document.querySelectorAll('input[type="file"]');
-        imageInputs.forEach(input => {
-            input.addEventListener('change', function(event) {
-                const index = this.id.replace('input', '');
-                viewImage(event, index);
-            });
-        });
-    });
-    </script> -->

@@ -402,7 +402,7 @@ function viewImage4(event) {
     document.getElementById("imgView4").src = URL.createObjectURL(event.target.files[0]);
 }
 
-// Size quantity toggle function
+
 function toggleQuantity(size) {
     let checkbox = document.getElementById(`size${size}`);
     let quantityInput = document.getElementById(`quantity${size}`);
@@ -417,7 +417,7 @@ function toggleQuantity(size) {
     }
 }
 
-// Image cropping function
+
 function viewImage(event, index) {
     let input = event.target;
     let reader = new FileReader();
@@ -500,7 +500,7 @@ function validateAndSubmit() {
         const form = document.querySelector('form');
         const formData = new FormData(form);
         
-        // Format sizes data
+     
         const sizesData = [];
         const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
         
@@ -515,24 +515,22 @@ function validateAndSubmit() {
                 });
             }
         });
-        
-        // Remove existing size data and add formatted data
+     
         formData.delete('sizes[]');
         formData.append('sizes', JSON.stringify(sizesData));
 
-        // Submit form
+    
         fetch('/admin/addProducts', {
             method: 'POST',
             body: formData
         })
         .then(response => {
-            // Check if the response is JSON
+          
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
                 return response.json();
             }
             
-            // If response is not JSON, check if it was successful
             if (response.ok) {
                 window.location.href = '/admin/products';
                 return;
@@ -560,7 +558,7 @@ function validateForm() {
     clearErrorMessages();
     let isValid = true;
 
-    // Get form fields
+  
     const name = document.getElementsByName('productName')[0].value;
     const description = document.getElementById('descriptionid').value;
     const price = document.getElementsByName('regularPrice')[0].value;
@@ -568,7 +566,7 @@ function validateForm() {
     const color = document.getElementsByName('color')[0].value;
     const image1 = document.getElementById('input1').files;
 
-    // Validate product name
+ 
     if (!name.trim()) {
         displayErrorMessage('productName-error', 'Please enter a product name');
         isValid = false;
@@ -589,7 +587,7 @@ function validateForm() {
         isValid = false;
     }
 
-    // Validate sale price if provided
+    // Validate sale price 
     if (salePrice) {
         if (isNaN(salePrice) || parseFloat(salePrice) <= 0) {
             displayErrorMessage('salePrice-error', 'Please enter a valid sale price');
@@ -643,7 +641,7 @@ function displayErrorMessage(elementId, message) {
         errorElement.innerText = message;
         errorElement.style.display = 'block';
     } else {
-        // Fallback if error element doesn't exist
+      
         alert(message);
     }
 }
@@ -656,9 +654,9 @@ function clearErrorMessages() {
     });
 }
 
-// Add event listeners when document loads
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize file input handlers
+ 
     if (document.getElementById("input")) {
         document.getElementById("input").addEventListener("change", handleFileSelect);
     }

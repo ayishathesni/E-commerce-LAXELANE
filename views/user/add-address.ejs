@@ -1,0 +1,870 @@
+
+
+<%- include("../../views/partials/user/header") %>
+
+
+<style>
+
+.main {
+    padding: 30px 0;
+    background-color: #fdf7f0;
+    min-height: calc(100vh - 100px);
+}
+
+
+.breadcrumb-nav {
+    background-color: #fff;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.breadcrumb {
+    margin: 0;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: #CC9966;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #b37a50;
+}
+
+
+.dashboard-menu {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.dashboard-menu .nav-link {
+    color: #555;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-menu .nav-link:hover,
+.dashboard-menu .nav-link.active {
+    background-color: #CC9966;
+    color: #fff;
+    transform: translateX(5px);
+}
+
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #CC9966;
+    color: #fff;
+    padding: 15px 20px;
+    border-bottom: none;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+.profile-card {
+    background: linear-gradient(135deg, #CC9966 0%, #b37a50 100%);
+    color: #fff;
+}
+
+.profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    border: 4px solid rgba(255,255,255,0.3);
+}
+
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-pending { background-color: #ffe0b3; color: #995c2d; }
+.status-processing { background-color: #ffcc99; color: #804d26; }
+.status-delivered { background-color: #ffb366; color: #663300; }
+.status-cancelled { background-color: #ff6666; color: #660000; }
+
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-success {
+    background-color: #CC9966;
+    border-color: #CC9966;
+}
+
+.btn-success:hover {
+    background-color: #b37a50;
+    border-color: #b37a50;
+    transform: translateY(-2px);
+}
+
+.address-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.address-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.address-actions {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.modal-dialog {
+    max-width: 500px;
+}
+
+.modal-content {
+    border-radius: 12px;
+}
+
+.modal-header {
+    background-color: #CC9966;
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-header .btn-close {
+    color: white;
+}
+
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .main {
+        padding: 15px 0;
+    }
+    
+    .dashboard-menu {
+        margin-bottom: 20px;
+    }
+}
+</style>
+
+<main class="main">
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"> Home</a></li>
+                <li class="breadcrumb-item active">Dashboard</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar Menu -->
+            <div class="col-lg-3">
+                <div class="dashboard-menu">
+                    <ul class="nav flex-column" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link " id="dashboard-tab" role="tab" href="/userProfile">
+                                My Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="orders-tab" role="tab" href="/orders">
+                                Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" id="address-tab" role="tab" href="/addAddress">
+                                Address
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="wallet-tab" role="tab" href="/wallet">
+                                Wallet
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="coupons-tab" role="tab"  href="/coupons">
+                                Coupons
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="/logout">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="address">
+                        <div class="container-fluid px-3 d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addAddressModal">Add Address</button>
+                        </div>
+
+                        <!-- Modal For Address Add -->
+                        <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addressModalLabel" >
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h6 class="modal-title" id="addressModalLabel">Add Address</h6>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <form method="post" style="padding-left: 15px;padding-right: 15px;" id="addform">
+                                            <p class="" id="msg"><%= locals.msgg ? msgg : '' %></p>
+                                            
+                                            <div class="row mb-3">
+                                                <div class="col-lg-12">
+                                                    <label for="addressType" class="col-form-label text-black">Address Type *</label>
+                                                    <select class="form-select" name="addressType" id="addressType" required>
+                                                        <option value="" selected disabled>Select Address Type</option>
+                                                        <option value="Home">Home</option>
+                                                        <option value="Office">Office</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label for="name" class="col-form-label text-black">Name *</label>
+                                                    <input type="text" class="form-control" name="name" id="name" placeholder="Enter your Name" required>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <label for="phone" class="col-form-label text-black">Mobile Number *</label>
+                                                    <input type="tel" class="form-control" name="phone" id="phone" placeholder="Enter your Mobile" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-12 mt-3">
+                                                <label for="address" class="col-form-label text-black">Address *</label>
+                                                <textarea class="form-control" id="address" name="address" rows="3" placeholder="Enter your Address" required></textarea>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div class="col-lg-6">
+                                                    <label for="landMark" class="col-form-label text-black">Landmark *</label>
+                                                    <input type="text" class="form-control" name="landMark" id="landMark" placeholder="Enter nearby landmark" required>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <label for="city" class="col-form-label text-black">City *</label>
+                                                    <input type="text" class="form-control" name="city" id="city" placeholder="Enter your City" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div class="col-lg-6">
+                                                    <label for="state" class="col-form-label text-black">State *</label>
+                                                    <input type="text" class="form-control" name="state" id="state" placeholder="Enter your State" required>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <label for="pincode" class="col-form-label text-black">Pincode *</label>
+                                                    <input type="text" class="form-control" name="pincode" id="pincode" placeholder="Enter your pincode" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div class="col-lg-6">
+                                                    <label for="altPhone" class="col-form-label text-black">Alternative Phone *</label>
+                                                    <input type="tel" class="form-control" name="altPhone" id="altPhone" placeholder="Alternative phone number" required>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <input type="hidden" value="<%= userData._id %>" id="validUserId">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary" onclick="return validateForm();">Add Address</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Address Cards Section -->
+                        <div class="row">
+                            <% if (addresses.length > 0) { %>
+                                <% for (let i = 0; i < addresses.length; i++) { %>
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card card-dashboard">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <h3 class="card-title">
+                                                        <%= addresses[i].addressType %> Address
+                                                    </h3>
+                                                    <button type="button" class="btn-close" aria-label="Delete" 
+                                                            onclick="deleteAddress('<%= userData._id %>', '<%= addresses[i]._id %>')">
+                                                    </button>
+                                                </div>
+                                                
+                                                <p class="mb-1"><strong><%= addresses[i].name %></strong></p>
+                                                <p class="mb-1"><%= addresses[i].address %></p>
+                                                <p class="mb-1">Landmark: <%= addresses[i].landMark %></p>
+                                                <p class="mb-1"><%= addresses[i].city %>, <%= addresses[i].state %>, <%= addresses[i].pincode %></p>
+                                                <p class="mb-3">Phone: <%= addresses[i].phone %></p>
+                                                <p class="mb-3">Alt Phone: <%= addresses[i].altPhone %></p>
+                                                
+                                                <a href="#" style="color: #cf954d;" data-bs-toggle="modal" 
+                                                   data-bs-target="#editModal" onclick="editAddress('<%= addresses[i]._id %>')">
+                                                    Edit <i class="icon-edit"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% } else { %>
+                                <div class="col-12">
+                                    <div class="alert alert-info" role="alert">
+                                        You haven't added any addresses yet. Please add an address using the "Add Address" button.
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <!-- Edit Address Modal -->
+                        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editModalLabel">Edit Address</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="/editAddress" method="post" style="padding-left: 15px;padding-right: 15px;" id="editForm">
+                                            <div class="row mb-3">
+                                                <div class="col-lg-12">
+                                                    <label for="editAddressType" class="col-form-label text-black">Address Type *</label>
+                                                    <select class="form-select" name="addressType" id="editAddressType" required>
+                                                        <option value="Home">Home</option>
+                                                        <option value="Office">Office</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label for="editName" class="col-form-label text-black">Name *</label>
+                                                    <input type="text" class="form-control" name="name" id="editName" placeholder="Enter your Name" required>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <label for="editPhone" class="col-form-label text-black">Mobile Number *</label>
+                                                    <input type="tel" class="form-control" name="phone" id="editPhone" placeholder="Enter your Mobile" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-12 mt-3">
+                                                <label for="editAddress" class="col-form-label text-black">Address *</label>
+                                                <textarea class="form-control" id="editAddress" name="address" rows="3" placeholder="Enter your Address" required></textarea>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div class="col-lg-6">
+                                                    <label for="editLandMark" class="col-form-label text-black">Landmark *</label>
+                                                    <input type="text" class="form-control" name="landMark" id="editLandMark" placeholder="Enter nearby landmark" required>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <label for="editCity" class="col-form-label text-black">City *</label>
+                                                    <input type="text" class="form-control" name="city" id="editCity" placeholder="Enter your City" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div class="col-lg-6">
+                                                    <label for="editState" class="col-form-label text-black">State *</label>
+                                                    <input type="text" class="form-control" name="state" id="editState" placeholder="Enter your State" required>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                    <label for="editPincode" class="col-form-label text-black">Pincode *</label>
+                                                    <input type="text" class="form-control" name="pincode" id="editPincode" placeholder="Enter your pincode" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div class="col-lg-6">
+                                                    <label for="editAltPhone" class="col-form-label text-black">Alternative Phone *</label>
+                                                    <input type="tel" class="form-control" name="altPhone" id="editAltPhone" placeholder="Alternative phone number" required>
+                                                </div>
+                                            </div>
+
+                                            <input type="hidden" name="addressId" id="addressId">
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary" onclick="return updateAddress()">Save changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</main>
+
+<!-- Scripts section - can be placed before the footer -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+    
+// Validate Form before submitting
+function validateForm() {
+  const validId = document.getElementById('validUserId').value;
+  const form = document.getElementById('addform');
+  const inputs = form.querySelectorAll('input, textarea, select');
+  let isValid = true;
+
+  inputs.forEach(function(input) {
+    if (input.hasAttribute('required') && input.value.trim() === "") {
+        isValid = false;
+        input.classList.add('is-invalid');
+    } else {
+        input.classList.remove('is-invalid');
+    }
+  });
+
+  if (!isValid) {
+    event.preventDefault();
+    Swal.fire({
+        title: "Validation Error",
+        text: "Please fill all required fields",
+        icon: "error"
+    });
+  } else {
+    event.preventDefault();
+    addAddress(validId);
+  }
+}
+
+
+function addAddress(userId) {
+  const form = document.getElementById('addform');
+  const formData = new FormData(form);
+  const addressData = {};
+
+  formData.forEach((value, key) => {
+    addressData[key] = value;
+  });
+
+  fetch(`/addAddress`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, addressData })
+  })
+  .then(res => res.json())
+  .then(data => {
+      if (data.success) {
+          Swal.fire({
+              title: 'Success',
+              text: 'Address added successfully',
+              icon: 'success',
+              confirmButtonText: 'OK'
+          }).then(() => {
+              updateAddressList(userId);  // Fetch updated addresses dynamically
+          });
+      } else {
+          Swal.fire({
+              title: 'Failed',
+              text: data.message || 'Failed to add address',
+              icon: 'error',
+              confirmButtonText: 'OK'
+          });
+      }
+  })
+  .catch(error => {
+      Swal.fire({
+          title: 'Error',
+          text: 'An unexpected error occurred',
+          icon: 'error',
+          confirmButtonText: 'OK'
+      });
+  });
+}
+
+// Fetch Updated Address List
+function updateAddressList(userId) {
+  fetch(`/getAddresses?userId=${userId}`) // Make sure this backend route exists
+  .then(res => res.json())
+  .then(data => {
+      const addressContainer = document.getElementById("address-list");
+      addressContainer.innerHTML = ""; // Clear old addresses
+
+      if (data.addresses.length === 0) {
+          addressContainer.innerHTML = "<p>You haven't added any addresses yet.</p>";
+          return;
+      }
+
+      data.addresses.forEach(address => {
+          const addressElement = document.createElement("div");
+          addressElement.innerHTML = `
+              <p><strong>${address.name}</strong></p>
+              <p>${address.city}, ${address.state}, ${address.pincode}</p>
+              <p>${address.phone}</p>
+          `;
+          addressContainer.appendChild(addressElement);
+      });
+  })
+  .catch(error => console.error('Error fetching addresses:', error));
+}
+
+
+
+
+// Edit Address Function
+// Edit Address Function
+function editAddress(addressId) {
+
+  fetch(`/editAddress?id=${addressId}`, { // ✅ Corrected: Pass ID as query param
+    method: 'GET',
+    headers: {
+        'Content-Type': 'application/json'
+    }
+  })
+  .then(res => res.json()) 
+  .then(data => {
+    if (data.success && data.address) {
+        const address = data.address;
+
+        document.getElementById('editAddressType').value = address.addressType || '';
+        document.getElementById('editName').value = address.name || '';
+        document.getElementById('editPhone').value = address.phone || '';
+        document.getElementById('editAddress').value = address.address || '';
+        document.getElementById('editLandMark').value = address.landMark || '';
+        document.getElementById('editCity').value = address.city || '';
+        document.getElementById('editState').value = address.state || '';
+        document.getElementById('editPincode').value = address.pincode || '';
+        document.getElementById('editAltPhone').value = address.altPhone || '';
+        document.getElementById('addressId').value = address._id; 
+
+        // ✅ Show edit modal
+        let modal = new bootstrap.Modal(document.getElementById("editModal"));
+        modal.show();
+    } else {
+        Swal.fire({
+            title: 'Error',
+            text: data.message || 'Failed to load address data',
+            icon: 'error'
+        });
+    }
+  })
+  .catch(error => {
+    console.error("Fetch error:", error); // Debugging
+    Swal.fire({
+        title: 'Error',
+        text: 'An unexpected error occurred while fetching the address.',
+        icon: 'error'
+    });
+  });
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Existing code...
+  
+  // Fix for edit links - manually add event listeners
+  const editLinks = document.querySelectorAll('a[href="#"][data-bs-toggle="modal"][data-bs-target="#editModal"]');
+  editLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      // Extract the address ID from the onclick attribute
+      const onclickAttr = this.getAttribute('onclick');
+      if (onclickAttr) {
+        const addressIdMatch = onclickAttr.match(/editAddress\('([^']*)'\)/);
+        if (addressIdMatch && addressIdMatch[1]) {
+          const addressId = addressIdMatch[1];
+          e.preventDefault(); // Prevent default link behavior
+          editAddress(addressId);
+        }
+      }
+    });
+  });
+})
+function validateAddressForm() {
+    // Get all form inputs
+    const name = document.getElementById('editName').value.trim();
+    const phone = document.getElementById('editPhone').value.trim();
+    const address = document.getElementById('editAddress').value.trim();
+    const landmark = document.getElementById('editLandMark').value.trim();
+    const city = document.getElementById('editCity').value.trim();
+    const state = document.getElementById('editState').value.trim();
+    const pincode = document.getElementById('editPincode').value.trim();
+    const altPhone = document.getElementById('editAltPhone').value.trim();
+
+    // Validation rules
+    const nameRegex = /^[a-zA-Z\s]{2,50}$/;
+    const phoneRegex = /^[0-9]{10}$/;
+    const pincodeRegex = /^[0-9]{6}$/;
+    
+    let errors = [];
+
+    // Name validation
+    if (!nameRegex.test(name)) {
+        errors.push('Name should contain only letters and spaces (2-50 characters)');
+    }
+
+    // Phone validation
+    if (!phoneRegex.test(phone)) {
+        errors.push('Phone number should be 10 digits');
+    }
+
+    // Alternative phone validation
+    if (!phoneRegex.test(altPhone)) {
+        errors.push('Alternative phone number should be 10 digits');
+    }
+
+    // Address validation
+    if (address.length < 10 || address.length > 200) {
+        errors.push('Address should be between 10 and 200 characters');
+    }
+
+    // Landmark validation
+    if (landmark.length < 3 || landmark.length > 100) {
+        errors.push('Landmark should be between 3 and 100 characters');
+    }
+
+    // City validation
+    if (!/^[a-zA-Z\s]{2,50}$/.test(city)) {
+        errors.push('City should contain only letters and spaces (2-50 characters)');
+    }
+
+    // State validation
+    if (!/^[a-zA-Z\s]{2,50}$/.test(state)) {
+        errors.push('State should contain only letters and spaces (2-50 characters)');
+    }
+
+    // Pincode validation
+    if (!pincodeRegex.test(pincode)) {
+        errors.push('Pincode should be 6 digits');
+    }
+
+    // Display errors if any
+    if (errors.length > 0) {
+        Swal.fire({
+            title: 'Validation Error',
+            html: errors.join('<br>'),
+            icon: 'error'
+        });
+        return false;
+    }
+
+    return true;
+}
+
+// Update the updateAddress function to include validation
+function updateAddress() {
+    if (!validateAddressForm()) {
+        return false;
+    }
+
+    const form = document.getElementById('editForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    fetch('/editAddress', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                title: 'Success',
+                text: 'Address updated successfully',
+                icon: 'success'
+            }).then(() => {
+                // Close modal and refresh page
+                let modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                modal.hide();
+                window.location.reload();
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: data.message || 'Failed to update address',
+                icon: 'error'
+            });
+        }
+    })
+    .catch(error => {
+        console.error("Update error:", error);
+        Swal.fire({
+            title: 'Error',
+            text: 'An unexpected error occurred while updating the address.',
+            icon: 'error'
+        });
+    });
+}
+
+
+
+
+
+// Delete Address Function
+function deleteAddress(userId, addressId) {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "Do you want to delete this address?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, delete it!"
+  }).then((result) => {
+    if (result.isConfirmed) {
+        fetch(`/deleteAddress?userId=${userId}&addressId=${addressId}`, {
+            method: 'GET'
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "Your address has been deleted.",
+                    icon: "success"
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    text: data.message || "Failed to delete address",
+                    icon: "error"
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: "Error",
+                text: "An unexpected error occurred",
+                icon: "error"
+            });
+        });
+    }
+  });
+}
+
+// Check for success messages on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const success = urlParams.get('success');
+  const message = urlParams.get('message');
+
+  if (success === 'true' && message) {
+    Swal.fire({
+        title: 'Success',
+        text: decodeURIComponent(message),
+        icon: 'success',
+        confirmButtonText: 'OK'
+    });
+  } else if (success === 'false' && message) {
+    Swal.fire({
+        title: 'Error',
+        text: decodeURIComponent(message),
+        icon: 'error',
+        confirmButtonText: 'OK'
+    });
+  }
+  
+  // Add event listeners for forms
+  const addAddressForm = document.getElementById('addform');
+  if (addAddressForm) {
+    addAddressForm.addEventListener('submit', validateForm);
+  }
+  
+  const editAddressForm = document.getElementById('editForm');
+  if (editAddressForm) {
+    editAddressForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      updateAddress();
+    });
+  }
+  
+  // Add event listeners for edit buttons
+  const editButtons = document.querySelectorAll('.edit-address-btn');
+  editButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const addressId = this.getAttribute('data-address-id');
+      editAddress(addressId);
+    });
+  });
+  
+  // Add event listeners for delete buttons
+  const deleteButtons = document.querySelectorAll('.delete-address-btn');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const userId = this.getAttribute('data-user-id');
+      const addressId = this.getAttribute('data-address-id');
+      deleteAddress(userId, addressId);
+    });
+  });
+});
+
+window.editAddress = editAddress;
+
+document.getElementById("address-tab").addEventListener("click", function (event) {
+    event.preventDefault(); // Prevents default behavior of the link
+    console.log("Address tab clicked!"); // Debugging log
+    let tab = new bootstrap.Tab(this);
+    tab.show(); // Show the tab manually
+});
+
+
+</script>
+
+
+
+<%- include("../../views/partials/user/footer") %>
+</body>
+</html>
