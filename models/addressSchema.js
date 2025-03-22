@@ -17,6 +17,10 @@ const addressSchema=new Schema({
             type:String,
             required:true
         },
+        address: {
+            type: String,
+            required: false
+          },
         city:{
             type:String,
             required:true
@@ -25,7 +29,7 @@ const addressSchema=new Schema({
             type:String,
             required:true
         },
-
+     
         state:{
             type:String,
             required:true
@@ -42,6 +46,10 @@ const addressSchema=new Schema({
             type:String,
             required:true
         },
+        status : {
+            type : Boolean ,
+             required : true , 
+             default : false},
     }]
 })
 

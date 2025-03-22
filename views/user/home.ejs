@@ -1,6 +1,7 @@
 
 <%-include("../../views/partials/user/header")%> 
-        <main class="main">
+
+      <main class="main">
             <div class="intro-slider-container">
                 <div class="intro-slider owl-carousel owl-theme owl-nav-inside owl-light" data-toggle="owl" data-owl-options='{
                         "dots": false,
@@ -16,7 +17,7 @@
                             <h3 class="intro-subtitle text-white">You're Looking Good</h3><!-- End .h3 intro-subtitle -->
                             <h1 class="intro-title text-white">New Lookbook</h1><!-- End .intro-title -->
 
-                            <a href="category.html" class="btn btn-outline-white-4">
+                            <a href="/shop" class="btn btn-outline-white-4">
                                 <span>Discover More</span>
                             </a>
                         </div><!-- End .intro-content -->
@@ -27,7 +28,7 @@
                             <h3 class="intro-subtitle text-white">Don’t Miss</h3><!-- End .h3 intro-subtitle -->
                             <h1 class="intro-title text-white">Mysrety Deals</h1><!-- End .intro-title -->
 
-                            <a href="category.html" class="btn btn-outline-white-4">
+                            <a href="/shop" class="btn btn-outline-white-4">
                                 <span>Discover More</span>
                             </a>
                         </div><!-- End .intro-content -->
@@ -43,13 +44,28 @@
                         <div class="col-sm-6">
                             <div class="banner banner-overlay">
                                 <a href="#">
-                                    <img src="assets/images/demos/demo-6/banners/banner-1.jpg" alt="Banner">
+                                    <img src="assets/images/demos/demo-6/banners/banner-1.jpeg" alt="Banner">
                                 </a>
 
                                 <div class="banner-content banner-content-center">
                                     <h4 class="banner-subtitle text-white"><a href="#">New in</a></h4><!-- End .banner-subtitle -->
                                     <h3 class="banner-title text-white"><a href="#"><strong>Women’s</strong></h3><!-- End .banner-title -->
-                                    <a href="#" class="btn btn-outline-white banner-link underline">Shop Now</a>
+                                    <a href="/shop" class="btn btn-outline-white banner-link underline">Shop Now</a>
+                                </div><!-- End .banner-content -->
+                            </div><!-- End .banner -->
+                        </div><!-- nd .col-sm-6 -->
+
+
+                        <div class="col-sm-6 ">
+                            <div class="banner banner-overlay two">
+                                <a href="#">
+                                    <img src="assets/images/demos/demo-6/banners/banner-4.jpeg" alt="Banner">
+                                </a>
+
+                                <div class="banner-content banner-content-center">
+                                    <h4 class="banner-subtitle text-white"><a href="#">New in</a></h4><!-- End .banner-subtitle -->
+                                    <h3 class="banner-title text-white"><a href="#"><strong>kids’s</strong></h3><!-- End .banner-title -->
+                                    <a href="/shop" class="btn btn-outline-white banner-link underline">Shop Now</a>
                                 </div><!-- End .banner-content -->
                             </div><!-- End .banner -->
                         </div><!-- End .col-sm-6 -->
@@ -57,13 +73,28 @@
                         <div class="col-sm-6">
                             <div class="banner banner-overlay">
                                 <a href="#">
-                                    <img src="assets/images/demos/demo-6/banners/banner-2.jpg" alt="Banner">
+                                    <img src="assets/images/demos/demo-6/banners/banner-2.jpeg" alt="Banner">
                                 </a>
 
                                 <div class="banner-content banner-content-center">
                                     <h4 class="banner-subtitle text-white"><a href="#">New in</a></h4><!-- End .banner-subtitle -->
                                     <h3 class="banner-title text-white"><a href="#"><strong>Men’s</strong></a></h3><!-- End .banner-title -->
-                                    <a href="#" class="btn btn-outline-white banner-link underline">Shop Now</a>
+                                    <a href="/shop" class="btn btn-outline-white banner-link underline">Shop Now</a>
+                                </div><!-- End .banner-content -->
+                            </div><!-- End .banner -->
+                        </div><!-- End .col-sm-6 -->
+
+
+                        <div class="col-sm-6">
+                            <div class="banner banner-overlay">
+                                <a href="#">
+                                    <img src="assets/images/demos/demo-6/banners/banner-5.jpeg" alt="Banner">
+                                </a>
+
+                                <div class="banner-content banner-content-center">
+                                    <h4 class="banner-subtitle text-white"><a href="#">For Your </a></h4><!-- End .banner-subtitle -->
+                                    <h3 class="banner-title text-white"><a href="#"><strong>Family</strong></a></h3><!-- End .banner-title -->
+                                    <a href="/shop" class="btn btn-outline-white banner-link underline">Shop Now</a>
                                 </div><!-- End .banner-content -->
                             </div><!-- End .banner -->
                         </div><!-- End .col-sm-6 -->
@@ -510,7 +541,7 @@
                                             <span class="old-price">Was $30.99</span>
                                         </div><!-- End .product-price -->
                                     </div><!-- End .product-body -->
-                                    <a href="category.html" class="action">shop now</a>
+                                    <a href="/shop" class="action">shop now</a>
                                 </div>
                                 <div class="col-6 deal-product text-center">
                                     <figure class="product-media">
@@ -527,7 +558,7 @@
                                             <span class="old-price">Was $17.99</span>
                                         </div><!-- End .product-price -->
                                     </div><!-- End .product-body -->
-                                    <a href="category.html" class="action">shop now</a>
+                                    <a href="/shop" class="action">shop now</a>
                                 </div>
                             </div>
                         </div><!-- End .col-lg-5 -->
@@ -1051,4 +1082,32 @@
             </div><!-- End .blog-posts -->
         </main><!-- End .main -->
 
+        <style>
+            .banner img {
+                width: 100%;
+                height: auto;
+                object-fit: cover; /* Ensures the image fills the container without distortion */
+                border-radius: 25px;
+                background-color: white;
+                overflow: hidden;
+                
+            }
+            .banner img:hover {
+                background-color: white;
+                
+            }
+            
+            .banner {
+                background-color: white;
+                position: relative;
+                overflow: hidden; /* Prevents content from spilling out */
+                max-width: 100%; /* Ensures banners don’t exceed their container */
+            }
+
+            .two {
+    width: 100%;
+    padding-top: 65px;
+    background-color: white;
+}
+              </style>
 <%-include("../../views/partials/user/footer")%> 

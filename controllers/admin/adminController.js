@@ -19,31 +19,28 @@ const loadLogin=async (req,res)=>{
 const login=async(req,res)=>{
     try{
         const {email,password}=req.body;
-        console.log('hello');
-        console.log('email',email);
-        
-        
+
         const admin=await User.findOne({email,isAdmin:true});
-        console.log(admin)
+       
         if(admin){
             const  passwordMatch=await bcrypt.compare(password,admin.password);
             if(passwordMatch){
                 req.session.admin=true;
-                console.log('byee');
+              
                 
                 return res.redirect("/admin/dashboard")
             }else{
-                console.log('nnmnmnm');
+             
                 
                 return res.render("login",{message:'Invalid password'})
             }
         }else{
-            console.log('dgfdgfd');
+           
                 
             return res.render("admin/login",{message:'Admin not found'})
         }
     }catch(error){
-          console.log("login error");
+       
           return res.redirect("/pagerror")
     }
 }
@@ -63,15 +60,11 @@ const loadDashboard=async (req,res)=>{
 
 const logout=async(req,res)=>{
     try {
-       req.session.destroy(err=>{
-        if(err){
-            console.log("Error destroying session",err);
-            return res.redirect("/pageerror")
-        }
+       req.session.admin = null
         res.redirect("/admin/login")
-       })
+       
     } catch (error) {
-        console.log(("unexpected error during logout",error));
+       
         res.redirect("/pageerror")
         
     }

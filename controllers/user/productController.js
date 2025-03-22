@@ -7,7 +7,7 @@ const productDetails = async (req, res) => {
         const userId = req.session.user;
         const productId = req.params.id;
         const getProduct = await Product.findById(productId).populate('category');
-        console.log("getProduct:", getProduct);
+        
         
         if (!getProduct) {
             return res.redirect('/pageNotFound');
@@ -23,7 +23,7 @@ const productDetails = async (req, res) => {
         .limit(8)
         .lean();
 
-        console.log("Related Products Found (Category Match):", relatedProducts.length);
+
 
         if (relatedProducts.length < 8) {
             let additionalProducts = await Product.find({
@@ -36,7 +36,7 @@ const productDetails = async (req, res) => {
             .limit(8 - relatedProducts.length)
             .lean();
 
-            console.log("Additional Products Found (Color Match):", additionalProducts.length);
+          
 
           
             const uniqueProducts = new Map();
@@ -47,7 +47,7 @@ const productDetails = async (req, res) => {
             relatedProducts = Array.from(uniqueProducts.values());
         }
 
-        console.log("Final Recommended Product IDs:", relatedProducts.map(p => p._id.toString()));
+      
 
        
         res.render('user/singleDetails', {

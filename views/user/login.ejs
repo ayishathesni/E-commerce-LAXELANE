@@ -216,11 +216,11 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" required placeholder="Enter your password" name="password">
             </div>
-            <% if (typeof message !== 'undefined' && message) { %>
-                <div class="alert alert-danger text-center">
-                    <%= message %>
-                </div>
+            <% if (message && message.length > 0 ) { %>
+                <div class="alert alert-danger"><%= message %></div>
             <% } %>
+            
+            
             
                     <div id="error2" class="error-message"></div>
 

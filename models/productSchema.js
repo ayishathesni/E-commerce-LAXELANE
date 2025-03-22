@@ -64,7 +64,7 @@ const productSchema = new Schema({
         required:true,
         default:"Available"
     },
-    stock: { type: Number, default: 1 },
+   
 },
 {timestamps:true});
    

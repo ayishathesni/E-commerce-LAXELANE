@@ -21,10 +21,15 @@ const cartSchema = new mongoose.Schema({
             required: true
 
         },
-
+        size: {
+            type: String,
+            required: true
+        },
+        
         quantity: {
             
             type: Number,
+            required:true,
             default: 1
 
         },
@@ -32,14 +37,17 @@ const cartSchema = new mongoose.Schema({
         price: {
              
             type: Number,
-            required: true
+            required: true,
+            default: 0
+
 
         },
 
     totalPrice: {
             
         type: Number,
-        required: true
+        required: true,
+        default: 0
 
     },
     status:{

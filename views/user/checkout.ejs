@@ -1,0 +1,914 @@
+<%- include("../../views/partials/user/header") %>
+<style>
+  .orders {
+    margin: 0 auto; 
+    max-width: 800px; 
+}
+
+.modal-dialog {
+    max-width: 600px;
+}
+
+.card-dashboard {
+    width: 100%;
+    box-shadow: 1px 1px 4px 0px #888888;
+    padding: 15px;
+}
+
+.text-warning {
+    font-weight: bold;
+}
+
+</style>
+
+<div class="page-wrapper">
+    <main class="main">
+        <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+            <div class="container">
+                <h1 class="page-title text-black-50">Checkout<span>Shop</span></h1>
+            </div>
+        </div>
+        
+        <nav aria-label="breadcrumb" class="breadcrumb-nav">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="#">Cart</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+                </ol>
+            </div>
+        </nav>
+
+        <% if (typeof productRemovedMsg !== 'undefined' && productRemovedMsg) { %>
+            <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+                <%= productRemovedMsg %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+
+        <!-- Modal For Address Add-->
+        <div class="modal fade" id="address" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title" id="exampleModalLabel">Add Address</h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                   
+                    <div class="modal-body">
+                        <form method="post" style="padding-left: 15px;padding-right: 15px;" id="addform">
+                            <p class="" id="msg"><%= locals.msgg ? msgg : '' %></p>
+                            
+                            <div class="row mb-3">
+                                <div class="col-lg-12">
+                                    <label for="addressType" class="col-form-label text-black">Address Type *</label>
+                                    <select class="form-select" name="addressType" id="addressType" required>
+                                        <option value="" selected disabled>Select Address Type</option>
+                                        <option value="Home">Home</option>
+                                        <option value="Office">Office</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label for="name" class="col-form-label text-black">Name *</label>
+                                    <input type="text" class="form-control" name="name" id="name" placeholder="Enter your Name" required>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <label for="phone" class="col-form-label text-black">Mobile Number *</label>
+                                    <input type="tel" class="form-control" name="phone" id="phone" placeholder="Enter your Mobile" required>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 mt-3">
+                                <label for="address" class="col-form-label text-black">Address *</label>
+                                <textarea class="form-control" id="address" name="address" rows="3" placeholder="Enter your Address" required></textarea>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-lg-6">
+                                    <label for="landMark" class="col-form-label text-black">Landmark *</label>
+                                    <input type="text" class="form-control" name="landMark" id="landMark" placeholder="Enter nearby landmark" required>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <label for="city" class="col-form-label text-black">City *</label>
+                                    <input type="text" class="form-control" name="city" id="city" placeholder="Enter your City" required>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-lg-6">
+                                    <label for="state" class="col-form-label text-black">State *</label>
+                                    <input type="text" class="form-control" name="state" id="state" placeholder="Enter your State" required>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <label for="pincode" class="col-form-label text-black">Pincode *</label>
+                                    <input type="text" class="form-control" name="pincode" id="pincode" placeholder="Enter your pincode" required>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-lg-6">
+                                    <label for="altPhone" class="col-form-label text-black">Alternative Phone *</label>
+                                    <input type="tel" class="form-control" name="altPhone" id="altPhone" placeholder="Alternative phone number" required>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+
+
+                    <div class="modal-footer">
+                        <input type="hidden" value="<%= userData._id %>" id="validUserId">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" onclick="return validateForm(event)">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       <!-- Modal Choose Address -->
+<div class="modal fade" id="changeAddressModal" tabindex="-1" aria-labelledby="changeAddressModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Choose Address</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <% if (address && address.address && address.address.length > 0) { %>
+                        <% for (let i = 0; i < address.address.length; i++) { %>
+                            <div class="col-lg-5" style="margin: auto;">
+                                <div class="card card-dashboard mt-2 style" 
+                                    style="width: 100%; box-shadow:1px 1px 4px 0px #888888;" 
+                                    onclick="chooseAddress('<%= address.address[i]._id %>')">
+                                    <div class="card-body" style="cursor: pointer;">
+                                        <h3 class="card-title"><%= address.address[i].addressType %></h3>
+                                        <p><%= address.address[i].name %></p>
+                                        <p>
+                                            <%= address.address[i].address %>, <%= address.address[i].landMark %>,
+                                            <br> <%= address.address[i].city %>, <%= address.address[i].state %> - <%= address.address[i].pincode %>
+                                            <br> Phone: <%= address.address[i].phone %> | Alt: <%= address.address[i].altPhone %>
+                                        </p>
+                                        <a href="#" class="text-warning" data-bs-toggle="modal" data-bs-target="#editAddressModal" 
+                                            onclick="editAddress('<%= address.address[i]._id %>')">
+                                            Edit <i class="icon-edit"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <div class="p-3">
+                            <p class="text-center">No Address Found. <a href="/addAddress">Click Here</a> to add an address.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Address Section -->
+<div class="page-content">
+    <div class="checkout">
+        <div class="container">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <% if (!address || !address.address || address.address.length === 0) { %>
+                            <div class="text-center mt-4">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#address">
+                                    Add Address
+                                </button>
+                                <p class="text-info mt-3">Click the Add Address button to add an address.</p>
+                            </div>
+                        <% } else { 
+                            let defaultAddress = address.address.find(a => a.status === true);
+                            if (!defaultAddress) defaultAddress = address.address[0]; // Fallback to first address
+                        %>
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <span class="fw-bold">Default Address</span>
+                                <button type="button" class="btn btn-link text-warning" data-bs-toggle="modal" data-bs-target="#changeAddressModal">
+                                    Change Address
+                                </button>
+                            </div>
+                            <div class="card card-dashboard mt-2">
+                                <div class="card-body">
+                                    <p class="mt-2">
+                                        <span class="fw-bold"><%= defaultAddress.name %></span><br>
+                                        <%= defaultAddress.address %>, <%= defaultAddress.landMark %>,<br>
+                                        <%= defaultAddress.city %>, <%= defaultAddress.state %> - <%= defaultAddress.pincode %><br>
+                                        <span class="fw-bold">Phone:</span> <%= defaultAddress.phone %> | 
+                                        <span class="fw-bold">Alt Phone:</span> <%= defaultAddress.altPhone %>
+                                    </p>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+                  
+                            
+                            <!-- Edit Address Modal -->
+                            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Address</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" style="padding: 13px;">
+                                           
+                                            <form id="editAddressForm" action="editAddressCheckout" method="post" style="padding-left: 15px;padding-right: 15px;">
+                                                <p class="" hidden id="msg"><%= locals.msgg %></p>
+                                                <div class="row mb-3">
+                                                    <div class="col-lg-12">
+                                                        <label for="editAddressType" class="col-form-label text-black">Address Type *</label>
+                                                        <select class="form-select" name="addressType" id="editAddressType" required>
+                                                            <option value="Home">Home</option>
+                                                            <option value="Office">Office</option>
+                                                            <option value="Other">Other</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <label for="editName" class="col-form-label text-black">Name *</label>
+                                                        <input type="text" class="form-control" name="name" id="editName" placeholder="Enter your Name" required>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <label for="editPhone" class="col-form-label text-black">Mobile Number *</label>
+                                                        <input type="tel" class="form-control" name="phone" id="editPhone" placeholder="Enter your Mobile" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-12 mt-3">
+                                                    <label for="editAddress" class="col-form-label text-black">Address *</label>
+                                                    <textarea class="form-control" id="editAddress" name="address" rows="3" placeholder="Enter your Address" required></textarea>
+                                                </div>
+                                                <div class="row mt-3">
+                                                    <div class="col-lg-6">
+                                                        <label for="editLandMark" class="col-form-label text-black">Landmark *</label>
+                                                        <input type="text" class="form-control" name="landMark" id="editLandMark" placeholder="Enter nearby landmark" required>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <label for="editCity" class="col-form-label text-black">City *</label>
+                                                        <input type="text" class="form-control" name="city" id="editCity" placeholder="Enter your City" required>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-3">
+                                                    <div class="col-lg-6">
+                                                        <label for="editState" class="col-form-label text-black">State *</label>
+                                                        <input type="text" class="form-control" name="state" id="editState" placeholder="Enter your State" required>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <label for="editPincode" class="col-form-label text-black">Pincode *</label>
+                                                        <input type="text" class="form-control" name="pincode" id="editPincode" placeholder="Enter your pincode" required>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-3">
+                                                    <div class="col-lg-6">
+                                                        <label for="editAltPhone" class="col-form-label text-black">Alternative Phone *</label>
+                                                        <input type="tel" class="form-control" name="altPhone" id="editAltPhone" placeholder="Alternative phone number" required>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" name="addressId" id="addressId">
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                         
+                                            <button type="submit" class="btn btn-primary"  onclick="return updateAddress()">Save changes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        <!-- Order Summary Section -->
+                        
+
+                        <div class="d-flex justify-content-center mt-4">
+    <aside class="col-lg-4">
+        <div class="orders">
+            <div class="summary">
+                <h3 class="summary-title text-center">Your Order</h3>
+
+                <table class="table table-summary">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% cartData?.products?.forEach((product) => { %>
+        <tr>
+            <td>
+                <a href="#"><%= product.name %></a>
+                <div class="product-details">
+                    <small>Size: <%= product.size %></small><br>
+                    <small>Quantity: <%= product.quantity %></small>
+                </div>
+            </td>
+            <td>₹<%= product.price * product.quantity %>.00</td>
+        </tr>
+    <% }) %>
+
+                        <tr class="summary-subtotal">
+                            <td>Subtotal:</td>
+                            <% if (cartData.coupenDiscount >= 1) { %>
+                                <td>₹<%= cartData?.totalCartPrice + cartData.coupenDiscount %></td>
+                            <% } else { %>
+                                <td>₹<%= cartData?.totalCartPrice %>.00</td>
+                            <% } %>
+                        </tr>
+
+                        <% if (cartData.coupenDiscount >= 1) { %>
+                            <tr>
+                                <td>Coupon Offer:</td>
+                                <td class="text-success">- ₹<%= cartData.coupenDiscount %>.00</td>
+                            </tr>
+                        <% } %>
+
+                        <tr class="summary-total">
+                            <td>Total:</td>
+                            <td>₹<%= cartData?.totalCartPrice %>.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="accordion-summary" id="accordion-payment">
+                    <div class="card">
+                        <% if (cartData?.totalCartPrice <= 10000) { %>
+                            <div class="card-header mb-3">
+                                <h2 class="card-title">
+                                    <input type="radio" name="payment" value="Cash on Delivery" checked class="bg-primary me-2">
+                                    <label>Cash on Delivery</label>
+                                </h2>
+                            </div>
+                        <% } else { %>
+                            <div class="card-header mb-3">
+                                <h2 class="card-title">
+                                    <input type="radio" name="payment" value="Cash on Delivery" disabled class="bg-primary opacity-50 me-2">
+                                    <label style="text-decoration:line-through;">Cash on Delivery</label>
+                                </h2>
+                            </div>
+                        <% } %>
+
+                        <div class="card-header mb-3">
+                            <h2 class="card-title">
+                                <input type="radio" name="payment" value="Online Payment" class="bg-primary me-2">
+                                <label>Online Payment</label>
+                            </h2>
+                        </div>
+
+                        <div class="card-header mb-3">
+                            <h2 class="card-title">
+                                <input type="radio" name="payment" value="Wallet Payment" class="bg-primary me-2">
+                                <label>Wallet Payment</label>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="button" onclick="submitPayment('<%= userData?._id %>', '<%= locals.cartData?.totalCartPrice %>')" 
+                        class="btn btn-outline-primary-2 btn-order btn-block">
+                        <span class="btn-text">Place Order</span>
+                        <span class="btn-hover-text">Proceed to Checkout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+
+
+
+
+
+function validateForm(event) {
+    if (event) {
+        event.preventDefault();
+    }
+
+    const validId = document.getElementById('validUserId').value;
+    const form = document.getElementById('addform');
+    const inputs = form.querySelectorAll('input, textarea, select');
+    let isValid = true;
+    let errors = [];
+
+    let phoneValue = ""; 
+
+    inputs.forEach(function(input) {
+        let value = input.value.trim();
+        let fieldName = input.name; 
+
+        if (input.hasAttribute('required') && value === "") {
+            isValid = false;
+            input.classList.add('is-invalid');
+        } else {
+            input.classList.remove('is-invalid');
+        }
+
+        if (fieldName === "name" && !/^[a-zA-Z\s]{2,50}$/.test(value)) {
+            isValid = false;
+            errors.push("Name should contain only letters and spaces (2-50 characters).");
+        }
+        if (fieldName === "phone") {
+            if (!/^\d{10}$/.test(value)) {
+                isValid = false;
+                errors.push("Phone number should be exactly 10 digits.");
+            } else {
+                phoneValue = value; 
+            }
+        }
+        if (fieldName === "altPhone") {
+            if (!/^\d{10}$/.test(value)) {
+                isValid = false;
+                errors.push("Alternate phone number should be exactly 10 digits.");
+            } else if (phoneValue && phoneValue === value) {
+                isValid = false;
+                errors.push("Alternate phone number should be different from the main phone number.");
+            }
+        }
+        if (fieldName === "pincode" && !/^\d{6}$/.test(value)) {
+            isValid = false;
+            errors.push("Pincode should be exactly 6 digits.");
+        }
+        if (fieldName === "landmark" && value.length < 3) {
+            isValid = false;
+            errors.push("Landmark should be at least 3 characters long.");
+        }
+        if (fieldName === "address" && value.length < 10) {
+            isValid = false;
+            errors.push("Address should be at least 10 characters long.");
+        }
+        if (fieldName === "city" && !/^[a-zA-Z\s]{3,50}$/.test(value)) {
+            isValid = false;
+            errors.push("City name should contain only letters and be at least 3 characters long.");
+        }
+        if (fieldName === "addressType" && value === "") {
+            isValid = false;
+            errors.push("Please select an address type.");
+        }
+    });
+
+    if (!isValid) {
+        Swal.fire({
+            title: "Validation Error",
+            html: errors.length > 0 ? errors.join("<br>") : "Please fill all required fields",
+            icon: "error"
+        });
+        return false;
+    }
+
+    addAddress(validId);
+}
+
+
+ 
+    function addAddress(userId) {
+  const form = document.getElementById('addform');
+  const formData = new FormData(form);
+  const addressData = {};
+
+  formData.forEach((value, key) => {
+    addressData[key] = value;
+  });
+
+  fetch(`/add-address-checkout`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        userId, 
+        address: [addressData]  
+    })
+})
+
+  .then(res => res.json())
+  .then(data => {
+      if (data.success) {
+          Swal.fire({
+              title: 'Success',
+              text: 'Address added successfully',
+              icon: 'success',
+              confirmButtonText: 'OK'
+          }).then(() => {
+              updateAddressList(userId); 
+          });
+      } else {
+          Swal.fire({
+              title: 'Failed',
+              text: data.message || 'Failed to add address',
+              icon: 'error',
+              confirmButtonText: 'OK'
+          });
+      }
+  })
+  .catch(error => {
+      Swal.fire({
+          title: 'Error',
+          text: 'An unexpected error occurred',
+          icon: 'error',
+          confirmButtonText: 'OK'
+      });
+  });
+}
+
+
+function chooseAddress(id) {
+    console.log("Choosing address with ID:", id); 
+
+    fetch(`/chooseAddress/${id}`, { method: 'PATCH' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                console.error("Error choosing address:", data.message);
+                Swal.fire({
+                    title: "Error",
+                    text: data.message || "Failed to select address",
+                    icon: "error",
+                });
+            }
+        })
+        .catch(err => {
+            console.error("Fetch error:", err);
+            Swal.fire({
+                title: "Error",
+                text: "An unexpected error occurred while selecting the address.",
+                icon: "error",
+            });
+        });
+}
+
+
+    function editAddress(edit) {
+    fetch('/edit-address-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: edit })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (!data.success) {
+            console.error("Backend response failed:", data);
+            throw new Error(data.message || "Failed to fetch address details.");
+        }
+
+        if (!data.editData) {
+            console.error(" Missing editData in response:", data);
+            throw new Error("editData is missing.");
+        }
+
+        const addressEntry = data.editData;
+     
+
+        if (!addressEntry.name || !addressEntry.phone || !addressEntry.city) {
+            console.error("Selected address data is incomplete:", addressEntry);
+            return;
+        }
+
+        setTimeout(() => {
+            const fields = [
+    { id: 'editName', value: addressEntry.name },  
+    { id: 'editPhone', value: addressEntry.phone },
+    { id: 'editAddressType', value: addressEntry.addressType }, 
+    { id: 'editPincode', value: addressEntry.pincode }, 
+    { id: 'editAddress', value: addressEntry.address || '' },  
+    { id: 'editCity', value: addressEntry.city },  
+    { id: 'editState', value: addressEntry.state },  
+    { id: 'editLandMark', value: addressEntry.landMark }, 
+    { id: 'editAltPhone', value: addressEntry.altPhone }  
+];
+
+
+            let missingFields = [];
+
+            fields.forEach(field => {
+                const element = document.getElementById(field.id);
+                if (element) {
+                    element.value = field.value || '';  
+                } else {
+                    console.warn(`Missing element: #${field.id}`);
+                    missingFields.push(field.id);
+                }
+            });
+
+            if (missingFields.length > 0) {
+                Swal.fire({
+                    title: 'Error',
+                    text: `Some fields are missing: ${missingFields.join(', ')}`,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            const modalElement = document.getElementById('exampleModal');
+            if (modalElement) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            } else {
+                console.error(" Modal #exampleModal not found in DOM.");
+            }
+        }, 300);
+
+    })
+    .catch(error => {
+        console.error(" Error fetching address:", error.message);
+        Swal.fire({
+            title: 'Error',
+            text: error.message || 'Something went wrong while fetching address details.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    });
+}
+
+
+   
+    function validateAddressForm() {
+    const name = document.getElementById('editName').value.trim();
+    const phone = document.getElementById('editPhone').value.trim();
+    const address = document.getElementById('editAddress').value.trim();
+    const landmark = document.getElementById('editLandMark').value.trim();
+    const city = document.getElementById('editCity').value.trim();
+    const state = document.getElementById('editState').value.trim();
+    const pincode = document.getElementById('editPincode').value.trim();
+    const altPhone = document.getElementById('editAltPhone').value.trim();
+
+    const nameRegex = /^[a-zA-Z\s]{2,50}$/;
+    const phoneRegex = /^[0-9]{10}$/;
+    const pincodeRegex = /^[0-9]{6}$/;
+    
+    let errors = [];
+    if (!nameRegex.test(name)) {
+        errors.push('Name should contain only letters and spaces (2-50 characters)');
+    }
+    if (!phoneRegex.test(phone)) {
+        errors.push('Phone number should be 10 digits');
+    }
+    if (!phoneRegex.test(altPhone)) {
+        errors.push('Alternative phone number should be 10 digits');
+    }
+    if (address.length < 10 || address.length > 200) {
+        errors.push('Address should be between 10 and 200 characters');
+    }
+
+    if (landmark.length < 3 || landmark.length > 100) {
+        errors.push('Landmark should be between 3 and 100 characters');
+    }
+
+    if (!/^[a-zA-Z\s]{2,50}$/.test(city)) {
+        errors.push('City should contain only letters and spaces (2-50 characters)');
+    }
+    if (!/^[a-zA-Z\s]{2,50}$/.test(state)) {
+        errors.push('State should contain only letters and spaces (2-50 characters)');
+    }
+    if (!pincodeRegex.test(pincode)) {
+        errors.push('Pincode should be 6 digits');
+    }
+
+    if (errors.length > 0) {
+        Swal.fire({
+            title: 'Validation Error',
+            html: errors.join('<br>'),
+            icon: 'error'
+        });
+        return false;
+    }
+
+    return true;
+}
+
+
+function updateAddress() {
+    if (!validateAddressForm()) {
+        return false;
+    }
+
+    const form = document.getElementById('editAddressForm');
+
+    if (!form || !(form instanceof HTMLFormElement)) {
+        console.error("Error: Form not found or invalid!");
+        Swal.fire({
+            title: 'Error',
+            text: 'Form not found! Please refresh and try again.',
+            icon: 'error'
+        });
+        return;
+    }
+
+    const addressId = document.getElementById('addressId')?.value;
+
+    if (!addressId) {
+        console.error("Error: Address ID is missing!");
+        Swal.fire({
+            title: 'Error',
+            text: 'Address ID is missing. Please try again.',
+            icon: 'error'
+        });
+        return;
+    }
+
+    const formData = new FormData(form);
+    let data = Object.fromEntries(formData.entries());
+
+ 
+    data.addressId = addressId;
+
+
+    fetch('/edit-address-checkout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(response => {
+        if (response.success) {
+            Swal.fire({
+                title: 'Success',
+                text: 'Address updated successfully',
+                icon: 'success'
+            }).then(() => {
+                const modalElement = document.getElementById('exampleModal');
+                if (modalElement) {
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) modalInstance.hide();
+                }
+                window.location.reload();
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: response.message || 'Failed to update address',
+                icon: 'error'
+            });
+        }
+    })
+    .catch(error => {
+        console.error("Update error:", error);
+        Swal.fire({
+            title: 'Error',
+            text: 'An unexpected error occurred while updating the address.',
+            icon: 'error'
+        });
+    });
+
+    return false; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function submitPayment(userId, totalPrice) {
+    console.log("🔹 Submit Payment Called");
+
+   
+    const paymentMethodElement = document.querySelector('input[name="payment"]:checked');
+    if (!paymentMethodElement) {
+        return Swal.fire({
+            icon: 'warning',
+            title: 'Payment Method',
+            text: 'Please select a payment method.'
+        });
+    }
+    
+    const paymentMethod = paymentMethodElement.value;
+    
+  
+    if (paymentMethod === "Cash on Delivery" && totalPrice > 10000) {
+        return Swal.fire({
+            icon: 'warning',
+            title: 'Payment Restriction',
+            text: 'Cash on Delivery is not available for orders above ₹10,000. Please select another payment method.'
+        });
+    }
+
+   
+    const defaultAddressElement = document.querySelector('.card-dashboard .card-body');
+    if (!defaultAddressElement) {
+        return Swal.fire({
+            icon: 'warning',
+            title: 'Delivery Address',
+            text: 'Please add a delivery address first.'
+        });
+    }
+
+  
+    const couponDiscount = parseFloat("<%= cartData?.coupenDiscount || 0 %>");
+
+
+    const orderData = {
+        userId,
+        paymentMethod,
+        couponDiscount,
+    };
+
+    console.log("🔹 Order Data:", orderData);
+
+    try {
+        const response = await fetch("/place-order", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(orderData),
+        });
+
+      
+        const result = await response.json();
+        console.log("🔹 Place Order Response:", result);
+
+        if (result.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Order Placed',
+                text: 'Your order has been placed successfully!'
+            }).then(() => {
+                window.location.href = "/order-success";
+            });
+        } else {
+           
+            Swal.fire({
+                icon: 'error',
+                title: 'Order Failed',
+                text: result.message || "Failed to place order. Please check your cart and try again."
+            });
+        }
+    } catch (error) {
+        console.error("Error in submitting payment:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Network Error',
+            text: "Unable to connect to the server. Please check your internet connection and try again."
+        });
+    }
+}
+
+
+
+
+    
+
+
+
+
+
+</script>
+
+<style>
+    .style:hover {
+        background-color: rgb(239, 239, 239);
+    }
+    
+    .style:active {
+        background-color: rgb(211, 211, 211);
+    }
+</style>
+
+<%- include("../../views/partials/user/footer") %>

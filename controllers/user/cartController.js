@@ -2,89 +2,92 @@ const User=require("../../models/userSchema");
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
+const mongoose = require("mongoose");
 
 const addToCart = async (req, res) => {
     try {
-        // Check if user is logged in
-        if (!req.session.user || !req.session.user._id) {
+        if (!req.session?.user?._id) {
             return res.status(401).json({
                 success: false,
                 message: 'Please login to add items to cart'
             });
         }
-
-        const userId = req.session.user._id;
+     const userId = req.session.user._id;
         const { productId, quantity, size } = req.body;
 
-        console.log("this is the condole",req.body)
-
-        // Validate input
         if (!productId || !quantity || !size) {
             return res.status(400).json({
                 success: false,
-                message: 'Missing required fields'
+                message: 'Missing required fields: productId, quantity, or size'
             });
         }
-
-        // Find product
         const product = await Product.findById(productId);
-        if (!product) {
-            return res.status(404).json({
+        if (!product || product.isBlocked) {
+            return res.status(400).json({
                 success: false,
-                message: 'Product not found'
+                message: 'This product is not available.'
+            });
+        }
+        
+
+        const selectedSize = product.sizes.find(s => s.size === size);
+        if (!selectedSize) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid size selection. Available sizes: ${product.sizes.map(s => s.size).join(', ')}` 
             });
         }
 
-        // Calculate price (use salePrice from your product model)
+        if (quantity > selectedSize.quantity) {
+            return res.status(400).json({
+                success: false,
+                message: `Only ${selectedSize.quantity} left in stock`
+            });
+        }
+
         const price = product.salePrice;
         const totalPrice = price * quantity;
 
-        // Check if user already has a cart
         let cart = await Cart.findOne({ userId });
 
-        // Check if product already exists in cart
-        if (cart) {
-            const existingItem = cart.items.find(item => 
-                item.productId.toString() === productId && 
-                item.size === size &&
-                item.status === 'placed'
-            );
-
-            if (existingItem) {
-                return res.json({
-                    exist: true,
-                    message: 'Item already in cart'
-                });
-            }
-        } else {
-            // Create new cart if it doesn't exist
+        if (!cart) {
             cart = new Cart({ userId, items: [] });
         }
 
-        // Add new item to cart
-        cart.items.push({
-            productId,
-            name: product.productName,
-            quantity,
-            price,
-            totalPrice,
-            size,
-            status: 'placed'
-        });
+        const existingItem = cart.items.find(item => 
+            item.productId.toString() === productId &&
+            item.size === size &&
+            item.status === 'placed'
+        );
+
+        if (existingItem) {
+         
+            return res.status(400).json({
+                success: false,
+                message: `This item is already in your cart. You can update the quantity from the cart page.`
+            });
+        } else {
+        
+            cart.items.push({
+                productId,
+                name: product.productName,
+                quantity: parseInt(quantity),
+                price,
+                totalPrice,
+                size,
+                status: 'placed'
+            });
+        }
 
         await cart.save();
 
-        // Get updated cart count
-        const cartCount = cart.items.length;
-
         return res.json({
             success: true,
-            cartCount,
+            cartCount: cart.items.length,
             message: 'Product added to cart successfully'
         });
 
     } catch (error) {
-        console.error('Add to cart error:', error);
         return res.status(500).json({
             success: false,
             message: 'Failed to add item to cart'
@@ -96,226 +99,216 @@ const addToCart = async (req, res) => {
 
 
 
-
-
-
 const loadCart = async (req, res) => {
     try {
         if (!req.session.user) {
             return res.redirect('/login');
         }
 
-        const userId = req.session.user;
+        const userId = req.session.user._id;
         const categories = await Category.find({ isBlocked: false });
-        
-        // Find cart with populated product details
-        const cartData = await Cart.findOne({ userId }).populate({
-            path: 'items.productId',
-            populate: { path: 'category' }
-        });
 
-        if (cartData && cartData.items.length > 0) {
-            // Filter out products that are unavailable or blocked
-            const unavailableProducts = cartData.items.filter(
-                item => item.productId.isBlocked || item.productId.status !== "Available"
-            );
-            
-            // Remove unavailable products from cart
-            if (unavailableProducts.length > 0) {
-                for (const item of unavailableProducts) {
-                    await Cart.findOneAndUpdate(
-                        { userId },
-                        { $pull: { items: { productId: item.productId._id } } },
-                        { new: true }
-                    );
-                }
-            }
-            
-            // Get updated cart after removing unavailable products
-            const updatedCart = unavailableProducts.length > 0 
-                ? await Cart.findOne({ userId }).populate('items.productId')
-                : cartData;
-            
-            // Calculate cart totals
-            let cartTotal = 0;
-            updatedCart.items.forEach(item => {
-                cartTotal += item.totalPrice;
-            });
-            
-            // Convert cart items format to match template expectations
-            const cart = {
-                _id: updatedCart._id,
-                products: updatedCart.items.map(item => {
-                    // Add 'images' property that points to 'productImage'
-                    const productData = item.productId;
-                    productData.images = productData.productImage;
-                    
-                    // Handle name difference (productName in schema but template expects name)
-                    productData.name = productData.productName;
-                    
-                    // Handle price differences
-                    productData.price = productData.regularPrice;
-                    productData.discount_price = productData.salePrice;
-                    productData.discount = productData.regularPrice > productData.salePrice ? 
-                        productData.regularPrice - productData.salePrice : 0;
-                    
-                    return {
-                        productId: productData,
-                        quantity: item.quantity,
-                        price: item.totalPrice
-                    };
-                }),
-                coupenDiscount: 0 // Initialize to 0 or set from your coupon logic
-            };
-            
+        const cartData = await Cart.findOne({ userId }).populate('items.productId');
+
+        if (!cartData || cartData.items.length === 0) {
             return res.render('user/cart', {
                 login: userId,
                 categories,
-                cart: cart,
-                totalPrice: cartTotal
-            });
-        } else {
-            // Return empty cart
-            return res.render('user/cart', {
-                login: userId,
-                categories,
-                cart: { products: [] },
-                totalPrice: 0
+                cart: { items: [] },
+                maxQuantities: []
             });
         }
+
+      
+        const filteredItems = cartData.items.filter(item => {
+            return item.productId && !item.productId.isBlocked;
+        });
+
+      
+        if (filteredItems.length !== cartData.items.length) {
+            cartData.items = filteredItems;
+            await cartData.save(); 
+        }
+
+        if (filteredItems.length === 0) {
+            return res.render('user/cart', {
+                login: userId,
+                categories,
+                cart: { items: [] },
+                maxQuantities: []
+            });
+        }
+
+      
+        const maxQuantities = filteredItems.map(item => {
+            const selectedSize = item.size;
+            const sizeInfo = item.productId?.sizes?.find(s => s.size === selectedSize);
+            return sizeInfo ? sizeInfo.quantity : 0;
+        });
+
+        return res.render('user/cart', {
+            login: userId,
+            categories,
+            cart: { ...cartData.toObject(), items: filteredItems },
+            maxQuantities
+        });
+
     } catch (error) {
         console.error('Error loading cart:', error);
-        // Changed error handling to use a more generic approach
-        return res.status(500).redirect('/'); // Redirect to home page on error
-        // Alternative: Display error message on the current page
-        // return res.render('user/cart', {
-        //     login: userId,
-        //     categories: [],
-        //     cart: { products: [] },
-        //     totalPrice: 0,
-        //     error: 'Failed to load cart. Please try again later.'
-        // });
+        return res.status(500).redirect('/');
     }
 };
 
 
-// Update Cart (PUT Method)
-const updateCart = async (req, res) => {
+
+
+
+
+
+
+
+
+const cartUpdate = async (req, res) => {
+    console.log("the product is updating")
+    const { quantity, cartId, proId, size,price } = req.body;
+    console.log("Received Request:", { quantity, cartId, proId, size,price });
+  
     try {
-        if (!req.session.user) {
-            return res.status(401).json({ success: false, message: 'Please login to update cart' });
-        }
+   
+      if (!mongoose.Types.ObjectId.isValid(cartId)) {
+        return res.json({ success: false, message: "Invalid cart ID format" });
+      }
+      if (!mongoose.Types.ObjectId.isValid(proId)) {
+        return res.json({ success: false, message: "Invalid product ID format" });
+      }
+  
+      const cart = await Cart.findById(cartId);
+      if (!cart) return res.json({ success: false, message: "Cart not found" });
+  
+      const product = await Product.findById(proId);
+      if (!product) return res.json({ success: false, message: "Product not found" });
+  
 
-        const userId = req.session.user;
-        const { itemId, quantity } = req.body;
-        
-        if (!itemId || !quantity || quantity < 1) {
-            return res.status(400).json({ success: false, message: 'Invalid update parameters' });
-        }
-
-        // Find cart and item
-        const cart = await Cart.findOne({ userId });
-        if (!cart) {
-            return res.status(404).json({ success: false, message: 'Cart not found' });
-        }
-
-        const cartItem = cart.items.id(itemId);
-        if (!cartItem) {
-            return res.status(404).json({ success: false, message: 'Item not found in cart' });
-        }
-
-        // Validate product and stock availability
-        const product = await Product.findById(cartItem.productId);
-        if (!product || product.isBlocked || product.status !== 'Available') {
-            return res.status(400).json({ success: false, message: 'Product is not available' });
-        }
-
-        // Check stock availability
-        if (product.stock < quantity) {
-            return res.status(400).json({ 
-                success: false, 
-                message: `Only ${product.stock} items available in stock` 
-            });
-        }
-
-        // Update item quantity and price
-        const itemPrice = cartItem.price;
-        const newTotalPrice = itemPrice * quantity;
-
-        // Update cart item
-        cartItem.quantity = quantity;
-        cartItem.totalPrice = newTotalPrice;
-
-        await cart.save();
-
-        // Calculate new cart total
-        const cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-
-        return res.status(200).json({
-            success: true,
-            newItemTotal: newTotalPrice,
-            cartTotal: cartTotal,
-            message: 'Cart updated successfully'
+      const selectedSize = (size && size.trim().toUpperCase()) || "N/A";
+      console.log("Selected Size:", selectedSize);
+  
+      const sizeData = product.sizes.find(s => s.size.toUpperCase() === selectedSize);
+      if (!sizeData) {
+        return res.json({ success: false, message: "Invalid size selected" });
+      }
+  
+      if (quantity > sizeData.quantity) {
+        return res.json({ success: false, message: "Not enough stock available for this size!" });
+      }
+  
+   
+      const selectedPrice = Number(product.salePrice || product.regularPrice || 0);
+      if (isNaN(selectedPrice) || selectedPrice <= 0) {
+        return res.json({ success: false, message: "Invalid price for selected product" });
+      }
+  
+      const selectedName = product.name;
+  
+      const itemIndex = cart.items.findIndex(
+        item =>
+          item.productId.toString() === proId &&
+          (item.size && item.size.trim().toUpperCase()) === selectedSize
+      );
+  
+     
+  
+      if (itemIndex !== -1) {
+        cart.items[itemIndex].quantity = quantity;
+        cart.items[itemIndex].price = selectedPrice;
+        cart.items[itemIndex].totalPrice = quantity * selectedPrice;
+        console.log("Updated existing cart item.");
+      } else {
+        cart.items.push({
+          productId: proId,
+          name: selectedName,
+          size: selectedSize,
+          quantity,
+          price: selectedPrice,
+          totalPrice: quantity * selectedPrice,
+          status: "placed",
+          cancellationReason: "none"
         });
+        console.log("Added new cart item.");
+      }
+  
+      const subTotal = cart.items.reduce((acc, item) => acc + (Number(item.totalPrice) || 0), 0);
+      const totalPrice = subTotal;
+  
+      await cart.save();
+
+      console.log("Updated cart saved:", {
+        items: cart.items.map(item => ({
+          productId: item.productId,
+          size: item.size,
+          quantity: item.quantity,
+          totalPrice: item.totalPrice
+        })),
+        totalPrice: cart.totalPrice || subTotal,
+        subTotal: cart.subTotal || subTotal
+      });
+  
+      return res.json({
+        success: true,
+        productPrice: quantity * selectedPrice,
+        subTotal,
+        totalPrice
+      });
+  
+    } catch (err) {
+      console.error("Cart Update Error:", err);
+      return res.status(500).json({ success: false, message: "Server error" });
+    }
+  };
+  
+
+  
+
+
+
+
+
+
+
+const deleteCart = async (req, res) => {
+    if (!req.session?.user?._id) {
+        return res.status(401).json({ success: false, message: "Please login to remove items" });
+    }
+
+    const userId = req.session.user._id;
+    const { productId, size } = req.body;
+
+    if (!productId || !size) {
+        return res.status(400).json({ success: false, message: "Product ID and size are required" });
+    }
+
+    try {
+        const result = await Cart.updateOne(
+            { userId },
+            { $pull: { items: { productId, size } } }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ success: false, message: "Item not found in cart or already removed" });
+        }
+        return res.status(200).json({ success: true, message: "Item removed from cart successfully" });
+
     } catch (error) {
-        console.error('Error updating cart:', error);
-        return res.status(500).json({ success: false, message: 'Failed to update cart' });
+        return res.status(500).json({ success: false, message: "Failed to remove item from cart." });
     }
 };
+
+
+
+
 
 module.exports = {
     addToCart,
     loadCart,
-    updateCart
+    cartUpdate,
+    deleteCart
 }
-
-// // Delete from Cart (DELETE Method)
-// const deleteCart = async (req, res) => {
-//     try {
-//         if (!req.session.user) {
-//             return res.status(401).json({ success: false, message: 'Please login to remove items' });
-//         }
-
-//         const userId = req.session.user;
-//         const { itemId } = req.body;
-
-//         if (!itemId) {
-//             return res.status(400).json({ success: false, message: 'Item ID is required' });
-//         }
-
-//         // Find cart
-//         const cart = await Cart.findOne({ userId });
-//         if (!cart) {
-//             return res.status(404).json({ success: false, message: 'Cart not found' });
-//         }
-
-//         // Remove item from cart
-//         cart.items = cart.items.filter(item => item._id.toString() !== itemId);
-        
-//         // Save updated cart
-//         await cart.save();
-
-//         // Calculate new cart total
-//         const cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-
-//         // Return appropriate response based on cart state
-//         if (cart.items.length === 0) {
-//             return res.status(200).json({ 
-//                 success: true, 
-//                 empty: true,
-//                 cartTotal: 0,
-//                 message: 'Cart is now empty' 
-//             });
-//         } else {
-//             return res.status(200).json({ 
-//                 success: true, 
-//                 cartTotal: cartTotal,
-//                 message: 'Item removed from cart' 
-//             });
-//         }
-//     } catch (error) {
-//         console.error('Error removing from cart:', error);
-//         return res.status(500).json({ success: false, message: 'Failed to remove item from cart' });
-//     }
-// };
-

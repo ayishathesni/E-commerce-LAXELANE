@@ -1,0 +1,74 @@
+<%- include("../../views/partials/user/header") %>
+
+<div class="page-wrapper">
+    <main class="main">
+        <div class="page-header text-center" style="background-image: url('/assets/images/page-header-bg.jpg')">
+            <div class="container">
+                <h1 class="page-title text-black-50">Order Success<span>Thank You</span></h1>
+            </div>
+        </div>
+
+        <nav aria-label="breadcrumb" class="breadcrumb-nav">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/checkout">Checkout</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Order Success</li>
+                </ol>
+            </div>
+        </nav>
+
+        <div class="page-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div class="card border-0 mb-3">
+                            <div class="card-body p-5">
+                                <div class="mb-4">
+                                    <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                                </div>
+                                <h2 class="fw-bold mb-4">Thank You For Your Order!</h2>
+                                <p class="text-muted mb-4">Your order has been placed successfully and is being processed.</p>
+                                <div class="mb-4">
+                                    <p><strong>Order ID:</strong> <%= order.orderId %></p>
+                                    <p><strong>Payment Method:</strong> Cash on Delivery</p>
+                                    <p><strong>Order Total:</strong> <%= order.finalAmount %>.00</p>
+                                </div>
+                                <div class="d-flex justify-content-center">
+                                    <a href="/orders" class="btn btn-outline-primary-2 me-3">
+                                        <span>View Order</span>
+                                    </a>
+                                    <a href="/shop" class="btn btn-outline-primary-2">
+                                        <span>Continue Shopping</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+<!-- Plugins JS File -->
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        if (typeof Waypoint !== "undefined") {
+            console.log("Waypoint loaded successfully.");
+        } else {
+            console.error("Waypoint is not loaded.");
+        }
+    });
+</script>
+
+<script src="/assets/js/main.js"></script>
+<script src="assets/js/jquery.waypoints.min.js"></script>
+
+<%- include("../../views/partials/user/footer") %>

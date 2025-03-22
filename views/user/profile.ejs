@@ -156,6 +156,40 @@
     color: white;
 }
 
+.stat-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    padding: 15px 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 120px;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card h5 {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.stat-card h3 {
+    font-size: 1.4rem;
+    color: #CC9966;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.stat-icon {
+    font-size: 22px;
+    color: #CC9966;
+    margin-bottom: 6px;
+}
+
 
 .fade-in {
     animation: fadeIn 0.5s ease-in;
@@ -248,7 +282,7 @@
                                 <% } %>
                                 <div class="mt-4">
                                     <button class="btn btn-light me-2" onclick="editProfile()">
-                                        Edit Profile
+                                        <i class="fas fa-edit"></i>  Edit Profile
                                     </button>
                                     <% if (userData.password && userData.password.trim() !== "") { %>
                                         <button class="btn btn-light" onclick="changePassword()">
@@ -262,29 +296,30 @@
                         <!-- Quick Stats -->
                         <div class="row">
                             <div class="col-md-4">
-                                <div class="card text-center fade-in">
+                                <div class="card stat-card text-center fade-in">
                                     <div class="card-body">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </div>
                                         <h5>Total Orders</h5>
                                         <h3><%= userData.orderHistory.length %></h3>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card text-center fade-in">
+                                <div class="card stat-card text-center fade-in">
                                     <div class="card-body">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-wallet"></i>
+                                        </div>
                                         <h5>Wallet Balance</h5>
                                         <h3>₹<%= userData.wallet.toFixed(2) %></h3>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="card text-center fade-in">
-                                    <div class="card-body">
-                                        <h5>Total Users</h5>
-                                        <h3><%= userData.redeemedUsers.length %></h3>
-                                    </div>
-                                </div>
-                            </div>
+                        </div>
+                        
+                          
                         </div>
                     </div>
 
@@ -363,16 +398,19 @@
 </div>
 
 
+ 
+
 
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  
 
 
-// Get modal instances
-// Get modal instances
+
+              
 const editProfileModal = new bootstrap.Modal(document.getElementById('editProfileModal'));
 const changePasswordModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
 

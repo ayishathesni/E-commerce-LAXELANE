@@ -8,7 +8,7 @@ const productController=require("../controllers/admin/productController");
 const multer = require('multer')
 const storage = require('../helpers/multer')
 const uploads = multer({storage:storage})
-
+const orderController=require("../controllers/admin/orderController");
 
 router.post("/pageerror",adminController.pageerror);
 
@@ -27,7 +27,7 @@ router.get("/unblockCustomer",adminAuth,customerController.customerunBlocked);
 router.get("/Category",adminAuth,categoryController.categoryInfo);
 router.post("/addCategory",adminAuth,categoryController.addCategory);
 router.post("/addCategoryoffer",adminAuth,categoryController.addCategoryOffer);
-router.post("/removeCategoryoffer",adminAuth,categoryController.removeCategoryOffer);
+router.delete("/removeCategoryoffer",adminAuth,categoryController.removeCategoryOffer);
 router.get("/listCategory",adminAuth,categoryController.getListCategory);
 router.get("/unlistCategory",adminAuth,categoryController.getUnlistCategory);
 router.get("/editCategory",adminAuth,categoryController.getEditCategory);
@@ -44,6 +44,21 @@ router.get("/unblockProduct",adminAuth,productController.unblockProduct);
 router.get("/editProduct",adminAuth,productController.getEditProduct);
 router.post("/editProduct/:id",adminAuth,uploads.array("images"),productController.editProduct);
 router.post("/deleteImage",adminAuth,productController.deleteSingleImage);
+
+//order management
+router.get("/orders", adminAuth, orderController.getListOfOrders);
+router.get("/orders/:orderId", adminAuth, orderController.getOrderDetails);
+router.post("/updateOrderStatus/:orderId", adminAuth, orderController.updateStatus);
+// router.post("/return-manage", adminAuth, orderController.returnManaging);
+router.post("/return-request", adminAuth, orderController.requestReturn);
+
+// Admin accepts return (process refund, stock update, wallet credit)
+router.post("/return-accept", adminAuth, orderController.returnAccept);
+
+// Admin rejects return (just change status to "Return Rejected")
+router.post("/return-reject", adminAuth, orderController.returnReject);
+
+
 
 module.exports=router;
 

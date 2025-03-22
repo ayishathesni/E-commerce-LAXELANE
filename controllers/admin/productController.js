@@ -26,7 +26,7 @@ const getProductAddPage = async(req,res)=>{
 const addProducts = async (req, res) => {
     try {
         const products = req.body;
-        console.log("products", products);
+        
 
         const productExists = await Product.findOne({ productName: products.productName });
 
@@ -81,7 +81,7 @@ const addProducts = async (req, res) => {
                 productImage: images,
                 status: formattedSizes.some(size => size.quantity > 0) ? 'Available' : 'out of stock'
             });
-            console.log|("newproducts nfjrnffnknr",newProduct)
+            
             await newProduct.save();
             
            
@@ -99,8 +99,7 @@ const addProducts = async (req, res) => {
 
     } catch (error) {
         console.error("Error saving product:", error);
-        
-        // Send appropriate error response
+       
         if (req.xhr || req.headers.accept.indexOf('json') > -1) {
             return res.status(500).json({ 
                 success: false, 
@@ -152,9 +151,6 @@ const getAllProducts = async(req,res)=>{
        }else{
         res.render("page-404");
        }
-
-
-
 
     } catch (error) {
         res.redirect("/pageerror");
@@ -229,10 +225,9 @@ const removeProductOffer = async (req,res) => {
 const getEditProduct = async (req, res) => {
     try {
         const id = req.query.id;
-        // Get the product with its category
+      
         const product = await Product.findOne({ _id: id }).populate('category');
-        
-        // Get all categories to populate the dropdown
+    
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isBlocked: false });
 
@@ -242,7 +237,7 @@ const getEditProduct = async (req, res) => {
 
         res.render("admin/edit-product", {
             product: product,
-            category: categories, // Changed from cat to category for clarity
+            category: categories, 
             brand: brands,
         });
     } catch (error) {
@@ -253,14 +248,13 @@ const getEditProduct = async (req, res) => {
 const editProduct = async (req, res) => {
     try {
         const id = req.params.id;
-        console.log("Product ID:", id);
+        
         
         const product = await Product.findOne({ _id: id });
         const data = req.body;
         
-        console.log("Received Category:", data.category);
+       
         
-        // Check for duplicate product name
         const existingProduct = await Product.findOne({
             productName: data.productName,
             _id: { $ne: id }
@@ -272,24 +266,21 @@ const editProduct = async (req, res) => {
             });
         }
 
-        // Handle new images if any were uploaded
-        let updatedImages = [...product.productImage]; // Start with existing images
+        let updatedImages = [...product.productImage]; 
         if (req.files && req.files.length > 0) {
             const newImages = req.files.map(file => file.filename);
             updatedImages = [...updatedImages, ...newImages];
         }
 
-        // Handle sizes
-        let updatedSizes = [...product.sizes]; // Start with existing sizes
+        let updatedSizes = [...product.sizes]; 
         if (data.sizes) {
             try {
                 const newSizes = JSON.parse(data.sizes);
-                // Create a map of existing sizes for easy lookup
+              
                 const existingSizeMap = new Map(
                     product.sizes.map(size => [size.size, size])
                 );
 
-                // Update quantities for existing sizes and add new ones
                 newSizes.forEach(newSize => {
                     const existingSize = existingSizeMap.get(newSize.size);
                     if (existingSize) {
@@ -302,7 +293,7 @@ const editProduct = async (req, res) => {
                     }
                 });
 
-                // Remove sizes that are no longer selected
+              
                 updatedSizes = updatedSizes.filter(size => 
                     newSizes.some(newSize => newSize.size === size.size)
                 );
@@ -313,7 +304,6 @@ const editProduct = async (req, res) => {
             }
         }
 
-        // Update fields
         const updateFields = {
             productName: data.productName,
             description: data.description,
@@ -323,12 +313,11 @@ const editProduct = async (req, res) => {
             salePrice: data.salePrice,
             sizes: updatedSizes,
             color: data.color,
-            productImage: updatedImages,
-            // Update status based on total quantity
+            productImage: updatedImages,        
             status: updatedSizes.some(size => size.quantity > 0) ? 'Available' : 'out of stock'
         };
 
-        // Update the product
+   
         const updatedProduct = await Product.findByIdAndUpdate(
             id,
             updateFields,
@@ -339,7 +328,6 @@ const editProduct = async (req, res) => {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        // Handle response based on request type
         if (req.xhr || req.headers.accept.indexOf('json') > -1) {
             res.json({ 
                 success: true, 

@@ -1,0 +1,597 @@
+
+<%- include("../../views/partials/user/header") %>
+
+
+<%
+function getStatusBadgeClass(status) {
+    switch(status) {
+        case 'Pending':
+            return 'badge-warning';
+        case 'Processing':
+            return 'badge-info';
+        case 'Shipped':
+            return 'badge-primary';
+        case 'Delivered':
+            return 'badge-success';
+        case 'Cancelled':
+            return 'badge-danger';
+        case 'Returned':
+            return 'badge-danger';
+        case 'Return Request':
+            return 'badge-warning';
+        default:
+            return 'badge-secondary';
+    }
+}
+%>
+<style>
+.main {
+    padding: 30px 0;
+    background-color: #fdf7f0;
+    min-height: calc(100vh - 100px);
+}
+
+
+.breadcrumb-nav {
+    background-color: #fff;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.breadcrumb {
+    margin: 0;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: #CC9966;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #b37a50;
+}
+
+
+.dashboard-menu {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.dashboard-menu .nav-link {
+    color: #555;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-menu .nav-link:hover,
+.dashboard-menu .nav-link.active {
+    background-color: #CC9966;
+    color: #fff;
+    transform: translateX(5px);
+}
+
+
+
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #CC9966 0%, #b37a50 100%);
+    color: #fff;
+    padding: 18px 25px;
+    border-bottom: none;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+
+.table {
+    margin-bottom: 0;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 12px 8px;
+    border-top: none;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table td {
+    padding: 12px 8px;
+    vertical-align: middle;
+    border-color: #f0f0f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.table th:nth-child(1), .table td:nth-child(1) { 
+    width: 18%;
+}
+.table th:nth-child(2), .table td:nth-child(2) { 
+    width: 15%;
+}
+.table th:nth-child(3), .table td:nth-child(3) { 
+    width: 15%;
+}
+.table th:nth-child(4), .table td:nth-child(4) { 
+    width: 12%;
+}
+.table th:nth-child(5), .table td:nth-child(5) { 
+    width: 15%;
+}
+.table th:nth-child(6), .table td:nth-child(6) { 
+    width: 25%;
+}
+
+.table-responsive {
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    background-color: #fff;
+    overflow: visible; 
+}
+
+
+.badge {
+    padding: 6px 10px;
+    border-radius: 30px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    max-width: 100%;
+}
+
+.badge-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.badge-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.badge-primary {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.badge-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.badge-secondary {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+.search-button {
+    border-radius: 15px;
+    width: 60px;
+    height: 40px;
+}
+
+
+.btn {
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-weight: 900;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 1.05rem;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #CC9966 0%, #b37a50 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #b37a50 0%, #996633 100%);
+    border: none;
+}
+
+.btn-outline-primary {
+    color: #CC9966;
+    border-color: #CC9966;
+}
+
+.btn-outline-primary:hover {
+    background-color: #CC9966;
+    border-color: #CC9966;
+    color: #fff;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+}
+
+.btn-group {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.btn-group .btn {
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+    flex: 1;
+    min-width: auto;
+}
+
+.btn-group .btn:first-child {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.btn-group .btn:last-child {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.modal-content {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #CC9966 0%, #b37a50 100%);
+    color: white;
+    border: none;
+    padding: 15px 25px;
+}
+
+.modal-title {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    padding: 15px 25px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.close {
+    color: #fff;
+    opacity: 1;
+    text-shadow: none;
+}
+
+.close:hover {
+    color: #fff;
+    opacity: 0.8;
+}
+
+
+.form-control {
+    border-radius: 8px;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #CC9966;
+    box-shadow: 0 0 0 0.2rem rgba(204, 153, 102, 0.25);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 30px;
+}
+
+.page-item {
+    margin: 0 3px;
+}
+
+.page-link {
+    border-radius: 8px;
+    border: none;
+    padding: 10px 15px;
+    color: #CC9966;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.page-link:hover {
+    background-color: #f3f3f3;
+    color: #b37a50;
+    transform: translateY(-2px);
+}
+
+.page-item.active .page-link {
+    background-color: #CC9966;
+    border-color: #CC9966;
+    color: white;
+
+}
+
+/* Empty State */
+.text-center.py-5 {
+    padding: 60px 0;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.text-center.py-5 i {
+    font-size: 4rem;
+    color: #CC9966;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+/* Animation */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .dashboard-menu {
+        margin-bottom: 30px;
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        padding: 20px 0;
+    }
+    
+    .card-body {
+        padding: 20px 15px;
+    }
+    
+    .breadcrumb-nav {
+        margin-bottom: 20px;
+    }
+    
+    .btn {
+        padding: 6px 10px;
+    }
+    
+    /* Make table responsive on small screens */
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .table th, .table td {
+        padding: 10px 6px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .btn-group {
+        display: flex;
+        flex-direction: row;
+    }
+    
+    .btn-group .btn {
+        padding: 4px 6px;
+        font-size: 0.7rem;
+    }
+}
+</style>
+
+<main class="main">
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"> Home</a></li>
+                <li class="breadcrumb-item active">Dashboard</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar Menu -->
+            <div class="col-lg-3">
+                <div class="dashboard-menu">
+                    <ul class="nav flex-column" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="dashboard-tab" role="tab" href="/userProfile">
+                                My Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="orders-tab" role="tab" href="/orders">
+                                Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="address-tab" role="tab"  href="/addAddress">
+                                Address
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="wallet-tab" role="tab" href="/wallet">
+                                Wallet
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="coupons-tab" role="tab"  href="/coupons">
+                                Coupons
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="/logout">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+                <!-- Main Content Area -->
+                <div class="col-md-8 col-lg-9">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="tab-orders" role="tabpanel">
+                            <!-- Order Search -->
+                            <div class="mb-4">
+                                <form action="/orders" method="GET" class="d-flex">
+                                    <input type="text" name="search" class="form-control" placeholder="Search by Order ID" value="<%= searchQuery || '' %>">
+                                    <button type="submit" class="search-button btn-primary ml-2">Search</button>
+                                </form>
+                            </div>
+
+                            <% if (orders && orders.length > 0) { %>
+                                <div class="table-responsive">
+                                    <table class="table table-cart table-mobile">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                                <th>Total</th>
+                                                <th>Payment</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% orders.forEach(order => { %>
+                                                <tr>
+                                                    <td><%= order.orderId %></td>
+                                                    <td><%= new Date(order.createdOn).toLocaleDateString() %></td>
+                                                    <td>
+                                                        <span class="badge <%= getStatusBadgeClass(order.status) %>">
+                                                            <%= order.status %>
+                                                        </span>
+                                                    </td>
+                                                    <td>₹<%= order.finalAmount.toFixed(2) %></td>
+                                                    <td><%= order.paymentMethod %></td>
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            
+                                                            <a href="/orders/<%= order.orderId %>" class="btn btn-sm btn-outline-primary">
+                                                                View
+                                                            </a>
+                                                    
+                                                            <% if (order.status !== 'Cancelled' && order.status !== 'Returned' && order.status !== 'Return Request') { %>
+                                                                <a href="/orders/<%= order.orderId %>" class="btn btn-sm btn-outline-danger">
+                                                                    Cancel
+                                                                </a>
+                                                            <% } %>
+                                                    
+                                                          
+                                                            <% if (order.status === 'Delivered') { %>
+                                                                <a href="/orders/<%= order.orderId %>" class="btn btn-sm btn-outline-warning">
+                                                                    Return
+                                                                </a>
+                                                            <% } %>
+                                                        </div>
+                                                    </td>
+                                                    
+                                                </tr>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Pagination -->
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center">
+                                        <% const pagesToShow = Math.max(1, totalPages); %>
+                                        <% for(let i = 1; i <= pagesToShow; i++) { %>
+                                            <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                                                <a class="page-link" href="/orders?page=<%= i %><%= searchQuery ? '&search=' + searchQuery : '' %>">
+                                                    <%= i %>
+                                                </a>
+                                            </li>
+                                        <% } %>
+                                    </ul>
+                                </nav>
+                                
+                            <% } else { %>
+                                <div class="text-center py-5">
+                                    <div class="mb-4">
+                                        <i class="icon-shopping-cart" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h3>No orders found</h3>
+                                    <p>You haven't placed any orders yet.</p>
+                                    <a href="/shop" class="btn btn-primary">Start Shopping</a>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include("../../views/partials/user/footer") %>

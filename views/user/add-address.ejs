@@ -315,51 +315,63 @@
                                     <div class="modal-footer">
                                         <input type="hidden" value="<%= userData._id %>" id="validUserId">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-primary" onclick="return validateForm();">Add Address</button>
+                                        <button type="submit" class="btn btn-primary" onclick="return validateForm(event);">Add Address</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Address Cards Section -->
-                        <div class="row">
-                            <% if (addresses.length > 0) { %>
-                                <% for (let i = 0; i < addresses.length; i++) { %>
-                                    <div class="col-lg-6 mb-4">
-                                        <div class="card card-dashboard">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <h3 class="card-title">
-                                                        <%= addresses[i].addressType %> Address
-                                                    </h3>
-                                                    <button type="button" class="btn-close" aria-label="Delete" 
-                                                            onclick="deleteAddress('<%= userData._id %>', '<%= addresses[i]._id %>')">
-                                                    </button>
-                                                </div>
-                                                
-                                                <p class="mb-1"><strong><%= addresses[i].name %></strong></p>
-                                                <p class="mb-1"><%= addresses[i].address %></p>
-                                                <p class="mb-1">Landmark: <%= addresses[i].landMark %></p>
-                                                <p class="mb-1"><%= addresses[i].city %>, <%= addresses[i].state %>, <%= addresses[i].pincode %></p>
-                                                <p class="mb-3">Phone: <%= addresses[i].phone %></p>
-                                                <p class="mb-3">Alt Phone: <%= addresses[i].altPhone %></p>
-                                                
-                                                <a href="#" style="color: #cf954d;" data-bs-toggle="modal" 
-                                                   data-bs-target="#editModal" onclick="editAddress('<%= addresses[i]._id %>')">
-                                                    Edit <i class="icon-edit"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <% } %>
-                            <% } else { %>
-                                <div class="col-12">
-                                    <div class="alert alert-info" role="alert">
-                                        You haven't added any addresses yet. Please add an address using the "Add Address" button.
-                                    </div>
-                                </div>
-                            <% } %>
+<div class="row">
+    <% if (addresses.length > 0) { %>
+        <% for (let i = 0; i < addresses.length; i++) { %>
+            <div class="col-lg-6 mb-4">
+                <div class="card card-dashboard">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h3 class="card-title">
+                                <%= addresses[i].addressType %> Address
+                            </h3>
+                            <button type="button" class="btn-close" aria-label="Delete" 
+                                    onclick="deleteAddress('<%= userData._id %>', '<%= addresses[i]._id %>')">
+                            </button>
                         </div>
+                        
+                        <p class="mb-1"><strong><%= addresses[i].name %></strong></p>
+                        <p class="mb-1"><%= addresses[i].address %></p>
+                        <p class="mb-1">Landmark: <%= addresses[i].landMark %></p>
+                        <p class="mb-1"><%= addresses[i].city %>, <%= addresses[i].state %>, <%= addresses[i].pincode %></p>
+                        <p class="mb-3">Phone: <%= addresses[i].phone %></p>
+                        <p class="mb-3">Alt Phone: <%= addresses[i].altPhone %></p>
+
+                        <!-- Default Address Radio Button -->
+                        <!-- <div class="form-check">
+                            <input class="form-check-input" type="radio" name="defaultAddress" 
+                                   id="defaultAddress_<%= addresses[i]._id %>" 
+                                   <%= addresses[i].isDefault ? 'checked' : '' %> 
+                                   onchange="setDefaultAddress('<%= userData._id %>', '<%= addresses[i]._id %>')">
+                            <label class="form-check-label" for="defaultAddress_<%= addresses[i]._id %>">
+                                Set as Default
+                            </label>
+                        </div> -->
+
+                        <a href="#" style="color: #cf954d;" data-bs-toggle="modal" 
+                           data-bs-target="#editModal" onclick="editAddress('<%= addresses[i]._id %>')">
+                            Edit <i class="icon-edit"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    <% } else { %>
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                You haven't added any addresses yet. Please add an address using the "Add Address" button.
+            </div>
+        </div>
+    <% } %>
+</div>
+
 
                         <!-- Edit Address Modal -->
                         <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel">
@@ -449,41 +461,98 @@
 </div>
 </main>
 
-<!-- Scripts section - can be placed before the footer -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
 <script>
     
-// Validate Form before submitting
-function validateForm() {
-  const validId = document.getElementById('validUserId').value;
-  const form = document.getElementById('addform');
-  const inputs = form.querySelectorAll('input, textarea, select');
-  let isValid = true;
 
-  inputs.forEach(function(input) {
-    if (input.hasAttribute('required') && input.value.trim() === "") {
-        isValid = false;
-        input.classList.add('is-invalid');
-    } else {
-        input.classList.remove('is-invalid');
+function validateForm(event) {
+    if (event) {
+        event.preventDefault();
     }
-  });
 
-  if (!isValid) {
-    event.preventDefault();
-    Swal.fire({
-        title: "Validation Error",
-        text: "Please fill all required fields",
-        icon: "error"
+    const validId = document.getElementById('validUserId').value;
+    const form = document.getElementById('addform');
+    const inputs = form.querySelectorAll('input, textarea, select');
+    let isValid = true;
+    let errors = [];
+
+    let phoneValue = ""; 
+
+    inputs.forEach(function(input) {
+        let value = input.value.trim();
+        let fieldName = input.name; 
+
+        if (input.hasAttribute('required') && value === "") {
+            isValid = false;
+            input.classList.add('is-invalid');
+        } else {
+            input.classList.remove('is-invalid');
+        }
+
+        if (fieldName === "name" && !/^[a-zA-Z\s]{2,50}$/.test(value)) {
+            isValid = false;
+            errors.push("Name should contain only letters and spaces (2-50 characters).");
+        }
+        if (fieldName === "phone") {
+            if (!/^\d{10}$/.test(value)) {
+                isValid = false;
+                errors.push("Phone number should be exactly 10 digits.");
+            } else {
+                phoneValue = value; 
+            }
+        }
+        if (fieldName === "altPhone") {
+            if (!/^\d{10}$/.test(value)) {
+                isValid = false;
+                errors.push("Alternate phone number should be exactly 10 digits.");
+            } else if (phoneValue && phoneValue === value) {
+                isValid = false;
+                errors.push("Alternate phone number should be different from the main phone number.");
+            }
+        }
+        if (fieldName === "pincode" && !/^\d{6}$/.test(value)) {
+            isValid = false;
+            errors.push("Pincode should be exactly 6 digits.");
+        }
+        if (fieldName === "landmark" && value.length < 3) {
+            isValid = false;
+            errors.push("Landmark should be at least 3 characters long.");
+        }
+        if (fieldName === "address" && value.length < 10) {
+            isValid = false;
+            errors.push("Address should be at least 10 characters long.");
+        }
+        if (fieldName === "city" && !/^[a-zA-Z\s]{3,50}$/.test(value)) {
+            isValid = false;
+            errors.push("City name should contain only letters and be at least 3 characters long.");
+        }
+        if (fieldName === "addressType" && value === "") {
+            isValid = false;
+            errors.push("Please select an address type.");
+        }
     });
-  } else {
-    event.preventDefault();
+
+    if (!isValid) {
+        Swal.fire({
+            title: "Validation Error",
+            html: errors.length > 0 ? errors.join("<br>") : "Please fill all required fields",
+            icon: "error"
+        });
+        return false;
+    }
+
     addAddress(validId);
-  }
 }
+
+
+
+
+
+
+
 
 
 function addAddress(userId) {
@@ -509,7 +578,7 @@ function addAddress(userId) {
               icon: 'success',
               confirmButtonText: 'OK'
           }).then(() => {
-              updateAddressList(userId);  // Fetch updated addresses dynamically
+              updateAddressList(userId); 
           });
       } else {
           Swal.fire({
@@ -530,13 +599,13 @@ function addAddress(userId) {
   });
 }
 
-// Fetch Updated Address List
+
 function updateAddressList(userId) {
-  fetch(`/getAddresses?userId=${userId}`) // Make sure this backend route exists
+  fetch(`/getAddresses?userId=${userId}`) 
   .then(res => res.json())
   .then(data => {
       const addressContainer = document.getElementById("address-list");
-      addressContainer.innerHTML = ""; // Clear old addresses
+      addressContainer.innerHTML = ""; 
 
       if (data.addresses.length === 0) {
           addressContainer.innerHTML = "<p>You haven't added any addresses yet.</p>";
@@ -558,12 +627,9 @@ function updateAddressList(userId) {
 
 
 
-
-// Edit Address Function
-// Edit Address Function
 function editAddress(addressId) {
 
-  fetch(`/editAddress?id=${addressId}`, { // ✅ Corrected: Pass ID as query param
+  fetch(`/editAddress?id=${addressId}`, { 
     method: 'GET',
     headers: {
         'Content-Type': 'application/json'
@@ -585,7 +651,7 @@ function editAddress(addressId) {
         document.getElementById('editAltPhone').value = address.altPhone || '';
         document.getElementById('addressId').value = address._id; 
 
-        // ✅ Show edit modal
+     
         let modal = new bootstrap.Modal(document.getElementById("editModal"));
         modal.show();
     } else {
@@ -597,7 +663,7 @@ function editAddress(addressId) {
     }
   })
   .catch(error => {
-    console.error("Fetch error:", error); // Debugging
+    console.error("Fetch error:", error); 
     Swal.fire({
         title: 'Error',
         text: 'An unexpected error occurred while fetching the address.',
@@ -609,27 +675,24 @@ function editAddress(addressId) {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Existing code...
-  
-  // Fix for edit links - manually add event listeners
+
   const editLinks = document.querySelectorAll('a[href="#"][data-bs-toggle="modal"][data-bs-target="#editModal"]');
   editLinks.forEach(link => {
     link.addEventListener('click', function(e) {
-      // Extract the address ID from the onclick attribute
       const onclickAttr = this.getAttribute('onclick');
       if (onclickAttr) {
         const addressIdMatch = onclickAttr.match(/editAddress\('([^']*)'\)/);
         if (addressIdMatch && addressIdMatch[1]) {
           const addressId = addressIdMatch[1];
-          e.preventDefault(); // Prevent default link behavior
+          e.preventDefault();
           editAddress(addressId);
         }
       }
     });
   });
 })
+
 function validateAddressForm() {
-    // Get all form inputs
     const name = document.getElementById('editName').value.trim();
     const phone = document.getElementById('editPhone').value.trim();
     const address = document.getElementById('editAddress').value.trim();
@@ -639,54 +702,44 @@ function validateAddressForm() {
     const pincode = document.getElementById('editPincode').value.trim();
     const altPhone = document.getElementById('editAltPhone').value.trim();
 
-    // Validation rules
     const nameRegex = /^[a-zA-Z\s]{2,50}$/;
     const phoneRegex = /^[0-9]{10}$/;
     const pincodeRegex = /^[0-9]{6}$/;
     
     let errors = [];
 
-    // Name validation
     if (!nameRegex.test(name)) {
         errors.push('Name should contain only letters and spaces (2-50 characters)');
     }
 
-    // Phone validation
     if (!phoneRegex.test(phone)) {
         errors.push('Phone number should be 10 digits');
     }
 
-    // Alternative phone validation
     if (!phoneRegex.test(altPhone)) {
         errors.push('Alternative phone number should be 10 digits');
     }
 
-    // Address validation
     if (address.length < 10 || address.length > 200) {
         errors.push('Address should be between 10 and 200 characters');
     }
 
-    // Landmark validation
     if (landmark.length < 3 || landmark.length > 100) {
         errors.push('Landmark should be between 3 and 100 characters');
     }
 
-    // City validation
     if (!/^[a-zA-Z\s]{2,50}$/.test(city)) {
         errors.push('City should contain only letters and spaces (2-50 characters)');
     }
 
-    // State validation
     if (!/^[a-zA-Z\s]{2,50}$/.test(state)) {
         errors.push('State should contain only letters and spaces (2-50 characters)');
     }
 
-    // Pincode validation
     if (!pincodeRegex.test(pincode)) {
         errors.push('Pincode should be 6 digits');
     }
 
-    // Display errors if any
     if (errors.length > 0) {
         Swal.fire({
             title: 'Validation Error',
@@ -699,7 +752,6 @@ function validateAddressForm() {
     return true;
 }
 
-// Update the updateAddress function to include validation
 function updateAddress() {
     if (!validateAddressForm()) {
         return false;
@@ -724,7 +776,7 @@ function updateAddress() {
                 text: 'Address updated successfully',
                 icon: 'success'
             }).then(() => {
-                // Close modal and refresh page
+              
                 let modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
                 modal.hide();
                 window.location.reload();
@@ -748,10 +800,6 @@ function updateAddress() {
 }
 
 
-
-
-
-// Delete Address Function
 function deleteAddress(userId, addressId) {
   Swal.fire({
     title: "Are you sure?",
@@ -764,7 +812,7 @@ function deleteAddress(userId, addressId) {
   }).then((result) => {
     if (result.isConfirmed) {
         fetch(`/deleteAddress?userId=${userId}&addressId=${addressId}`, {
-            method: 'GET'
+            method: 'delete'
         })
         .then(res => res.json())
         .then(data => {
@@ -795,7 +843,6 @@ function deleteAddress(userId, addressId) {
   });
 }
 
-// Check for success messages on page load
 document.addEventListener('DOMContentLoaded', function() {
   const urlParams = new URLSearchParams(window.location.search);
   const success = urlParams.get('success');
@@ -817,7 +864,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Add event listeners for forms
+
   const addAddressForm = document.getElementById('addform');
   if (addAddressForm) {
     addAddressForm.addEventListener('submit', validateForm);
@@ -831,7 +878,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Add event listeners for edit buttons
   const editButtons = document.querySelectorAll('.edit-address-btn');
   editButtons.forEach(button => {
     button.addEventListener('click', function() {
@@ -840,7 +886,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Add event listeners for delete buttons
   const deleteButtons = document.querySelectorAll('.delete-address-btn');
   deleteButtons.forEach(button => {
     button.addEventListener('click', function() {
@@ -854,11 +899,14 @@ document.addEventListener('DOMContentLoaded', function() {
 window.editAddress = editAddress;
 
 document.getElementById("address-tab").addEventListener("click", function (event) {
-    event.preventDefault(); // Prevents default behavior of the link
-    console.log("Address tab clicked!"); // Debugging log
+    event.preventDefault(); 
+    console.log("Address tab clicked!"); 
     let tab = new bootstrap.Tab(this);
-    tab.show(); // Show the tab manually
+    tab.show(); 
 });
+
+
+
 
 
 </script>

@@ -44,7 +44,7 @@ const customerInfo = async (req, res) => {
 const customerBlocked = async (req, res) => {
     try {
         const id = req.query.id;
-        console.log("Received ID:", id);
+        
 
      
         const user = await User.findOneAndUpdate(
@@ -69,7 +69,7 @@ const customerBlocked = async (req, res) => {
 const customerunBlocked = async (req, res) => {
     try {
         const id = req.query.id;
-        console.log("Received ID:", id);
+        
 
        
         const user = await User.findOneAndUpdate(
@@ -83,7 +83,7 @@ const customerunBlocked = async (req, res) => {
             return res.status(404).send("User not found");
         }
 
-        console.log("User unblocked successfully:", user);
+     
         res.redirect("/admin/users");
     } catch (error) {
         console.error("Error unblocking user:", error);
