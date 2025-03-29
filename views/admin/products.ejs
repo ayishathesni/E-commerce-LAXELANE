@@ -21,8 +21,9 @@
             <tr>
                 <th scope="col"><b>Product name</b></th>
                 <th scope="col"><b>Category</b></th>
+                <th scope="col"><b>Regular Price</b></th>
                 <th scope="col"><b>Sale Price</b></th>
-                <th scope="col"><b>Offer Price</b></th>
+                <th scope="col"><b>Offer percentage</b></th>
                 <th scope="col"><b>Offer</b></th>
                 <th scope="col"><b>Quantity</b></th>
                 <th scope="col"><b>Action</b></th>
@@ -30,24 +31,24 @@
             </tr>
         </thead>
         <tbody>
-
-            <%for(let i=data.length-1;i>=0;i--){%>
+            <% for (let i = data.length - 1; i >= 0; i--) { %>
+                <tr>
+                    <td><%= data[i].productName %></td>
+                    <td><%= data[i].category.name %></td>
+                    <td><%= data[i].regularPrice %></td>
+                    <td><%= data[i].salePrice %></td>
+                    <td>
+                        <% 
+                            let regularPrice = data[i].regularPrice; 
+                            let salePrice = data[i].salePrice;
+                            let discount = 0;
             
-            <tr>
-                <td><%=data[i].productName%></td>
-                <td><%=data[i].category.name%></td>
-                <td><%=data[i].salePrice%></td>
-                <td>
-
-                    <%if(locals.data[i].productOffer){%>
-                        <%=data[i].productOffer%>
-
-                        <%}else{%>
-                            0%
-
-                            <%}%>
-
-                </td>
+                            if (regularPrice && salePrice && regularPrice > salePrice) {
+                                discount = Math.round(((regularPrice - salePrice) / regularPrice) * 100);
+                            }
+                        %>
+                        <%= discount %>% Off
+                    </td>
                 <td>
                     <%if(locals.data[i].productOffer===0){%>
                     <button class="btn btn-info" onclick="addOffer('<%=data[i]._id%>')" style="width: 100px;">

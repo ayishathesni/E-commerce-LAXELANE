@@ -557,6 +557,41 @@ const deleteAddress = async (req, res) => {
 
 
 
+const loadWallet = async (req, res) => {
+    try {
+      console.log("🔍 Loading Wallet...");
+  
+      // Check if user is authenticated (userAuth ensures this)
+      if (!req.session.user) {
+        console.log("❌ No user session found. Redirecting to login...");
+        return res.redirect("/login");
+      }
+  
+      console.log("✅ User ID from session:", req.session.user);
+  
+      // Fetch the user from the database
+      const user = await User.findById(req.session.user);
+      if (!user) {
+        console.log("❌ User not found in database.");
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+  
+      console.log("💰 Wallet Balance:", user.wallet);
+      console.log("📜 Wallet History:", user.walletHistory);
+  
+      // Render wallet page (or send JSON response if API request)
+      if (req.xhr || req.headers.accept?.includes('application/json')) {
+        return res.json({ success: true, wallet: user.wallet, history: user.walletHistory });
+      } else {
+        return res.render("user/wallet", { userData: user });
+
+      }
+    } catch (error) {
+      console.error("❌ Error loading wallet:", error);
+      return res.status(500).send("Internal Server Error");
+    }
+  };
+  
 
 
 
@@ -579,6 +614,7 @@ module.exports={
     editAddress,
     postEditAddress,
     deleteAddress,
+    loadWallet
     
    
    

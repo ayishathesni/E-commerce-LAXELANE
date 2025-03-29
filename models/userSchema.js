@@ -81,7 +81,8 @@
             type:String
         },
         redeemed:{
-            type:Boolean
+            type:Boolean,
+            default: false,
         },
         redeemedUsers:[{
             type:Schema.Types.ObjectId,

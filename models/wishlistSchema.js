@@ -22,6 +22,6 @@ const wishlistSchema = new Schema({
 
     }]
 
-});
+},{timestamps:true});
 
 module.exports = mongoose.model('Wishlist', wishlistSchema);

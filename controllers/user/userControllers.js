@@ -31,10 +31,16 @@ const loadShoppingPage = async (req, res) => {
     const filter = { isBlocked: false };
 
     if (categoryFilter.length > 0) {
-      const categories = await Category.find({ name: { $in: categoryFilter } });
-      filter.category = { $in: categories.map(cat => cat._id) };
-    }
-
+      const categories = await Category.find({ 
+          name: { $in: categoryFilter.map(name => new RegExp(`^${name}$`, 'i')) }, // Case-insensitive match
+          isListed: true 
+      });
+      if (categories.length > 0) {
+          filter.category = { $in: categories.map(cat => cat._id) };
+      } else {
+          filter.category = null; // No matching categories, return empty result
+      }
+  }
     if (colorFilter.length > 0) {
       filter.color = { $in: colorFilter };
     }

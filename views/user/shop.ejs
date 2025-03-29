@@ -31,7 +31,25 @@
     <link rel="stylesheet" href="assets/css/plugins/magnific-popup/magnific-popup.css">
     <link rel="stylesheet" href="assets/css/plugins/nouislider/nouislider.css">
 </head>
+<style>
+  .product-label.label-sale {
+    background-color: #e74c3c; /* Red color for discount */
+    color: #fff;
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1;
+}
 
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+}
+</style>
 <body>
     <div class="page-wrapper">
 
@@ -86,48 +104,55 @@
 
                 				</div><!-- End .toolbox-right -->
                 			</div><!-- End .toolbox -->
+                   <div class="products mb-3">
+    <div class="row justify-content-start">
+        <% product.forEach(product => { %>
+            <div class="col-6 col-md-4 col-lg-4">
+                <div class="product product-7 text-center">
+                    <figure class="product-media">
+                        <% 
+                            // Calculate discount percentage
+                            const discountPercentage = ((product.regularPrice - product.salePrice) / product.regularPrice) * 100;
+                        %>
+                        <% if (discountPercentage > 10) { %>
+                            <span class="product-label label-sale"><%= Math.round(discountPercentage) %>% OFF</span>
+                        <% } %>
+                        <% if (product.isNew) { %>
+                            <span class="product-label label-new">New</span>
+                        <% } %>
+                        <a href="/productDetails/<%= product._id %>">
+                            <img src="/uploads/re-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" class="product-image">
+                        </a>
 
-                            <div class="products mb-3">
-                                <div class="row justify-content-start">
-                                    <% product.forEach(product => { %>
-                                        <div class="col-6 col-md-4 col-lg-4">
-                                            <div class="product product-7 text-center">
-                                                <figure class="product-media">
-                                                    <% if (product.isNew) { %>
-                                                        <span class="product-label label-new">New</span>
-                                                    <% } %>
-                                                    <a href="/productDetails/<%= product._id %>">
-                                                        <img src="/uploads/re-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" class="product-image">
-                                                    </a>
-                            
-                                                    <div class="product-action-vertical">
-                                                        <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                                        <a href="/productDetails/<%= product._id %>" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                                                        <!-- <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a> -->
-                                                    </div>
-                            
-                                                    <div class="product-action">
-                                                        <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                                    </div>
-                                                </figure>
-                            
-                                                <div class="product-body">
-                                                    <div class="product-cat">
-                                                        <a href="#"> <%= product.category.name %> </a>
-                                                    </div>
-                                                    <h3 class="product-title"><a href="/productDetails/<%= product._id %>"><%= product.productName %></a></h3>
-                                                    <div class="product-price">
-                                                        ₹<%= product.salePrice %>
-                                                    </div>
-                                                  
-        
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <% }); %>
-                                </div>
-                            </div>
-                            
+                        <div class="product-action-vertical">
+                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable" onclick="addToWishlist('<%= product._id %>', event)">
+                                <span>add to wishlist</span>
+                            </a>
+                            <a href="/productDetails/<%= product._id %>" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                        </div>
+
+                        <div class="product-action">
+                            <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                        </div>
+                    </figure>
+
+                    <div class="product-body">
+                        <div class="product-cat">
+                            <a href="#"> <%= product.category.name %> </a>
+                        </div>
+                        <h3 class="product-title"><a href="/productDetails/<%= product._id %>"><%= product.productName %></a></h3>
+                        <div class="product-price">
+                            ₹<%= product.salePrice %>
+                            <% if (discountPercentage > 10) { %>
+                                <span class="old-price">₹<%= product.regularPrice %></span>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
 
 							<nav aria-label="Page navigation">
   <ul class="pagination justify-content-center">
@@ -231,7 +256,7 @@
 									<h3 class="widget-title">Price</h3>
 									<div class="widget-body">
 										<div class="filter-price">
-											<input type="range" id="price-range" class="form-range" min="0" max="5000" step="100" value="2500"
+											<input type="range" id="price-range" class="form-range" min="0" max="10000" step="100" value="2500"
 												oninput="updatePrice(this.value)">
 											<p>Price: ₹<span id="price-value">2500</span></p>
 										</div>
@@ -531,7 +556,71 @@ if (sortDropdown) {
 
 
 
+function showToast(message, type = 'success') {
+  // Remove any existing toasts
+  const existingToasts = document.querySelectorAll('.toast');
+  existingToasts.forEach(toast => toast.remove());
+  
+  // Create new toast
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  
+  // Append to body
+  document.body.appendChild(toast);
+  
+  // Remove after animation completes
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
 
+function addToWishlist(productId, event) {
+  event.preventDefault();
+
+  fetch('/addWishlist', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ productId })
+  })
+  .then(response => response.json())
+  .then(data => {
+    const button = event.target.closest('.btn-wishlist');
+
+    if (data.success) {
+      // ✅ Update button UI
+      button.classList.add('added');
+      const textSpan = button.querySelector('span');
+      if (textSpan) textSpan.innerText = 'Added to wishlist';
+
+      // ✅ Update wishlist count safely
+      const countElement = document.getElementById('wishlistCount');
+      if (countElement) {
+        let currentCount = parseInt(countElement.innerText.trim()) || 0;
+        countElement.innerText = currentCount + 1;
+      }
+
+      showToast('Product added to wishlist!', 'success');
+
+    } else {
+      // ✅ Handle product already in wishlist
+      if (data.message === 'Product already in wishlist') {
+        button.classList.add('added');
+        const textSpan = button.querySelector('span');
+        if (textSpan) textSpan.innerText = 'Already in wishlist';
+        showToast('Product already in your wishlist.', 'info');
+      } else {
+        showToast(data.message || 'Failed to add to wishlist', 'error');
+      }
+    }
+  })
+  .catch(error => {
+    console.error('Wishlist Add Error:', error.message);
+    showToast(error.message || 'Something went wrong. Please try again.', 'error');
+  });
+}
 
 
 

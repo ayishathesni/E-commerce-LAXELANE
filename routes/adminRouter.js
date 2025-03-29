@@ -9,6 +9,10 @@ const multer = require('multer')
 const storage = require('../helpers/multer')
 const uploads = multer({storage:storage})
 const orderController=require("../controllers/admin/orderController");
+const couponController=require("../controllers/admin/couponController");
+
+
+
 
 router.post("/pageerror",adminController.pageerror);
 
@@ -49,14 +53,15 @@ router.post("/deleteImage",adminAuth,productController.deleteSingleImage);
 router.get("/orders", adminAuth, orderController.getListOfOrders);
 router.get("/orders/:orderId", adminAuth, orderController.getOrderDetails);
 router.post("/updateOrderStatus/:orderId", adminAuth, orderController.updateStatus);
-// router.post("/return-manage", adminAuth, orderController.returnManaging);
 router.post("/return-request", adminAuth, orderController.requestReturn);
-
-// Admin accepts return (process refund, stock update, wallet credit)
 router.post("/return-accept", adminAuth, orderController.returnAccept);
-
-// Admin rejects return (just change status to "Return Rejected")
 router.post("/return-reject", adminAuth, orderController.returnReject);
+
+//coupon managment
+router.get('/coupon',adminAuth,couponController.loadCoupon)
+router.post('/coupon',adminAuth,couponController.createCoupon)
+router.put('/coupon/:couponId',adminAuth,couponController.editCoupon)
+router.delete('/coupon/:couponId',adminAuth,couponController.deleteCoupon)
 
 
 

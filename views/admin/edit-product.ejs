@@ -123,7 +123,7 @@
                                                        class="form-control size-quantity" 
                                                        placeholder="Qty" 
                                                        min="1" 
-                                                       style="display: <%= product.sizes.some(s => s.size === size) ? 'block' : 'none' %>; width: 80px;"
+                                                       style="display: '<%= product.sizes.some(s => s.size === size) ? 'block' : 'none' %>'; width: 80px;"
                                                        value="<%= product.sizes.find(s => s.size === size)?.quantity || '' %>">
                                                 <div id="quantity-<%= size %>-error" class="error-message mt-1"></div>
                                             </div>
@@ -175,7 +175,7 @@
                                             <img src="" alt="" id="imgView<%=i%>" style="max-width: 200px; display: none;">
                                             <input class="form-control" type="file" name="images" id="input<%=i%>"
                                                 accept="image/png, image/jpeg, image/jpg"
-                                                onchange="viewImage(event, <%=i%>)">
+                                                onchange="viewImage(event, '<%=i%>')">
                                         </div>
                                         <div class="image-cropper d-flex align-items-center"
                                             style="display: none; width: 300px; height: 200px; margin: 10px 0;">

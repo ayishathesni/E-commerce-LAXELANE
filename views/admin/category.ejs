@@ -324,78 +324,81 @@
             inputPlaceholder:"%",
         });
 
+
+
         if(amount){
-            try {
-               const response = await fetch("/admin/addCategoryOffer",{
-                method:"delete",
-                headers:{
-                    'content-type':"application/json",
-                },
-                body: JSON.stringify({
-                  percentage:amount,
-                    categoryId:categoryId,
-                })
-               }) ;
-
-               const data = await response.json();
-               if(response.ok && data.status===true){
-                Swal.fire(
-                    "Offer added",
-                    "The offer has been added",
-                    "succes"
-               ).then(()=>{
-                    location.reload();
-                })
-               }else{
-                  Swal.fire("Failed",data.message || "Adding offer failed","error");
-               }
-            } catch (error) {
-                Swal.fire(
-                    "Error",
-                    "An error occured while adding the offer",
-                    "error"
-            );
-                console.log("Error adding offer",error)
-                
-            }
-        }
-     }
-
-     async function removeOffer(categoryId){
-            try {
-               const response = await fetch("/admin/addCategoryOffer",{
+            try{
+              const response = await fetch("/admin/addCategoryOffer",{
                 method:"POST",
                 headers:{
                     'content-type':"application/json",
                 },
                 body: JSON.stringify({
-                    categoryId:categoryId,
-                })
-               }) ;
-            
-               const data = await response.json();
-               if(response.ok && data.status===true){
+                    categoryId: categoryId,  //  Pass categoryId here
+                    percentage: amount, //  Include the percentage entered by the user
+                }),
+              });
+              const data = await response.json();
+              if(response.ok && data.status === true){
                 Swal.fire(
-                    "Offer removed",
-                    "The offer has been removed",
-                    "succes"
-               ).then(()=>{
+                    "Offer added",
+                    "The offer has been added",
+                    "success"
+                ).then(()=>{
                     location.reload();
+               
                 })
-               }else{
-                  Swal.fire("Failed",data.message || "Removing offer failed","error");
-               }
-            } catch (error) {
-                Swal.fire(
-                    "Error",
-                    "An error occured while removing the offer",
-                    "error"
-            );
-                console.log("Error removing offer",error)
-                
+              }else{
+                Swal.fire("Failed",data.message||"Adding offer failed","error");
+              }
+
+            }catch(error){
+               Swal.fire(
+                 "error",
+                 "An error occured while adding the offer",
+                 "error"
+               );
+               console.log("Error adding offer",error);
             }
         }
-     
+    }
+
+    async function removeOffer(categoryId){
+        try{
+           const response = await fetch("/admin/removeCategoryOffer" , {
+              method:"delete",
+              headers:{
+                "content-type" : "application/json",
+              },
+              body:JSON.stringify({
+                 categoryId:categoryId,
+              })
+           })
+
+           const data = await response.json();
+
+           if(response.ok && data.status===true){
+              Swal.fire(
+                "Offer removed",
+                "The offer has been removed",
+                "success"
+              ).then(()=>{
+                location.reload();
+              });
+           }else{
+              Swal.fire("Failed",data.message||"Removing offer failed","error");
+           }
+
+        }catch(error){
+           Swal.fire(
+             "Error",
+             "An error occured while removing the offer",
+             "error"
+          );
+          console.error("Error removing offer",error);
+
+        }
+    }
 
 
 

@@ -8,6 +8,8 @@ const profileController = require('../controllers/user/profileController');
 const cartController = require('../controllers/user/cartController');
 const checkoutController = require('../controllers/user/checkoutController');
 const orderController = require('../controllers/user/orderController');
+const wishlistController = require('../controllers/user/wishlistController');
+const couponController = require('../controllers/user/couponController');
 
 
 
@@ -22,7 +24,7 @@ router.get('/filter-color', userController.filterByColor);
 router.get('/apply-filters', userController.applyFilters);
 router.get('/clear-filters', userController.clearFilters);
 router.get("/search",userController.searchProducts);
-// router.get("/search",userController.searchP);
+
 
 router.get('/productDetails/:id',productController.productDetails)
 
@@ -65,8 +67,8 @@ router.post("/edit-profile", userAuth, profileController.editProfile);
 router.post("/update-password", userAuth, profileController.updatePassword);
 
 
-
-
+//wallet
+router.get("/wallet",userAuth,profileController.loadWallet);
 
 //address
 router.get("/addAddress",userAuth,profileController.addAddress);
@@ -99,6 +101,24 @@ router.delete('/cancel-single-order/:orderId', userAuth, orderController.cancelS
 router.delete('/cancel-order', userAuth, orderController.cancelOrder);
 router.post("/request-Product-Return/:orderId", userAuth, orderController.productReturn)
 router.get('/download-invoice',userAuth,orderController.downloadInvoice);
+
+//payment
+router.post('/create-razorpay-order',checkoutController.createRazorpayOrder)
+router.post('/verify-razorpay-payment',checkoutController.verifyRazorpayPayment)
+// router.post('/handle-payment-dismissal',checkoutController.handlePaymentDismissal)
+
+//wishlist
+router.get('/wishlist',userAuth,wishlistController.loadWishlist);
+router.post('/addWishlist',userAuth,wishlistController.addWishlist);
+router.delete('/removeFromWishlist',userAuth,wishlistController.removeFromWishlist)
+
+//coupon
+router.post("/apply-coupon",userAuth,couponController.applyCoupon)
+router.delete("/remove-coupon",userAuth,couponController.removeCoupon)
+
+
+
+
 
 module.exports=router;
 

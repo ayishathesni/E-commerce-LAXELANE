@@ -1,0 +1,256 @@
+
+<%- include("../../views/partials/user/header") %>
+
+<style>
+.main {
+    padding: 30px 0;
+    background-color: #fdf7f0;
+    min-height: calc(100vh - 100px);
+}
+
+.breadcrumb-nav {
+    background-color: #fff;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.breadcrumb {
+    margin: 0;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: #CC9966;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #b37a50;
+}
+
+.dashboard-menu {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.dashboard-menu .nav-link {
+    color: #555;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-menu .nav-link:hover,
+.dashboard-menu .nav-link.active {
+    background-color: #CC9966;
+    color: #fff;
+    transform: translateX(5px);
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #CC9966;
+    color: #fff;
+    padding: 15px 20px;
+    border-bottom: none;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+.table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.badge {
+    padding: 0.4em 0.6em;
+    font-size: 0.8rem;
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    padding: 15px 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 120px;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card h5 {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.stat-card h3 {
+    font-size: 1.4rem;
+    color: #CC9966;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.stat-icon {
+    font-size: 22px;
+    color: #CC9966;
+    margin-bottom: 6px;
+}
+
+@media (max-width: 768px) {
+    .main {
+        padding: 15px 0;
+    }
+    
+    .dashboard-menu {
+        margin-bottom: 20px;
+    }
+}
+</style>
+
+<main class="main">
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"> Home</a></li>
+                <li class="breadcrumb-item active">Wallet</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar Menu -->
+            <div class="col-lg-3">
+                <div class="dashboard-menu">
+                    <ul class="nav flex-column" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/userProfile">
+                                My Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/orders">
+                                Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/addAddress">
+                                Address
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/wallet">
+                                Wallet
+                            </a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" href="/coupons">
+                                Coupons
+                            </a>
+                        </li> -->
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="/logout">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <h5 class="mb-0">Wallet Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="card stat-card text-center">
+                                    <div class="card-body">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-wallet"></i>
+                                        </div>
+                                        <h5>Current Balance</h5>
+                                        <h3>₹<%= userData.wallet ? userData.wallet.toFixed(2) : '0.00' %></h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Transaction Type</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (userData.walletHistory && userData.walletHistory.length > 0) { %>
+                                        <% userData.walletHistory.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(function(transaction) { %>
+                                            <tr>
+                                                <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                                                <td>
+                                                    <% if (transaction.type === 'credit') { %>
+                                                        <span class="badge bg-success">Credit</span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-danger">Debit</span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (transaction.type === 'credit') { %>
+                                                        <span class="text-success">+ ₹<%= transaction.amount.toFixed(2) %></span>
+                                                    <% } else { %>
+                                                        <span class="text-danger">- ₹<%= transaction.amount.toFixed(2) %></span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (transaction.status === 'Completed') { %>
+                                                        <span class="badge bg-success">Completed</span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="4" class="text-center">No wallet transactions found</td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<%- include("../../views/partials/user/footer") %>

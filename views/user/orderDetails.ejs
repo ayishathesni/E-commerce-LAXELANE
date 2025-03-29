@@ -488,14 +488,17 @@
       const data = await response.json();
 
       if (data.success) {
-        Swal.fire({
-          title: "Success",
-          text: "Item cancelled successfully. No amount will be refunded for Cash on Delivery orders.",
-          icon: "success"
-        }).then(() => {
-          window.location.reload();
-        });
-      } else {
+    const refundText = data.refundDetails?.refundAmount > 0
+        ? `Refund of ₹${data.refundDetails.refundAmount} processed to wallet.`
+        : "No refund applicable.";
+    Swal.fire({
+        title: "Success",
+        text: `Item cancelled successfully. ${refundText}`,
+        icon: "success"
+    }).then(() => {
+        window.location.reload();
+    });
+} else {
         Swal.fire({
           title: "Error",
           text: data.message || "Failed to cancel item",
@@ -511,8 +514,6 @@
     }
   }
 }
-
-
   
   
     async function confirmCancelOrder(orderId) {
@@ -563,14 +564,17 @@
             const data = await response.json();
             
             if (data.success) {
-              Swal.fire({
-                title: "Success",
-                text: "Order cancelled successfully.",
-                icon: "success"
-              }).then(() => {
-                document.querySelector('.total-amount').textContent = '₹0.00';
-              });
-            } else {
+    const refundText = data.refundAmount > 0
+        ? `Refund of ₹${data.refundAmount} processed to wallet.`
+        : "No refund applicable.";
+    Swal.fire({
+        title: "Success",
+        text: `Order cancelled successfully. ${refundText}`,
+        icon: "success"
+    }).then(() => {
+        document.querySelector('.total-amount').textContent = '₹0.00';
+    });
+}else {
               Swal.fire({
                 title: "Error",
                 text: data.message || "Failed to cancel order",
