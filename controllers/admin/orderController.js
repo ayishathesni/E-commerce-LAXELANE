@@ -279,11 +279,10 @@ const returnAccept = async (req, res, next) => {
 
 const returnReject = async (req, res, next) => {
   try {
-    const ordId = req.query.id;
-    const proIdd = req.query.proId;
+    const { orderId, itemId } = req.body;
 
     const updatedOrder = await Order.findOneAndUpdate(
-      { _id: ordId, "orderedItems._id": proIdd },
+      { _id: orderId, "orderedItems._id": itemId },
       { $set: { "orderedItems.$.status": "Return Rejected" } },
       { new: true }
     );
@@ -292,7 +291,7 @@ const returnReject = async (req, res, next) => {
       return res.status(404).json({ message: "Order or product not found." });
     }
 
-    res.status(200).json({ message: "Return rejected by admin." });
+    res.redirect(`/admin/Orders/${orderId}`);
 
   } catch (error) {
     next(error);

@@ -117,8 +117,14 @@ const orderSchema = new Schema({
     couponApplied: {
         type: Boolean,
         default: false
+    },
+    couponCode: { 
+        type: String, 
+        required: false, 
+        default: ''
     }
-}, { timestamps: true });
+}, 
+{ timestamps: true });
 
 const Order = mongoose.model("Order", orderSchema);
 module.exports = Order;

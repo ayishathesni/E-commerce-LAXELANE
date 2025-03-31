@@ -1247,8 +1247,13 @@ async function removeCoupon() {
         if (result.success) {
             document.getElementById('couponFeedback').innerHTML = `<span class="text-success">${result.message}</span>`;
             document.querySelector('.summary-total td:last-child').innerText = `₹<%= cartData?.totalCartPrice %>.00`;
-            discountedTotal = '<%= cartData?.totalCartPrice %>'; // Reset to original total
+            const discountRow = document.querySelector('.coupon-discount');
+            if (discountRow) discountRow.remove();
+            discountedTotal = '<%= cartData?.totalCartPrice %>'; 
             document.getElementById('couponInput').value = '';
+            appliedDiscount = 0;
+            const appliedCouponInfo = document.querySelector('.applied-coupon-info');
+            if (appliedCouponInfo) appliedCouponInfo.remove();
             delete document.getElementById('couponInput').dataset.appliedCoupon;
         } else {
             document.getElementById('couponFeedback').innerHTML = `<span class="text-danger">${result.message}</span>`;

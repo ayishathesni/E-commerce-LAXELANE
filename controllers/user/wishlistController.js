@@ -10,7 +10,6 @@ const loadWishlist = async (req,res)=>{
     try {
 
         const userId = req.session.user
-
         const user = await User.findById(userId)
 
         if(!user){
@@ -18,8 +17,6 @@ const loadWishlist = async (req,res)=>{
         }
 
         const wishlist = await Wishlist.findOne({userId:userId}).populate('products.productId')
-        console.log('Wishlist:', wishlist);
-
         const products = wishlist ? wishlist.products : [];
 
         res.render('user/wishlist',{
@@ -41,12 +38,9 @@ const loadWishlist = async (req,res)=>{
 
 const addWishlist = async (req, res) => {
     try {
-      console.log("💬 Wishlist Controller Called");
-  
+      
       const user = req.session.user;
       const { productId } = req.body;
-  
-      console.log("✅ Received productId:", productId);
      
   
       if (!user || !user._id) {
@@ -60,10 +54,10 @@ const addWishlist = async (req, res) => {
       }
   
       let wishlist = await Wishlist.findOne({ userId });
-      console.log("📦 Found Wishlist:", wishlist);
+      
   
       if (!wishlist) {
-        console.log("📦 No wishlist found, creating new one...");
+    
         wishlist = new Wishlist({
           userId,
           products: [{ productId }]
@@ -71,12 +65,11 @@ const addWishlist = async (req, res) => {
   
         await wishlist.save();
   
-        // ✅ Add the wishlist ID to User document
         const userDoc = await User.findById(userId);
         if (userDoc && !userDoc.wishlist.includes(wishlist._id)) {
           userDoc.wishlist.push(wishlist._id);
           await userDoc.save();
-          console.log("🔗 Wishlist ID added to User.wishlist array");
+         
         }
   
       } else {
@@ -92,11 +85,10 @@ const addWishlist = async (req, res) => {
         await wishlist.save();
       }
   
-      console.log("✅ Wishlist saved successfully");
       return res.status(200).json({ success: true, message: 'Product added to wishlist' });
   
     } catch (error) {
-      console.error('❌ Error in addWishlist:', error);
+      console.error(' Error in addWishlist:', error);
       return res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
   };
@@ -104,7 +96,7 @@ const addWishlist = async (req, res) => {
   const removeFromWishlist = async (req, res) => {
     try {
         const userId = req.session.user;
-        const productId = req.query.productId; // ✅ use query param instead of req.body
+        const productId = req.query.productId; 
 
         if (!userId) {
             return res.status(401).json({

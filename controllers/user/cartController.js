@@ -169,7 +169,7 @@ const loadCart = async (req, res) => {
 
 
 const cartUpdate = async (req, res) => {
-    console.log("the product is updating")
+   
     const { quantity, cartId, proId, size,price } = req.body;
     console.log("Received Request:", { quantity, cartId, proId, size,price });
   
@@ -190,7 +190,7 @@ const cartUpdate = async (req, res) => {
   
 
       const selectedSize = (size && size.trim().toUpperCase()) || "N/A";
-      console.log("Selected Size:", selectedSize);
+      
   
       const sizeData = product.sizes.find(s => s.size.toUpperCase() === selectedSize);
       if (!sizeData) {
@@ -221,7 +221,7 @@ const cartUpdate = async (req, res) => {
         cart.items[itemIndex].quantity = quantity;
         cart.items[itemIndex].price = selectedPrice;
         cart.items[itemIndex].totalPrice = quantity * selectedPrice;
-        console.log("Updated existing cart item.");
+        
       } else {
         cart.items.push({
           productId: proId,
@@ -233,7 +233,7 @@ const cartUpdate = async (req, res) => {
           status: "placed",
           cancellationReason: "none"
         });
-        console.log("Added new cart item.");
+      
       }
   
       const subTotal = cart.items.reduce((acc, item) => acc + (Number(item.totalPrice) || 0), 0);

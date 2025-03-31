@@ -18,8 +18,14 @@ router.post("/pageerror",adminController.pageerror);
 
 router.get("/login",adminController.loadLogin);
 router.post("/login",adminController.login);
-router.get("/dashboard",adminAuth,adminController.loadDashboard);
+// router.get("/dashboard",adminAuth,adminController.loadDashboard);
 router.get("/logout",adminController.logout);
+router.get('/dashboard', adminAuth, adminController.loadDashboard);
+router.get('/dashboard/analytics', adminAuth, adminController.getAnalyticsData);
+router.get('/dashboard/top-performers',adminAuth, adminController.getTopPerformers);
+router.get('/sales-report', adminAuth, adminController.generateSalesReport);
+router.get('/download/excel', adminAuth, adminController.downloadExcelReport);
+router.get('/download/pdf', adminAuth, adminController.downloadPDFReport);
 
 //customer managment
 

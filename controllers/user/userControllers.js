@@ -32,13 +32,13 @@ const loadShoppingPage = async (req, res) => {
 
     if (categoryFilter.length > 0) {
       const categories = await Category.find({ 
-          name: { $in: categoryFilter.map(name => new RegExp(`^${name}$`, 'i')) }, // Case-insensitive match
+          name: { $in: categoryFilter.map(name => new RegExp(`^${name}$`, 'i')) },
           isListed: true 
       });
       if (categories.length > 0) {
           filter.category = { $in: categories.map(cat => cat._id) };
       } else {
-          filter.category = null; // No matching categories, return empty result
+          filter.category = null;
       }
   }
     if (colorFilter.length > 0) {

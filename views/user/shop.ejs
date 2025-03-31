@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <!-- molla/category.html  22 Nov 2019 10:02:48 GMT -->
 <head>
     <meta charset="UTF-8">
@@ -48,6 +47,12 @@
     color: #999;
     font-size: 1.2rem;
     margin-left: 0.5rem;
+}
+.no-products-found {
+    padding: 3rem 1rem;
+    background-color: #f8f8f8;
+    border-radius: 0.3rem;
+    margin-bottom: 2rem;
 }
 </style>
 <body>
@@ -106,6 +111,7 @@
                 			</div><!-- End .toolbox -->
                    <div class="products mb-3">
     <div class="row justify-content-start">
+      <% if (product.length > 0) { %>
         <% product.forEach(product => { %>
             <div class="col-6 col-md-4 col-lg-4">
                 <div class="product product-7 text-center">
@@ -151,6 +157,19 @@
                 </div>
             </div>
         <% }); %>
+        <% } else { %>
+          <div class="col-12 text-center py-5">
+              <div class="no-products-found">
+                  <i class="icon-search" style="font-size: 3rem; color: #8c8c8c;"></i>
+                  <h3 class="mt-3">No Products Found</h3>
+                  <p>We couldn't find any products matching your criteria.</p>
+                  <a href="/shop" class="btn btn-outline-primary-2 mt-2">
+                      <span>Clear Filters</span>
+                      <i class="icon-refresh"></i>
+                  </a>
+              </div>
+          </div>
+      <% } %>
     </div>
 </div>
 

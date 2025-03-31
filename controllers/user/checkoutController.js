@@ -71,7 +71,7 @@ const loadCheckout = async (req, res, next) => {
       itemTotal: item.price * item.quantity
     }));
 
-    console.log("coupon inside the session: ",req.session.appliedCoupon)
+    
 
     const modifiedCartData = {
       ...cartData.toObject(),
@@ -128,7 +128,7 @@ const verifyCheckOutAddress = async (req, res, next) => {
 
 const addAddressCheckout = async (req, res) => {
   try {
-    console.log("Received Data:", req.body); 
+    
 
     if (!req.body.userId || !req.body.address || req.body.address.length === 0) {
       return res.status(400).json({ message: "Invalid request data" });
@@ -166,8 +166,7 @@ const addAddressCheckout = async (req, res) => {
 
 const editAddressCheckout = async (req, res) => {
   try {
-      console.log("Incoming Edit Request:", req.body); 
-      console.log("Session User ID:", req.session.user);
+     
 
       const { id, addressType, name, address, city, landMark, state, pincode, phone, altPhone } = req.body;
       const userId = req.session.user;
@@ -189,7 +188,7 @@ const editAddressCheckout = async (req, res) => {
       }
 
       const userAddress = await Address.findOne({ userId });
-      console.log("Fetched User Address:", userAddress);
+     
 
       if (!userAddress || !Array.isArray(userAddress.address) || userAddress.address.length === 0) {
           return res.status(404).json({ success: false, message: "Address not found." });
@@ -214,7 +213,7 @@ const editAddressCheckout = async (req, res) => {
       if (altPhone) selectedAddress.altPhone = altPhone;
 
       await userAddress.save();
-      console.log("Updated Address:", selectedAddress);
+     
 
       res.json({ success: true, message: "Address updated successfully!", editData: selectedAddress });
 
@@ -269,10 +268,9 @@ const chooseAddress = async (req, res) => {
 
 const placeOrder = async (req, res) => {
   try {
-    console.log("🔹 placeOrder() API called.");
-
+   
     if (!req.session?.user?._id) {
-      console.warn("❌ User not authenticated.");
+      console.warn("User not authenticated.");
       return res.status(401).json({ success: false, message: "User not authenticated." });
     }
 
@@ -280,13 +278,12 @@ const placeOrder = async (req, res) => {
     const { paymentMethod, couponDiscount: clientCouponDiscount, totalPrice: clientTotalPrice } = req.body;
 
     const couponDiscount = req.session.appliedCoupon?.discountAmount || clientCouponDiscount || 0;
-    console.log("🟢 User ID:", userId);
-    console.log("🟢 Payment Method:", paymentMethod);
-    console.log("🟢 Coupon Discount:", couponDiscount);
+    const appliedCouponCode = req.session.appliedCoupon?.code || '';
+
 
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     if (!cart || !cart.items || cart.items.length === 0) {
-      console.warn("❌ Cart is empty.");
+      console.warn("Cart is empty.");
       return res.status(400).json({ success: false, message: "Cart is empty." });
     }
 
@@ -298,27 +295,25 @@ const placeOrder = async (req, res) => {
       console.warn("Client totalPrice mismatch:", clientTotalPrice, "vs Server:", totalPrice);
     }
 
-    console.log("🟢 Total Price Before Discount:", totalPrice);
 
     const finalAmount = Math.max(totalPrice - couponDiscount, 0);
 
-    console.log("🟢 Final Order Amount:", finalAmount);
+ 
 
     const user = await User.findById(userId);
     if (!user) {
-      console.warn("❌ User not found.");
+      console.warn(" User not found.");
       return res.status(400).json({ success: false, message: "User not found." });
     }
 
-    console.log("🟢 Current Wallet Balance:", user.wallet);
+  
 
     if (paymentMethod === "Wallet Payment") {
       if (user.wallet < finalAmount) {
-        console.warn("❌ Insufficient Wallet Balance.");
+        console.warn("Insufficient Wallet Balance.");
         return res.status(400).json({ success: false, message: "Insufficient wallet balance." });
       }
 
-      console.log("💰 Deducting Wallet Balance...");
       user.wallet -= finalAmount;
 
       if (!Array.isArray(user.walletHistory)) {
@@ -334,21 +329,18 @@ const placeOrder = async (req, res) => {
 
       try {
         await user.save();
-        console.log("✅ Wallet Balance Updated:", user.wallet);
       } catch (err) {
-        console.error("❌ Error updating wallet balance:", err);
+        console.error("Error updating wallet balance:", err);
         return res.status(500).json({ success: false, message: "Failed to update wallet balance.", error: err.message });
       }
     }
 
-    // Fetch user address
     const address = await Address.findOne({ userId }).then((addr) => addr?._id);
     if (!address) {
-      console.warn("❌ Address not found.");
+      console.warn("Address not found.");
       return res.status(400).json({ success: false, message: "User address not found." });
     }
 
-    // Create new order
     const newOrder = new Order({
       userId,
       orderedItems: cart.items.map((item) => ({
@@ -366,36 +358,35 @@ const placeOrder = async (req, res) => {
       status: "Pending",
       paymentMethod,
       couponApplied: couponDiscount > 0,
+      couponCode:appliedCouponCode
     });
 
     await newOrder.save();
     await Cart.deleteOne({ userId });
 
     req.session.orderGot = true;
-    console.log("✅ Order Placed Successfully! Order ID:", newOrder._id);
-
-    // ✅ Mark coupon as used if applied
+   
     if (couponDiscount > 0 && req.session.appliedCoupon?.couponId) {
       const coupon = await Coupon.findById(req.session.appliedCoupon.couponId);
       if (coupon) {
         if (!coupon.userId.includes(userId)) {
-          coupon.userId.push(userId); // Add the user ID to prevent reuse
+          coupon.userId.push(userId); 
           await coupon.save();
-          console.log(`✅ Coupon ${req.session.appliedCoupon.couponId} marked as used by user ${userId}`);
+          console.log(` Coupon ${req.session.appliedCoupon.couponId} marked as used by user ${userId}`);
         } else {
-          console.log(`⚠️ Coupon ${req.session.appliedCoupon.couponId} is already used by user ${userId}`);
+          console.log(` Coupon ${req.session.appliedCoupon.couponId} is already used by user ${userId}`);
         }
       } else {
-        console.warn("❌ Coupon not found in database.");
+        console.warn("Coupon not found in database.");
       }
-      delete req.session.appliedCoupon; // Remove the applied coupon from session
+      delete req.session.appliedCoupon; 
       await req.session.save();
     }
 
     return res.status(200).json({ success: true, message: "Order placed successfully.", orderId: newOrder._id });
 
   } catch (error) {
-    console.error("❌ Error placing order:", error);
+    console.error("Error placing order:", error);
     return res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
   }
 };
@@ -441,7 +432,7 @@ const createRazorpayOrder = async (req, res) => {
     const { paymentMethod, couponDiscount: clientCouponDiscount, totalPrice: clientTotalPrice } = req.body;
 
     const couponDiscount = req.session.appliedCoupon?.discountAmount || clientCouponDiscount || 0;
-    console.log("Creating Razorpay order for user:", userId, "with couponDiscount:", couponDiscount);
+    
 
     const cart = await Cart.findOne({ userId }).populate('items.productId');
     if (!cart || !cart.items.length) {
@@ -468,27 +459,23 @@ const createRazorpayOrder = async (req, res) => {
       return sum + (item.productId.salePrice * item.quantity);
     }, 0);
 
-    // Validate totalPrice against client-provided value (optional)
+  
     if (clientTotalPrice && clientTotalPrice !== totalPrice) {
       console.warn("Client totalPrice mismatch:", clientTotalPrice, "vs Server:", totalPrice);
     }
 
-    // Calculate finalAmount as totalPrice minus couponDiscount
     const finalAmount = Math.max(totalPrice - couponDiscount, 0);
     if (finalAmount <= 0) {
       return res.status(400).json({ success: false, message: "Invalid order amount after discount" });
     }
 
-    console.log("🟢 Total Price:", totalPrice);
-    console.log("🟢 Coupon Discount:", couponDiscount);
-    console.log("🟢 Final Amount:", finalAmount);
 
     const shortUserId = userId.toString().slice(0, 12);
     const shortTimestamp = Math.floor(Date.now() / 1000).toString();
     const receipt = `ord_${shortUserId}_${shortTimestamp}`;
 
     const razorpayOrder = await razorpayInstance.orders.create({
-      amount: finalAmount * 100, // Correct amount in paise (e.g., 435 * 100 = 43500)
+      amount: finalAmount * 100, 
       currency: "INR",
       receipt: receipt,
     });
@@ -504,8 +491,8 @@ const createRazorpayOrder = async (req, res) => {
         status: "Pending",
       })),
       totalPrice,
-      discount: couponDiscount, // Store the actual discount (e.g., 100)
-      finalAmount, // Correct final amount (e.g., 435)
+      discount: couponDiscount,
+      finalAmount, 
       address: addressDoc._id,
       status: "Pending",
       paymentMethod: "razorpay",
@@ -513,14 +500,14 @@ const createRazorpayOrder = async (req, res) => {
     });
 
     await newOrder.save();
-    console.log("Created Order ID:", newOrder._id);
+   
 
     res.status(201).json({
       success: true,
       orderId: newOrder._id,
       razorpayOrderId: razorpayOrder.id,
       razorpayKeyId: process.env.RAZORPAY_KEY_ID,
-      finalAmount, // Return correct final amount (e.g., 435)
+      finalAmount, 
     });
   } catch (error) {
     console.error("Razorpay Order Creation Error:", error.stack);
@@ -534,7 +521,6 @@ const verifyRazorpayPayment = async (req, res) => {
   try {
       const { orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
 
-      console.log("Verifying payment for order:", orderId, "with payment ID:", razorpayPaymentId);
 
       if (!orderId || !razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
           return res.status(400).json({ success: false, message: "Missing required payment details" });
@@ -551,7 +537,7 @@ const verifyRazorpayPayment = async (req, res) => {
       const order = await Order.findOneAndUpdate(
         { _id: orderId },
         {
-            status: "Processing",
+            status: "Pending",
             paymentMethod: "razorpay",
             razorpayPaymentId: razorpayPaymentId,
             paymentDetails: {
@@ -571,7 +557,7 @@ const verifyRazorpayPayment = async (req, res) => {
           return res.status(404).json({ success: false, message: "Order not found" });
       }
 
-      console.log("Updated order with payment details:", order);
+     
 
       if (order.paymentStatus === "Paid" && order.razorpayPaymentId) {
           return res.status(200).json({ success: true, orderId: order._id, message: "Payment already verified" });

@@ -43,13 +43,12 @@ const applyCoupon = async (req, res) => {
       const discountAmount = Math.min(coupon.offerPrice, orderTotal);
       const newTotal = orderTotal - discountAmount;
   
-      // Store the coupon data in the session
       req.session.appliedCoupon = {
         couponId: coupon._id,
         discountAmount,
         couponCode,
       };
-      await req.session.save(); // Ensure session is saved
+      await req.session.save();
   
       res.json({
         success: true,
@@ -102,7 +101,6 @@ const removeCoupon = async (req, res) => {
 
         await Coupon.updateOne({ _id: coupon._id }, { $pull: { userId: userId } });
 
-        // Clear the applied coupon from session
         delete req.session.appliedCoupon;
         await req.session.save();
     
