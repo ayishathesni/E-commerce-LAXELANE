@@ -109,11 +109,11 @@ const removeCategoryOffer = async (req, res) => {
         const category = await Category.findById(categoryId);
 
         if (!category) {
-            console.log("❌ Category not found:", categoryId);
+            console.log(" Category not found:", categoryId);
             return res.status(404).json({ status: false, message: "Category not found" });
         }
 
-        console.log("✅ Category found:", category.name);
+        console.log("Category found:", category.name);
 
         const percentage = category.categoryOffer;
         const products = await Product.find({ category: category._id });
@@ -132,11 +132,11 @@ const removeCategoryOffer = async (req, res) => {
         category.categoryOffer = 0;
         await category.save();
         
-        console.log("✅ Offer removed successfully");
+
         res.json({ status: true });
 
     } catch (error) {
-        console.error("❌ Internal Server Error:", error);
+        console.error("Internal Server Error:", error);
         res.status(500).json({ status: false, message: "Internal Server Error" });
     }
 };

@@ -2,6 +2,7 @@ const User=require("../../models/userSchema");
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
+const Wishlist = require("../../models/wishlistSchema");
 const mongoose = require("mongoose");
 
 const addToCart = async (req, res) => {
@@ -12,7 +13,8 @@ const addToCart = async (req, res) => {
                 message: 'Please login to add items to cart'
             });
         }
-     const userId = req.session.user._id;
+
+        const userId = req.session.user._id;
         const { productId, quantity, size } = req.body;
 
         if (!productId || !quantity || !size) {
@@ -21,6 +23,7 @@ const addToCart = async (req, res) => {
                 message: 'Missing required fields: productId, quantity, or size'
             });
         }
+
         const product = await Product.findById(productId);
         if (!product || product.isBlocked) {
             return res.status(400).json({
@@ -28,7 +31,6 @@ const addToCart = async (req, res) => {
                 message: 'This product is not available.'
             });
         }
-        
 
         const selectedSize = product.sizes.find(s => s.size === size);
         if (!selectedSize) {
@@ -61,13 +63,11 @@ const addToCart = async (req, res) => {
         );
 
         if (existingItem) {
-         
             return res.status(400).json({
                 success: false,
                 message: `This item is already in your cart. You can update the quantity from the cart page.`
             });
         } else {
-        
             cart.items.push({
                 productId,
                 name: product.productName,
@@ -81,19 +81,28 @@ const addToCart = async (req, res) => {
 
         await cart.save();
 
+        await Wishlist.findOneAndUpdate(
+            { userId },
+            { $pull: { products: { productId: new mongoose.Types.ObjectId(productId) } } }, 
+            { new: true }
+        );
+
         return res.json({
             success: true,
             cartCount: cart.items.length,
-            message: 'Product added to cart successfully'
+            message: 'Product added to cart successfully and removed from wishlist'
         });
 
     } catch (error) {
+        console.error('Error in addToCart:', error);
         return res.status(500).json({
             success: false,
-            message: 'Failed to add item to cart'
+            message: 'Failed to add item to cart',
+            error: error.message
         });
     }
 };
+
 
 
 

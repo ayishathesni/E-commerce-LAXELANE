@@ -117,7 +117,7 @@
                 <div class="product product-7 text-center">
                     <figure class="product-media">
                         <% 
-                            // Calculate discount percentage
+                           
                             const discountPercentage = ((product.regularPrice - product.salePrice) / product.regularPrice) * 100;
                         %>
                         <% if (discountPercentage > 10) { %>
@@ -176,7 +176,7 @@
 							<nav aria-label="Page navigation">
   <ul class="pagination justify-content-center">
     <% 
-      // Build query string for filters/sorting
+    
       const queryString = `&sortBy=${currentSort || ''}&categories=${(Array.isArray(selectedCategories) ? selectedCategories.join(',') : selectedCategories)}&colors=${(Array.isArray(selectedColors) ? selectedColors.join(',') : selectedColors)}&maxPrice=${selectedMaxPrice || ''}`;
     %>
 
@@ -318,7 +318,7 @@
 		document.addEventListener("DOMContentLoaded", function () {
 		  
 		  function applyFilters() {
-			const selectedPrice = document.querySelector("#priceFilter").value; // Get price filter value
+			const selectedPrice = document.querySelector("#priceFilter").value; 
 		
 			fetch(`/filterPrice?lt=${selectedPrice}`)
 			  .then(response => {
@@ -329,7 +329,7 @@
 			  })
 			  .then(data => {
 				if (data.success) {
-				  updateProductList(data.products); // Call function to update UI
+				  updateProductList(data.products); 
 				} else {
 				  console.error("No products found");
 				}
@@ -338,8 +338,8 @@
 		  }
 		
 		  function updateProductList(products) {
-			const productContainer = document.querySelector("#productContainer"); // Target your product list
-			productContainer.innerHTML = ""; // Clear existing products
+			const productContainer = document.querySelector("#productContainer"); 
+			productContainer.innerHTML = ""; 
 		
 			products.forEach(product => {
 			  const productHTML = `
@@ -353,7 +353,7 @@
 			});
 		  }
 		
-		  // Attach event listener to filter button
+		
 		  const filterBtn = document.querySelector("#applyFilterBtn");
 		  if (filterBtn) {
 			filterBtn.addEventListener("click", applyFilters);
@@ -365,20 +365,20 @@
 
 
 
-		//page
+		
 
 		document.addEventListener('DOMContentLoaded', function() {
-    // Get current URL parameters
+ 
     const urlParams = new URLSearchParams(window.location.search);
     
-    // Add event listeners to filter checkboxes
+
     const filterCheckboxes = document.querySelectorAll('.category-filter, .color-filter');
     filterCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
-            // Preserve current page and add filters
-            urlParams.set('page', '1'); // Reset to first page when filter changes
+        
+            urlParams.set('page', '1'); 
             
-            // Get all selected filters
+       
             const selectedCategories = [...document.querySelectorAll('.category-filter:checked')]
                 .map(cb => cb.value);
             const selectedColors = [...document.querySelectorAll('.color-filter:checked')]
@@ -395,13 +395,12 @@
             } else {
                 urlParams.delete('colors');
             }
-            
-            // Update URL and reload page
+       
             window.location.search = urlParams.toString();
         });
     });
     
-    // Handle price filter
+
     const priceRange = document.getElementById('price-range');
     if(priceRange) {
         priceRange.addEventListener('change', function() {
@@ -411,7 +410,7 @@
         });
     }
     
-    // Clear all filters
+
     const clearFiltersBtn = document.getElementById('clear-filters');
     if(clearFiltersBtn) {
         clearFiltersBtn.addEventListener('click', function(e) {
@@ -421,26 +420,26 @@
     }
 });
 		</script>
-		<!-- Add this JavaScript at the bottom of your shop.ejs file, just before the closing body tag -->
+		
 <script>
 	document.addEventListener('DOMContentLoaded', function() {
-	  // Handle category filter changes
+	 
 	  const categoryCheckboxes = document.querySelectorAll('.category-filter');
 	  categoryCheckboxes.forEach(checkbox => {
 		checkbox.addEventListener('change', updateFilters);
 	  });
 	  
-	  // Handle color filter changes
+	 
+    
 	  const colorCheckboxes = document.querySelectorAll('.color-filter');
 	  colorCheckboxes.forEach(checkbox => {
 		checkbox.addEventListener('change', updateFilters);
 	  });
-	  
-	  // Handle price filter changes
+	 
 	  const priceRange = document.getElementById('price-range');
 	  if (priceRange) {
 		priceRange.addEventListener('input', function() {
-		  // Update the displayed price value
+
 		  const priceValue = document.getElementById('price-value');
 		  if (priceValue) {
 			priceValue.textContent = this.value;
@@ -449,8 +448,7 @@
 		
 		priceRange.addEventListener('change', updateFilters);
 	  }
-	  
-	  // Clear all filters
+
 	  const clearFiltersBtn = document.getElementById('clear-filters');
 	  if (clearFiltersBtn) {
 		clearFiltersBtn.addEventListener('click', function(e) {
@@ -459,15 +457,15 @@
 		});
 	  }
 	  
-	  // Function to update filters and reload page
+
 	  function updateFilters() {
-		// Get current URL parameters
+	
 		const urlParams = new URLSearchParams(window.location.search);
 		
-		// Reset to page 1 when filters change
+
 		urlParams.set('page', '1');
 		
-		// Get selected categories
+
 		const selectedCategories = [...document.querySelectorAll('.category-filter:checked')].map(cb => cb.value);
 		if (selectedCategories.length > 0) {
 		  urlParams.set('categories', selectedCategories.join(','));
@@ -475,7 +473,7 @@
 		  urlParams.delete('categories');
 		}
 		
-		// Get selected colors
+
 		const selectedColors = [...document.querySelectorAll('.color-filter:checked')].map(cb => cb.value);
 		if (selectedColors.length > 0) {
 		  urlParams.set('colors', selectedColors.join(','));
@@ -483,21 +481,20 @@
 		  urlParams.delete('colors');
 		}
 		
-		// Get selected price
 		const priceRange = document.getElementById('price-range');
 		if (priceRange) {
 		  urlParams.set('maxPrice', priceRange.value);
 		}
 		
-		// Update URL and reload page
+	
 		window.location.search = urlParams.toString();
 	  }
 	  
-	  // Pre-select filters based on URL parameters
+
 	  function preSelectFilters() {
 		const urlParams = new URLSearchParams(window.location.search);
 		
-		// Pre-select categories
+
 		if (urlParams.has('categories')) {
 		  const categories = urlParams.get('categories').split(',');
 		  categories.forEach(category => {
@@ -506,7 +503,7 @@
 		  });
 		}
 		
-		// Pre-select colors
+
 		if (urlParams.has('colors')) {
 		  const colors = urlParams.get('colors').split(',');
 		  colors.forEach(color => {
@@ -514,8 +511,7 @@
 			if (checkbox) checkbox.checked = true;
 		  });
 		}
-		
-		// Set price range
+	
 		if (urlParams.has('maxPrice')) {
 		  const priceRange = document.getElementById('price-range');
 		  const priceValue = document.getElementById('price-value');
@@ -526,11 +522,10 @@
 		}
 	  }
 	  
-	  // Call the function to pre-select filters on page load
+
 	  preSelectFilters();
 	});
-	
-	// Function to update price display
+
 	function updatePrice(value) {
 	  document.getElementById('price-value').textContent = value;
 	}
@@ -550,22 +545,20 @@
 
 
 
-	// Handle sort dropdown changes
+
 const sortDropdown = document.getElementById('sortby');
 if (sortDropdown) {
   sortDropdown.addEventListener('change', function() {
-    // Get current URL parameters
+   
     const urlParams = new URLSearchParams(window.location.search);
     
-    // Update sort parameter
+  
     urlParams.set('sortBy', this.value);
-    
-    // Keep current page if possible
+ 
     if (!urlParams.has('page')) {
       urlParams.set('page', '1');
     }
-    
-    // Update URL and reload page
+ 
     window.location.search = urlParams.toString();
   });
 }
@@ -576,19 +569,17 @@ if (sortDropdown) {
 
 
 function showToast(message, type = 'success') {
-  // Remove any existing toasts
+
   const existingToasts = document.querySelectorAll('.toast');
   existingToasts.forEach(toast => toast.remove());
   
-  // Create new toast
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.textContent = message;
-  
-  // Append to body
+
   document.body.appendChild(toast);
   
-  // Remove after animation completes
+ 
   setTimeout(() => {
     toast.remove();
   }, 3000);
@@ -609,12 +600,10 @@ function addToWishlist(productId, event) {
     const button = event.target.closest('.btn-wishlist');
 
     if (data.success) {
-      // ✅ Update button UI
       button.classList.add('added');
       const textSpan = button.querySelector('span');
       if (textSpan) textSpan.innerText = 'Added to wishlist';
 
-      // ✅ Update wishlist count safely
       const countElement = document.getElementById('wishlistCount');
       if (countElement) {
         let currentCount = parseInt(countElement.innerText.trim()) || 0;
@@ -624,7 +613,7 @@ function addToWishlist(productId, event) {
       showToast('Product added to wishlist!', 'success');
 
     } else {
-      // ✅ Handle product already in wishlist
+     
       if (data.message === 'Product already in wishlist') {
         button.classList.add('added');
         const textSpan = button.querySelector('span');

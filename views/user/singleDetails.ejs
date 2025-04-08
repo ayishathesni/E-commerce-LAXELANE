@@ -354,7 +354,7 @@ body::-webkit-scrollbar {
                                         <div class="product">
                                             <figure class="product-media">
                                                 <% 
-                                                    // Calculate discount percentage for related product
+                                                  
                                                     const discountPercentage = ((relatedProduct.regularPrice - relatedProduct.salePrice) / relatedProduct.regularPrice) * 100;
                                                 %>
                                                 <% if (discountPercentage > 10) { %>
@@ -415,13 +415,13 @@ body::-webkit-scrollbar {
     <script src="/assets/js/jquery.magnific-popup.min.js"></script>
     <script src="/assets/js/nouislider.min.js"></script>
 
-   <!-- SweetAlert2 CDN -->
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-    // Initialize variables
+
     const stockData = JSON.parse(document.getElementById('stock-data')?.textContent || '{}');
     const sizeSelect = document.getElementById('size');
     const qtyInput = document.getElementById('qty');
@@ -429,7 +429,7 @@ body::-webkit-scrollbar {
     const stockMessage = document.getElementById('stock-message');
     const MAX_PURCHASE_LIMIT = 10;
 
-    // Product carousel initialization
+ 
     if (typeof jQuery !== 'undefined' && typeof jQuery.fn.owlCarousel !== 'undefined') {
         const carouselElement = $('.products-carousel');
         if (carouselElement.length > 0) {
@@ -461,7 +461,7 @@ body::-webkit-scrollbar {
         });
     }
 
-    // Size selection handler
+
     sizeSelect?.addEventListener('change', function() {
         const selectedSize = this.value;
         const availableStock = stockData[selectedSize] || 0;
@@ -480,7 +480,7 @@ body::-webkit-scrollbar {
         }
     });
 
-    // Quantity input handler
+   
     qtyInput?.addEventListener('input', function() {
         if (!sizeSelect.value) {
             showAlert("Size Required", "Please select a size first", "error");
@@ -515,7 +515,7 @@ body::-webkit-scrollbar {
 
 async function handleAddToCart(productId, selectedSize, quantity) {
     try {
-        // Validation checks
+   
         if (!selectedSize) {
             throw new Error("Please select a size");
         }
@@ -533,7 +533,7 @@ async function handleAddToCart(productId, selectedSize, quantity) {
             throw new Error(`Maximum ${MAX_PURCHASE_LIMIT} items per order`);
         }
 
-        // Log request details for debugging
+     
         console.log("Adding to cart:", { productId, size: selectedSize, quantity });
 
         const response = await fetch('/add-to-cart', {
@@ -547,7 +547,6 @@ async function handleAddToCart(productId, selectedSize, quantity) {
         const responseText = await response.text();
       
 
-        // Parse the response with error handling
         let data;
         try {
             data = JSON.parse(responseText);
@@ -557,7 +556,7 @@ async function handleAddToCart(productId, selectedSize, quantity) {
             throw new Error("Invalid response from server");
         }
 
-        // Check explicitly for the exist property
+     
         if (data && data.exist === true) {
             console.log("Item already exists in cart");
             Swal.fire({
@@ -567,15 +566,15 @@ async function handleAddToCart(productId, selectedSize, quantity) {
                 confirmButtonColor: "#3085d6",
                 showConfirmButton: true
             });
-            return; // Important: stop execution here
+            return;
         }
 
-        // Handle unsuccessful response
+  
         if (!response.ok) {
             throw new Error(data.message || 'Failed to add item to cart');
         }
 
-        // Handle successful response
+     
         if (data && data.success) {
             Swal.fire({
                 title: "Success",
@@ -585,7 +584,7 @@ async function handleAddToCart(productId, selectedSize, quantity) {
                 showConfirmButton: true
             });
 
-            // Update cart count
+         
             const cartCount = document.querySelector('.cart-count');
             if (cartCount && data.cartCount) {
                 cartCount.textContent = data.cartCount;
@@ -608,10 +607,10 @@ async function handleAddToCart(productId, selectedSize, quantity) {
 
 
 
-// Make the function accessible globally
+
 window.handleAddToCart = handleAddToCart;
 
-// Add click handlers to all add-to-cart buttons
+
 document.querySelectorAll('.btn-cart').forEach(button => {
     button.addEventListener('click', function(e) {
         e.preventDefault();
@@ -635,7 +634,6 @@ document.querySelectorAll('.btn-cart').forEach(button => {
 
 
 
-    // Image zoom functionality
     const imageContainer = document.querySelector('.imf');
     if (imageContainer) {
         let x, y, width, height;
@@ -656,7 +654,7 @@ document.querySelectorAll('.btn-cart').forEach(button => {
         });
     }
 
-    // Thumbnail gallery
+ 
     const thumbnails = document.querySelectorAll('.product-image-gallery .product-gallery-item img');
     thumbnails.forEach(thumbnail => {
         thumbnail.addEventListener('click', (e) => {
@@ -695,7 +693,7 @@ function addToWishlistSinglePage(productId, event) {
       button.classList.add('added');
       if (textSpan) textSpan.innerText = 'Added to Wishlist';
 
-      // ✅ Update wishlist count safely
+
       const countElement = document.getElementById('wishlistCount');
       if (countElement) {
         let currentCount = parseInt(countElement.innerText.trim()) || 0;
@@ -704,7 +702,7 @@ function addToWishlistSinglePage(productId, event) {
 
       showToast('Product added to wishlist!', 'success');
     } else {
-      // ✅ Handle product already in wishlist
+   
       if (data.message === 'Product already in wishlist') {
         button.classList.add('added');
         if (textSpan) textSpan.innerText = 'Already in Wishlist';
@@ -721,7 +719,6 @@ function addToWishlistSinglePage(productId, event) {
 }
 
 
-// // Ensure functions run after the page loads
 document.addEventListener('DOMContentLoaded', initializeStockCheck);
   
     </script>
@@ -734,5 +731,5 @@ document.addEventListener('DOMContentLoaded', initializeStockCheck);
 </body>
 
 
-<!-- molla/category.html  22 Nov 2019 10:02:52 GMT -->
+
 </html>

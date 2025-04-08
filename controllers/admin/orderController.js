@@ -82,12 +82,10 @@ const getListOfOrders = async (req, res, next) => {
 
 
 
-
 const updateStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
-
     const statusFlow = ['Pending', 'Processing', 'Shipped', 'Delivered'];
 
     const order = await Order.findById(orderId);
@@ -95,21 +93,15 @@ const updateStatus = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    if ((order.status === 'Cancelled' || order.status === 'Return Requested') && status !== 'Cancelled') {
+ 
+    if (['Cancelled', 'Return Request', 'Returned'].includes(order.status)) {
       return res.status(400).json({
         success: false,
-        message: `Cannot change status. Order is already '${order.status}'.`
+        message: `Cannot change status. Order is already in '${order.status}' state.`
       });
     }
 
     if (status === 'Cancelled') {
-      if (order.status === 'Cancelled') {
-        return res.status(400).json({
-          success: false,
-          message: 'Order is already cancelled.'
-        });
-      }
-
       if (order.status === 'Delivered') {
         return res.status(400).json({
           success: false,
@@ -120,7 +112,7 @@ const updateStatus = async (req, res) => {
       order.status = 'Cancelled';
 
       order.orderedItems.forEach(item => {
-        if (item.status !== 'Returned') {
+        if (!['Returned', 'Return Request'].includes(item.status)) {
           item.status = 'Cancelled';
         }
       });
@@ -129,7 +121,48 @@ const updateStatus = async (req, res) => {
       return res.json({ success: true, message: 'Order cancelled successfully' });
     }
 
+    if (status === 'Return Request') {
+      if (order.status !== 'Delivered') {
+        return res.status(400).json({
+          success: false,
+          message: 'Can only request returns for delivered orders.'
+        });
+      }
+
+      order.status = 'Return Request';
+      
+  
+      order.orderedItems.forEach(item => {
+        if (item.status === 'Delivered') {
+          item.status = 'Return Request';
+        }
+      });
+
+      await order.save();
+      return res.json({ success: true, message: 'Return request registered successfully' });
+    }
+
+    if (status === 'Returned') {
+      if (order.status !== 'Return Request') {
+        return res.status(400).json({
+          success: false, 
+          message: 'Can only mark orders with active return requests as returned.'
+        });
+      }
+
+      order.status = 'Returned';
+      
  
+      order.orderedItems.forEach(item => {
+        if (item.status === 'Return Request') {
+          item.status = 'Returned';
+        }
+      });
+
+      await order.save();
+      return res.json({ success: true, message: 'Order marked as returned successfully' });
+    }
+
     const currentStatusIndex = statusFlow.indexOf(order.status);
     const newStatusIndex = statusFlow.indexOf(status);
 
@@ -142,12 +175,14 @@ const updateStatus = async (req, res) => {
 
     order.status = status;
 
+  
     order.orderedItems.forEach(item => {
-      if (item.status !== 'Cancelled' && item.status !== 'Returned') {
+      if (!['Cancelled', 'Return Request', 'Returned'].includes(item.status)) {
         item.status = status;
       }
     });
 
+   
     if (status === 'Delivered') {
       order.invoiceDate = new Date();
     }
@@ -160,7 +195,6 @@ const updateStatus = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
-
 
 
 
@@ -221,56 +255,136 @@ const requestReturn = async (req, res, next) => {
 
 const returnAccept = async (req, res, next) => {
   try {
-    const ordId = req.body.orderId;
-    const proIdd = req.body.itemId;
+    const { orderId, itemId } = req.body;
 
     const updatedOrder = await Order.findOneAndUpdate(
-      { _id: ordId, "orderedItems._id": proIdd },
-      { $set: { "orderedItems.$.status": "Returned" } },
+      { _id: orderId, "orderedItems._id": itemId },
+      { 
+        $set: { 
+          "orderedItems.$.status": "Returned",
+          "orderedItems.$.returnApprovedAt": new Date()
+        }
+      },
       { new: true }
-    );
+    ).populate('orderedItems.product');
 
     if (!updatedOrder) {
-      return res.status(404).json({ message: "Order or product not found." });
+      console.warn(`Order ${orderId} or item ${itemId} not found`);
+      return res.status(404).json({ success: false, message: "Order or product not found." });
     }
 
-    const item = updatedOrder.orderedItems.find(item => item._id.toString() === proIdd);
+    const item = updatedOrder.orderedItems.find(
+      item => item._id.toString() === itemId
+    );
     if (!item) {
-      return res.status(404).json({ message: "Product not found in order." });
+      console.warn(`Item ${itemId} not found in order ${orderId}`);
+      return res.status(404).json({ success: false, message: "Product not found in order." });
     }
 
-    await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.quantity } });
+    await Product.findByIdAndUpdate(item.product, { 
+      $inc: { stock: item.quantity } 
+    }, { new: true });
 
-    const refundAmount = item.price;
+    const refundAmount = item.price * item.quantity;
     let refundFinalAmount = refundAmount;
 
-    if (updatedOrder.discount >= 1) {
-      refundFinalAmount = Math.floor(refundAmount - (refundAmount * updatedOrder.discount / 100));
+    if (updatedOrder.couponApplied && updatedOrder.discount > 0 && updatedOrder.couponCode) {
+   
+      const coupon = await Coupon.findOne({ code: updatedOrder.couponCode });
+      if (!coupon) {
+        console.warn(`Coupon ${updatedOrder.couponCode} not found for order ${orderId}`);
+      } else {
+  
+        const originalTotal = updatedOrder.totalPrice + refundAmount; 
+        const newTotalAfterReturn = Math.max(updatedOrder.totalPrice - refundAmount, 0);
+
+   
+        if (newTotalAfterReturn < coupon.minAmount && newTotalAfterReturn > 0) {
+      
+          const discountPerItem = updatedOrder.discount / originalTotal;
+          const remainingDiscount = discountPerItem * newTotalAfterReturn; 
+          const lostDiscount = updatedOrder.discount - remainingDiscount; 
+
+          refundFinalAmount = Math.max(refundAmount - lostDiscount, 0);
+          console.log(`Coupon ${coupon.code} minimum amount (${coupon.minAmount}) not met after return`, {
+            originalTotal,
+            newTotalAfterReturn,
+            lostDiscount,
+            adjustedRefund: refundFinalAmount
+          });
+
+          if (newTotalAfterReturn === 0 || refundFinalAmount === refundAmount) {
+            await Order.findByIdAndUpdate(orderId, {
+              $set: { 
+                discount: 0,
+                couponApplied: false,
+                couponCode: ''
+              }
+            });
+          }
+        } else {
+          refundFinalAmount = Math.floor(refundAmount - (refundAmount * updatedOrder.discount / 100));
+        }
+      }
     }
 
-    const newOrderAmount = updatedOrder.totalPrice - refundFinalAmount;
-    await Order.findByIdAndUpdate(ordId, { $set: { totalPrice: newOrderAmount } });
+    const newOrderAmount = Math.max(updatedOrder.totalPrice - refundFinalAmount, 0);
+    await Order.findByIdAndUpdate(orderId, { 
+      $set: { 
+        totalPrice: newOrderAmount,
+        returnStatus: updatedOrder.orderedItems.every(i => i.status === 'Returned') ? 'Returned' : 'Partially Returned'
+      }
+    });
+
 
     if (updatedOrder.paymentMethod !== 'COD') {
-      await User.findByIdAndUpdate(
-        updatedOrder.userId,
-        {
-          $inc: { wallet: refundFinalAmount },
-          $push: {
-            walletHistory: {
-              transactionId: `REF-${Date.now()}`,
-              type: "credit",
-              amount: refundFinalAmount,
-              status: "Completed"
-            }
-          }
-        }
-      );
+      const user = await User.findById(updatedOrder.userId);
+      if (!user) {
+        console.warn(`User ${updatedOrder.userId} not found for order ${orderId}`);
+        return res.status(404).json({ success: false, message: "User not found." });
+      }
+
+      if (typeof user.wallet !== 'number') {
+        user.wallet = 0;
+      }
+
+      const newWalletBalance = user.wallet + refundFinalAmount;
+      user.wallet = newWalletBalance;
+
+      if (!Array.isArray(user.walletHistory)) {
+        user.walletHistory = [];
+      }
+
+      user.walletHistory.push({
+        transactionId: `REF-${Date.now()}`,
+        type: "credit",
+        amount: refundFinalAmount,
+        status: "Completed",
+        date: new Date()
+      });
+
+      await user.save();
+      console.log(`Refund credited to wallet for order ${orderId}, item ${itemId}`, {
+        userId: updatedOrder.userId,
+        refundAmount: refundFinalAmount,
+        newWalletBalance: newWalletBalance
+      });
     }
 
-    res.redirect('/admin/orders'); 
+    const allItemsReturned = updatedOrder.orderedItems.every(item => item.status === 'Returned');
+    if (allItemsReturned) {
+      await Order.findByIdAndUpdate(orderId, { 
+        $set: { 
+          status: 'Returned',
+          returnStatus: 'Completed'
+        }
+      });
+    }
+
+    res.redirect('/admin/orders');
 
   } catch (error) {
+    console.error('Error in returnAccept:', error);
     next(error);
   }
 };

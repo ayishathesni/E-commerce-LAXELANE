@@ -14,6 +14,7 @@ const couponController = require('../controllers/user/couponController');
 
 
 router.get("/pageNotFound",userController.pageNotFound);
+
 //homepage & shop
 router.get("/",userController.loadHomepage);
 router.get("/shop",userAuth,userController.loadShoppingPage);
@@ -25,7 +26,7 @@ router.get('/apply-filters', userController.applyFilters);
 router.get('/clear-filters', userController.clearFilters);
 router.get("/search",userController.searchProducts);
 
-
+//product-detail
 router.get('/productDetails/:id',productController.productDetails)
 
 //signup
@@ -102,10 +103,16 @@ router.delete('/cancel-order', userAuth, orderController.cancelOrder);
 router.post("/request-Product-Return/:orderId", userAuth, orderController.productReturn)
 router.get('/download-invoice',userAuth,orderController.downloadInvoice);
 
-//payment
+//razorpay payment
 router.post('/create-razorpay-order',checkoutController.createRazorpayOrder)
 router.post('/verify-razorpay-payment',checkoutController.verifyRazorpayPayment)
-// router.post('/handle-payment-dismissal',checkoutController.handlePaymentDismissal)
+router.post('/handle-payment-dismissal',checkoutController.handlePaymentDismissal)
+router.post('/handle-payment-failure', checkoutController.handlePaymentFailure);
+router.post('/retry-payment', checkoutController.retryPayment);
+router.get('/transaction-failure',checkoutController.loadTransactionFailurePage);
+
+
+
 
 //wishlist
 router.get('/wishlist',userAuth,wishlistController.loadWishlist);
@@ -116,6 +123,9 @@ router.delete('/removeFromWishlist',userAuth,wishlistController.removeFromWishli
 router.post("/apply-coupon",userAuth,couponController.applyCoupon)
 router.delete("/remove-coupon",userAuth,couponController.removeCoupon)
 
+//about & contact
+router.get('/about', userController.getAboutPage);
+router.get('/contact', userController.loadContact);
 
 
 

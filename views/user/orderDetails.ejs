@@ -245,6 +245,11 @@
                       <i class="icon-close"></i> Cancel Entire Order
                     </button>
                     <% } %>
+                    <% if (order.status === 'Failed') { %>
+                      <button type="button" class="btn btn-outline-primary mb-2" onclick="retryPayment('<%= order._id %>')">
+                        <i class="icon-refresh"></i> Retry Payment
+                      </button>
+                    <% } %>
                   </div>
                 </div>
               </div>
@@ -345,19 +350,18 @@
                           </td>
                           <td>
                             <% if (item.status === 'Delivered') { %>
-                            <button type="button" onclick="returnOrder('<%= item.product._id %>', '<%= order._id %>', '<%= item.size %>')" class="btn btn-sm btn-warning">
-                              Return
-                            </button>
+                              <button type="button" onclick="returnOrder('<%= item.product._id %>', '<%= order._id %>', '<%= item.size %>')" class="btn btn-sm btn-warning">
+                                Return
+                              </button>
                             <% } else if (item.status === 'Pending' || item.status === 'Processing' || item.status === 'Shipped') { %>
-                            <button type="button" onclick="cancelOrder('<%= item.product._id %>', '<%= order._id %>','<%= item.size %>', '<%= item.price %>')" class="btn btn-sm btn-danger">
-                              Cancel
-                            </button>
+                              <button type="button" onclick="cancelOrder('<%= item.product._id %>', '<%= order._id %>','<%= item.size %>', '<%= item.price %>')" class="btn btn-sm btn-danger">
+                                Cancel
+                              </button>
                             <% } %>
-                            
                             <% if (item.status === 'Pending' && order.paymentMethod === 'COD') { %>
-                            <button type="button" class="btn btn-sm btn-primary mt-1" onclick="payNow('<%= order.userId %>', '<%= order.finalAmount %>', '<%= order._id %>')">
-                              Pay Now
-                            </button>
+                              <button type="button" class="btn btn-sm btn-primary mt-1" onclick="payNow('<%= order.userId %>', '<%= order.finalAmount %>', '<%= order._id %>')">
+                                Pay Now
+                              </button>
                             <% } %>
                           </td>
                         </tr>
@@ -440,7 +444,7 @@
   
 
   <script src="/assets/js/main.js"></script>
-  
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
     
     async function cancelOrder(productId, orderId, size, price) {
@@ -741,6 +745,109 @@
           icon: "error"
         });
       });
+    }
+    async function retryPayment(orderId) {
+      Swal.fire({
+        title: "Processing",
+        text: "Initiating payment retry...",
+        icon: "info",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => Swal.showLoading()
+      });
+
+      try {
+        const response = await fetch('/retry-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! Status: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.paymentMethod === 'razorpay') {
+          if (typeof Razorpay === 'undefined') {
+            await new Promise((resolve, reject) => {
+              const script = document.createElement('script');
+              script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+              script.onload = resolve;
+              script.onerror = () => reject(new Error('Failed to load Razorpay SDK'));
+              document.body.appendChild(script);
+            });
+          }
+
+          const rzp = new Razorpay({
+            ...data.razorpayOptions,
+            handler: async (response) => {
+              const verifyResponse = await fetch('/verify-razorpay-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  orderId,
+                  razorpayOrderId: response.razorpay_order_id,
+                  razorpayPaymentId: response.razorpay_payment_id,
+                  razorpaySignature: response.razorpay_signature
+                })
+              });
+              const verifyData = await verifyResponse.json();
+
+              if (verifyData.success) {
+                Swal.fire({
+                  title: "Payment Successful",
+                  text: "Your payment was processed successfully",
+                  icon: "success"
+                }).then(() => {
+                  window.location.reload();
+                });
+              } else {
+                Swal.fire({
+                  title: "Payment Verification Failed",
+                  text: verifyData.message || "Unable to verify payment",
+                  icon: "error"
+                });
+              }
+            }
+          });
+
+          rzp.on('payment.failed', async (response) => {
+            await fetch('/handle-payment-failure', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                orderId,
+                failureReason: response.error.description
+              })
+            });
+            Swal.fire({
+              title: "Payment Failed",
+              text: "Please try again or use a different payment method",
+              icon: "error"
+            }).then(() => {
+              window.location.reload();
+            });
+          });
+
+          rzp.open();
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: data.message || "Failed to initiate retry payment",
+            icon: "error"
+          });
+        }
+      } catch (error) {
+        console.error('Error in retryPayment:', error);
+        Swal.fire({
+          title: "Error",
+          text: "An error occurred while retrying payment: " + error.message,
+          icon: "error"
+        });
+      }
     }
   </script>
  <%- include("../../views/partials/user/footer") %>

@@ -54,16 +54,7 @@ const login=async(req,res)=>{
 }
 
 
-// const loadDashboard=async (req,res)=>{
 
-//     if(req.session.admin){
-//         try{
-//       res.render("admin/dashboard")
-//     }catch(error){
-//         res.redirect("/pageerror")
-//     }
-// } 
-// }
 
 
 const logout=async(req,res)=>{
@@ -125,13 +116,10 @@ const createDateFilter = (filter, startDate, endDate) => {
       {
         $group: {
           _id: '$orderedItems.product',
-          unitsSold: { $sum: '$orderedItems.variant.quantity' },
+          unitsSold: { $sum: '$orderedItems.quantity' },
           revenue: {
             $sum: {
-              $multiply: [
-                { $ifNull: ['$orderedItems.variant.salesPrice', '$orderedItems.variant.regularPrice'] },
-                '$orderedItems.variant.quantity'
-              ]
+              $multiply: ['$orderedItems.price', '$orderedItems.quantity']
             }
           }
         }
@@ -180,13 +168,10 @@ const createDateFilter = (filter, startDate, endDate) => {
         $group: {
           _id: { $arrayElemAt: ['$categoryInfo._id', 0] },
           name: { $first: { $arrayElemAt: ['$categoryInfo.name', 0] } },
-          unitsSold: { $sum: '$orderedItems.variant.quantity' },
+          unitsSold: { $sum: '$orderedItems.quantity' },
           revenue: {
             $sum: {
-              $multiply: [
-                { $ifNull: ['$orderedItems.variant.salesPrice', '$orderedItems.variant.regularPrice'] },
-                '$orderedItems.variant.quantity'
-              ]
+              $multiply: ['$orderedItems.price', '$orderedItems.quantity']
             }
           }
         }
@@ -196,165 +181,108 @@ const createDateFilter = (filter, startDate, endDate) => {
       { $limit: 10 }
     ]);
   };
+ 
 
-  const getSalesData = async (dateFilter, filterType = 'daily') => {
-    let dateFormat;
-    switch (filterType.toLowerCase()) {
-        case 'daily':
-            dateFormat = '%Y-%m-%d';
-            break;
-        case 'weekly':
-            dateFormat = '%Y-W%U';
-            break;
-        case 'monthly':
-            dateFormat = '%Y-%m';
-            break;
-        case 'yearly':
-            dateFormat = '%Y';
-            break;
-        case 'custom':
-            dateFormat = '%Y-%m-%d';
-            break;
-        default:
-            dateFormat = '%Y-%m-%d';
+  const getSalesData = async (dateFilter, filter) => {
+    let groupBy;
+    switch (filter.toLowerCase()) {
+      case 'daily':
+        groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdOn' } };
+        break;
+      case 'weekly':
+        groupBy = { $week: '$createdOn' };
+        break;
+      case 'monthly':
+        groupBy = { $month: '$createdOn' };
+        break;
+      case 'yearly':
+        groupBy = { $year: '$createdOn' };
+        break;
+      case 'custom':
+        groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdOn' } };
+        break;
+      default:
+        groupBy = { $dateToString: { format: '%Y-%m-%d', date: '$createdOn' } };
     }
-
-
-    const result = await Order.aggregate([
-        { $match: { ...dateFilter, status: 'Delivered' } },
-        { $unwind: '$orderedItems' },
-        {
-            $project: {
-                createdOn: 1,
-                itemRevenue: {
-                    $multiply: [
-                        { $ifNull: ['$orderedItems.variant.salesPrice', '$orderedItems.variant.regularPrice'] },
-                        '$orderedItems.variant.quantity'
-                    ]
-                }
-            }
+  
+    return await Order.aggregate([
+      { $match: { ...dateFilter, status: 'Delivered' } },
+      {
+        $group: {
+          _id: groupBy,
+          revenue: { $sum: '$finalAmount' },
         },
-        {
-            $group: {
-                _id: { $dateToString: { format: dateFormat, date: '$createdOn' } },
-                revenue: { $sum: '$itemRevenue' },
-                orderCount: { $sum: 1 }
-            }
+      },
+      {
+        $project: {
+          date: '$_id',
+          revenue: 1,
+          _id: 0,
         },
-        { $sort: { '_id': 1 } },
-        { $project: { date: '$_id', revenue: 1, orderCount: 1, _id: 0 } }
+      },
+      { $sort: { date: 1 } },
     ]);
+  };
 
-    return result;
-};
   const loadDashboard = async (req, res) => {
     try {
-        const { page = 1, filter = 'daily', startDate, endDate } = req.query;
-        const limit = 6;
-
-        if (filter === 'custom') {
-            if (!startDate || !endDate) {
-                throw new Error('Start date and end date are required for custom filter.');
-            }
-
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-                throw new Error('Invalid date format for start date or end date.');
-            }
-
-            if (end < start) {
-                throw new Error('End date cannot be before start date.');
-            }
-
-            const today = new Date();
-            today.setHours(23, 59, 59, 999)
-            if (start > today || end > today) {
-                throw new Error('Dates cannot be in the future.');
-            }
-        }
-
-        const dateFilter = createDateFilter(filter, startDate, endDate);
-
-        const [
-            totalOrders,
-            salesSummary,
-            orders,
-            totalUsers,
-            totalProducts,
-            totalCoupons,
-            bestSellingProducts,
-            bestCategories,
-            salesData
-        ] = await Promise.all([
-            Order.countDocuments(dateFilter),
-            Order.aggregate([
-                { $match: dateFilter },
-                {
-                    $group: {
-                        _id: null,
-                        totalSales: { $sum: '$finalAmount' },
-                        totalDiscount: { $sum: '$discount' }
-                    }
-                }
-            ]),
-            Order.find(dateFilter)
-                .populate('orderedItems.product', 'productName')
-                .sort({ createdOn: -1 })
-                .skip((page - 1) * limit)
-                .limit(limit),
-            User.countDocuments(),
-            Product.countDocuments(),
-            Coupon.countDocuments(),
-            getBestSellingProducts(dateFilter),
-            getBestCategories(dateFilter),
-            getSalesData(dateFilter)
-        ]);
-        console.log('Best Selling Products:', bestSellingProducts);
-        console.log('Best Categories:', bestCategories);
-       console.log('Sales Data:', salesData);
-
-        const responseData = {
-            totalOrders,
-            totalSales: salesSummary[0]?.totalSales || 0,
-            totalDiscount: salesSummary[0]?.totalDiscount || 0,
-            orders,
-            totalUsers,
-            totalProducts,
-            totalCoupons,
-            bestSellingProducts,
-            bestCategories,
-            salesData,
-            totalPages: Math.ceil(totalOrders / limit),
-            currentPage: parseInt(page),
-            selectedFilter: filter,
-            startDate: startDate || '',
-            endDate: endDate || ''
-        };
-
-        res.render('admin/dashboard', responseData);
+      const { page = 1, filter = 'daily', startDate, endDate } = req.query;
+      const limit = 6;
+      const dateFilter = createDateFilter(filter, startDate, endDate);
+  
+      const [
+        totalOrders,
+        salesSummary,
+        orders,
+        totalUsers,
+        bestSellingProducts,
+        bestCategories,
+        salesData,
+      ] = await Promise.all([
+        Order.countDocuments(dateFilter),
+        Order.aggregate([
+          { $match: dateFilter },
+          {
+            $group: {
+              _id: null,
+              totalSales: { $sum: '$finalAmount' },
+              totalDiscount: { $sum: '$discount' },
+            },
+          },
+        ]),
+        Order.find(dateFilter)
+          .populate('orderedItems.product', 'productName') 
+          .sort({ createdOn: -1 })
+          .skip((page - 1) * limit)
+          .limit(limit),
+        User.countDocuments(),
+        getBestSellingProducts(dateFilter),
+        getBestCategories(dateFilter),
+        getSalesData(dateFilter, filter), 
+      ]);
+  
+      const summary = salesSummary[0] || { totalSales: 0, totalDiscount: 0 };
+  
+      res.render('admin/dashboard', {
+        totalOrders,
+        totalSales: summary.totalSales || 0,
+        totalDiscount: summary.totalDiscount || 0,
+        orders,
+        totalUsers,
+        bestSellingProducts: bestSellingProducts || [],
+        bestCategories: bestCategories || [],
+        salesData: salesData || [], 
+        totalPages: Math.ceil(totalOrders / limit),
+        currentPage: parseInt(page),
+        selectedFilter: filter,
+        startDate: startDate || '',
+        endDate: endDate || '',
+      });
     } catch (error) {
-        console.error('Error loading dashboard:', error.message);
-        res.render('admin/dashboard', {
-            totalOrders: 0,
-            totalSales: 0,
-            totalDiscount: 0,
-            orders: [],
-            totalUsers: 0,
-            totalProducts: 0,
-            totalCoupons: 0,
-            bestSellingProducts: [],
-            bestCategories: [],
-            salesData: [],
-            totalPages: 0,
-            currentPage: 1,
-            selectedFilter: filter || 'daily',
-            startDate: startDate || '',
-            endDate: endDate || '',
-            errorMessage: error.message 
-        });
+      console.error('Error loading dashboard:', error);
+      res.redirect('/admin/pageerror');
     }
-};
+  };
   
   const getAnalyticsData = async (req, res) => {
     try {
@@ -452,17 +380,12 @@ const createDateFilter = (filter, startDate, endDate) => {
       res.redirect('/admin/pageerror');
     }
   };
-  
   const downloadExcelReport = async (req, res) => {
     try {
       const { filter = 'daily', startDate, endDate } = req.query;
       const dateFilter = createDateFilter(filter, startDate, endDate);
   
-      const queryFilter = {
-        ...dateFilter,
-        status: 'Delivered',
-      };
-  
+      const queryFilter = { ...dateFilter, status: 'Delivered' };
       const orders = await Order.find(queryFilter).populate('orderedItems.product');
       const summary = await Order.aggregate([
         { $match: queryFilter },
@@ -488,7 +411,6 @@ const createDateFilter = (filter, startDate, endDate) => {
       ]);
       worksheet.addRow([]);
   
-      // Add 'Status' column to the worksheet
       worksheet.columns = [
         { header: 'Order ID', key: 'orderId', width: 20 },
         { header: 'Date', key: 'date', width: 15 },
@@ -498,22 +420,21 @@ const createDateFilter = (filter, startDate, endDate) => {
         { header: 'Discount', key: 'discount', width: 12 },
         { header: 'Final Amount', key: 'finalAmount', width: 12 },
         { header: 'Coupon', key: 'coupon', width: 15 },
-        { header: 'Status', key: 'status', width: 15 }, // New column for status
+        { header: 'Status', key: 'status', width: 15 },
       ];
   
       orders.forEach((order) => {
         order.orderedItems.forEach((item) => {
-          console.log('Item debug:', item);
           worksheet.addRow({
             orderId: order.orderId,
             date: format(order.createdOn, 'yyyy-MM-dd'),
-            product: item.name || item.product?.productName || 'N/A',
-            quantity: item.variant?.quantity || 0,
-            price: item.price || item.variant?.salesPrice || item.variant?.regularPrice || 0,
+            product: item.product?.productName || 'N/A',
+            quantity: item.quantity || 0,
+            price: item.price || 0,
             discount: order.discount,
             finalAmount: order.finalAmount,
             coupon: order.couponCode || 'N/A',
-            status: order.status || 'N/A', // Add status field
+            status: order.status || 'N/A',
           });
         });
       });
@@ -545,29 +466,9 @@ const createDateFilter = (filter, startDate, endDate) => {
     try {
       const { filter = 'daily', startDate, endDate } = req.query;
       const dateFilter = createDateFilter(filter, startDate, endDate);
-  
-      const queryFilter = {
-        ...dateFilter,
-        status: 'Delivered',
-      };
-  
-      console.log('Date Filter in PDF:', queryFilter);
+      const queryFilter = { ...dateFilter, status: 'Delivered' };
   
       const orders = await Order.find(queryFilter).populate('orderedItems.product');
-      console.log(
-        'Orders fetched for PDF:',
-        orders.map((order) => ({
-          orderId: order.orderId,
-          createdOn: order.createdOn,
-          orderedItems: order.orderedItems,
-          totalPrice: order.totalPrice,
-          discount: order.discount,
-          finalAmount: order.finalAmount,
-          couponCode: order.couponCode,
-          status: order.status, 
-        }))
-      );
-  
       const summary = await Order.aggregate([
         { $match: queryFilter },
         {
@@ -580,7 +481,6 @@ const createDateFilter = (filter, startDate, endDate) => {
           },
         },
       ]);
-      console.log('Summary for PDF:', summary);
   
       const doc = new PDFDocument({ margin: 30 });
       res.setHeader('Content-Type', 'application/pdf');
@@ -600,16 +500,14 @@ const createDateFilter = (filter, startDate, endDate) => {
         order.orderedItems.map((item) => ({
           orderId: order.orderId.slice(0, 12),
           date: format(order.createdOn, 'yyyy-MM-dd'),
-          product: item.name || item.product?.productName || 'N/A',
-          qty: item.variant?.quantity || 0,
-          price: `₹${(item.price || item.variant?.salesPrice || item.variant?.regularPrice || 0).toFixed(2)}`,
+          product: item.product?.productName || 'N/A',
+          qty: item.quantity || 0,
+          price: `₹${(item.price || 0).toFixed(2)}`,
           discount: `₹${order.discount.toFixed(2)}`,
           final: `₹${order.finalAmount.toFixed(2)}`,
-          status: order.status || 'N/A', 
+          status: order.status || 'N/A',
         }))
       );
-  
-      console.log('Table Data:', tableData);
   
       if (tableData.length === 0) {
         doc.fontSize(12).text('No delivered orders found for the selected date range.', { align: 'center' });
@@ -623,7 +521,7 @@ const createDateFilter = (filter, startDate, endDate) => {
             { label: 'Price', property: 'price', width: 60 },
             { label: 'Discount', property: 'discount', width: 60 },
             { label: 'Final', property: 'final', width: 60 },
-            { label: 'Status', property: 'status', width: 60 }, 
+            { label: 'Status', property: 'status', width: 60 },
           ],
           datas: tableData,
         };
@@ -648,13 +546,7 @@ const createDateFilter = (filter, startDate, endDate) => {
   
       doc.end();
     } catch (error) {
-      console.error('Error generating PDF:', {
-        message: error.message,
-        stack: error.stack,
-        filter,
-        startDate,
-        endDate,
-      });
+      console.error('Error generating PDF:', error);
       res.redirect('/admin/pageerror');
     }
   };

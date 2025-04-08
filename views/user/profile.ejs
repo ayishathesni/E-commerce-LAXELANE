@@ -414,7 +414,7 @@
 const editProfileModal = new bootstrap.Modal(document.getElementById('editProfileModal'));
 const changePasswordModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
 
-// Edit Profile Functions
+
 function editProfile() {
     editProfileModal.show();
 }
@@ -427,13 +427,13 @@ function saveProfile() {
     const form = document.getElementById('editProfileForm');
     const formData = new FormData(form);
     
-    // Create data object
+  
     const data = {
         name: formData.get('name'),
         phone: formData.get('phone')
     };
 
-    // Validate input
+
     if (!data.name || !data.phone) {
         Swal.fire({
             title: 'Error',
@@ -443,7 +443,7 @@ function saveProfile() {
         return;
     }
 
-    // Send request to server
+ 
     fetch('/edit-profile', {
         method: 'POST',
         headers: {
@@ -483,15 +483,14 @@ function saveProfile() {
 function savePassword() {
     const form = document.getElementById('changePasswordForm');
     const formData = new FormData(form);
-    
-    // Create data object
+ 
     const data = {
         currentPassword: formData.get('currentPassword'),
         newPassword: formData.get('newPassword'),
         confirmPassword: formData.get('confirmPassword')
     };
 
-    // Validate input
+ 
     if (!data.currentPassword || !data.newPassword || !data.confirmPassword) {
         Swal.fire({
             title: 'Error',
@@ -518,7 +517,7 @@ function savePassword() {
         return;
     }
 
-    // Send request to server
+
     fetch('/update-password', {
         method: 'POST',
         headers: {
@@ -555,9 +554,9 @@ function savePassword() {
     });
 }
 
-// Add these elements to your error display
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Add error message elements if they don't exist
+  
     const editProfileForm = document.getElementById('editProfileForm');
     if (!document.getElementById('nameError')) {
         const nameErrorDiv = document.createElement('div');
@@ -572,7 +571,7 @@ document.addEventListener('DOMContentLoaded', function() {
         editProfileForm.querySelector('[name="phone"]').parentNode.appendChild(phoneErrorDiv);
     }
     
-    // Add password error element if it doesn't exist
+
     const changePasswordForm = document.getElementById('changePasswordForm');
     if (!document.getElementById('passwordError')) {
         const passwordErrorDiv = document.createElement('div');

@@ -51,12 +51,13 @@
 
 
                                     <td>
-                                        <select onchange="updateOrderStatus(this, '<%= order._id %>')" 
-                                            class="status-select">
+                                        <select onchange="updateOrderStatus(this, '<%= order._id %>')" class="status-select">
                                             <option value="Pending" <%= order.status==='Pending' ? 'selected' : '' %>>Pending</option>
                                             <option value="Processing" <%= order.status==='Processing' ? 'selected' : '' %>>Processing</option>
                                             <option value="Shipped" <%= order.status==='Shipped' ? 'selected' : '' %>>Shipped</option>
                                             <option value="Delivered" <%= order.status==='Delivered' ? 'selected' : '' %>>Delivered</option>
+                                            <option value="Return Request" <%= order.status==='Return Request' ? 'selected' : '' %>>Return Request</option>
+                                            <option value="Returned" <%= order.status==='Returned' ? 'selected' : '' %>>Returned</option>
                                             <option value="Cancelled" <%= order.status==='Cancelled' ? 'selected' : '' %>>Cancelled</option>
                                         </select>
                                         <div class="loading-spinner"></div>
@@ -166,6 +167,17 @@
         color: #721c24;
     }
 
+    .status-select.Return-Request {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+.status-select.Returned {
+    background-color: #e2e3e5;
+    border-color: #d6d8db;
+    color: #383d41;
+}
  
     .status-select option {
         padding: 5px;

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Failure - Laxelane</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        :root {
+            --primary-color: #CC9966;
+            --hover-color: #b88754;
+            --error-color: #dc3545;
+        }
+        
+        .failure-container {
+            text-align: center;
+            padding: 50px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .failure-illustration img {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        
+        .failure-message {
+            font-size: 2rem;
+            color: var(--error-color);
+            margin-bottom: 20px;
+        }
+        
+        .order-id {
+            font-weight: bold;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .action-buttons .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--hover-color);
+            border-color: var(--hover-color);
+        }
+        
+        .btn-secondary {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            color: #212529;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e2e6ea;
+            border-color: #dae0e5;
+        }
+        
+        .breadcrumb a {
+            color: #000000;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: border-bottom 0.3s ease, color 0.3s ease;
+        }
+        
+        .breadcrumb a:hover {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .breadcrumb .text-black {
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div class="site-wrap">
+        <%- include('../../views/partials/user/header') %>
+
+        <div class="bg-light py-3">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 mb-0 breadcrumb">
+                        <a href="/">Home</a> <span class="mx-2 mb-0">/</span>
+                        <a href="/cart">Cart</a> <span class="mx-2 mb-0">/</span>
+                        <a href="/checkout">Checkout</a> <span class="mx-2 mb-0">/</span>
+                        <strong class="text-black">Transaction Failure</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="site-section">
+            <div class="container">
+                <div class="failure-container">
+                    <div class="failure-illustration">
+                        <img src="/images/payment-failure.png" alt="Payment Failure Illustration">                    </div>
+                    <h2 class="failure-message">Payment Failed!</h2>
+                    <p>We're sorry, but there was an issue processing your payment for Order #<span class="order-id"><%= orderId %></span>. Please try again or check your payment details.</p>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="retryPayment('<%= orderId %>')">Retry Payment</button>
+                        <a href="/orders" class="btn btn-secondary">View Order Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="site-footer custom-border-top">
+            <%- include('../../views/partials/user/footer') %>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="assets/js/jquery.waypoints.min.js"></script>
+    <script>
+        async function retryPayment(orderId) {
+            try {
+                console.log('Initiating retry payment for orderId:', orderId);
+                const response = await fetch('/retry-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId })
+                });
+                console.log('Fetch response status:', response.status);
+                console.log('Fetch response ok:', response.ok);
+
+                if (!response.ok) {
+      const errorText = await response.text();
+      console.log('Error response text:', errorText);
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success && data.paymentMethod === 'razorpay') {
+                    const rzp = new Razorpay({
+                        ...data.razorpayOptions,
+                        handler: async (response) => {
+                            console.log('Razorpay payment response:', response);
+                            const verifyResponse = await fetch('/verify-razorpay-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    orderId,
+                                    razorpayOrderId: response.razorpay_order_id,
+                                    razorpayPaymentId: response.razorpay_payment_id,
+                                    razorpaySignature: response.razorpay_signature
+                                })
+                            });
+                            const verifyData = await verifyResponse.json();
+                            console.log('Verification response:', verifyData);
+                            if (verifyData.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Payment Successful',
+                                    text: 'Redirecting to order success page...'
+                                }).then(() => {
+                                    console.log('Redirecting to order-success page with orderId:', orderId);
+                                    window.location.href = `/order-success?orderId=${orderId}`;
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Payment Verification Failed',
+                                    text: verifyData.message || 'Unable to verify payment. Please try again.'
+                                });
+                            }
+                        }
+                    });
+
+                    rzp.on('payment.failed', async (response) => {
+                        console.log('Payment failed:', response);
+                        await fetch('/handle-payment-failure', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                orderId,
+                                failureReason: response.error.description
+                            })
+                        });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Payment Failed Again',
+                            text: 'Please try again or use a different payment method.'
+                        }).then(() => {
+                            window.location.href = '/transaction-failure?orderId=' + orderId;
+                        });
+                    });
+
+                    console.log('Opening Razorpay payment modal');
+                    rzp.open();
+                } else if (data.success && data.paymentMethod === 'Wallet Payment') {
+                  
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Processing Wallet Payment',
+                        text: 'Please wait while we process your wallet payment...'
+                    });
+                    
+                    const walletResponse = await fetch('/process-wallet-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ orderId })
+                    });
+                    
+                    const walletData = await walletResponse.json();
+                    
+                    if (walletData.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Payment Successful',
+                            text: 'Your order has been placed successfully!'
+                        }).then(() => {
+                            window.location.href = `/order-success?orderId=${orderId}`;
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Wallet Payment Failed',
+                            text: walletData.message || 'Insufficient wallet balance. Please try another payment method.'
+                        });
+                    }
+                } else {
+                    console.log('Retry payment failed:', data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to initiate retry payment.'
+                    });
+                }
+            } catch (error) {
+                console.error('Error in retryPayment:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while retrying payment: ' + error.message
+                });
+            }
+        }
+
+
+      $(document).ready(function () {
+   
+    setTimeout(function() {
+        if (typeof Waypoint !== "undefined") {
+            console.log("Waypoint loaded successfully.");
+           
+        } else {
+            console.warn("Waypoint is not loaded. Some animations may not work properly.");
+           
+            const script = document.createElement('script');
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js";
+            script.onload = function() {
+                console.log("Waypoint loaded dynamically.");
+            
+            };
+            document.head.appendChild(script);
+        }
+    }, 100);
+});
+    </script>
+</body>
+</html>
+        

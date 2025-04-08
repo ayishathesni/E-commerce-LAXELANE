@@ -16,9 +16,10 @@ const couponController=require("../controllers/admin/couponController");
 
 router.post("/pageerror",adminController.pageerror);
 
+//Login &dashboard
+
 router.get("/login",adminController.loadLogin);
 router.post("/login",adminController.login);
-// router.get("/dashboard",adminAuth,adminController.loadDashboard);
 router.get("/logout",adminController.logout);
 router.get('/dashboard', adminAuth, adminController.loadDashboard);
 router.get('/dashboard/analytics', adminAuth, adminController.getAnalyticsData);

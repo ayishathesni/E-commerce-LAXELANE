@@ -34,27 +34,41 @@ $(document).ready(function () {
     var catDropdown = $('.category-dropdown'),
         catInitVal = catDropdown.data('visible');
         
-	if ( $('.sticky-header').length && $(window).width() >= 992 ) {
-		var sticky = new Waypoint.Sticky({
-			element: $('.sticky-header')[0],
-			stuckClass: 'fixed',
-			offset: -300,
-            handler: function ( direction ) {
-                // Show category dropdown
-                if ( catInitVal &&  direction == 'up') {
-                    catDropdown.addClass('show').find('.dropdown-menu').addClass('show');
-                    catDropdown.find('.dropdown-toggle').attr('aria-expanded', 'true');
-                    return false;
-                }
+        if (typeof Waypoint !== 'undefined') {
+            // Your Waypoint initialization code here
+            new Waypoint({
+              element: document.getElementById('your-element'),
+              handler: function() {
+                // Your handler code
+              },
+              offset: '75%'
+            });
+          } else {
+            console.warn('Waypoint library is not loaded. Some animations may not work.');
+          }
+        
+          
+	// if ( $('.sticky-header').length && $(window).width() >= 992 ) {
+	// 	var sticky = new Waypoint.Sticky({
+	// 		element: $('.sticky-header')[0],
+	// 		stuckClass: 'fixed',
+	// 		offset: -300,
+    //         handler: function ( direction ) {
+    //             // Show category dropdown
+    //             if ( catInitVal &&  direction == 'up') {
+    //                 catDropdown.addClass('show').find('.dropdown-menu').addClass('show');
+    //                 catDropdown.find('.dropdown-toggle').attr('aria-expanded', 'true');
+    //                 return false;
+    //             }
 
-                // Hide category dropdown on fixed header
-                if ( catDropdown.hasClass('show') ) {
-                    catDropdown.removeClass('show').find('.dropdown-menu').removeClass('show');
-                    catDropdown.find('.dropdown-toggle').attr('aria-expanded', 'false');
-                } 
-            }
-		});
-	}
+    //             // Hide category dropdown on fixed header
+    //             if ( catDropdown.hasClass('show') ) {
+    //                 catDropdown.removeClass('show').find('.dropdown-menu').removeClass('show');
+    //                 catDropdown.find('.dropdown-toggle').attr('aria-expanded', 'false');
+    //             } 
+    //         }
+	// 	});
+	
 
     // Menu init with superfish plugin
     if ( $.fn.superfish ) {

@@ -134,18 +134,18 @@ const viewOrderDetails = async (req, res, next) => {
 
         let refundAmount = itemTotal;
         
-        // Handle coupon discount distribution
+      
         if (order.discount > 0 && coupon) {
             const minimumPrice = coupon.minimumPrice;
-            const offerPrice = coupon.offerPrice; // This is the discount amount
+            const offerPrice = coupon.offerPrice; 
             
-            // Calculate proportional discount for this item
+          
             const itemDiscountPortion = (itemTotal / originalTotal) * offerPrice;
 
             if (remainingTotal < minimumPrice) {
-                // If remaining total falls below minimum, deduct full coupon discount
+              
                 refundAmount = itemTotal - offerPrice;
-                order.discount = 0; // Coupon no longer applies
+                order.discount = 0; 
             } else {
              
                 refundAmount = itemTotal - Math.min(itemDiscountPortion, itemTotal);

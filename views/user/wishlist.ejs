@@ -341,15 +341,13 @@
 
         <section class="wishlist-container">
             <div class="container">
-                
-                
-                <% if (wishlist && wishlist.products && wishlist.products.length > 0) { %>
+                <div id="wishlist-content">
+                    <% if (wishlist && wishlist.products && wishlist.products.length > 0) { %>
+                        <div class="row" id="wishlist-items">
+                            <% for (let item of wishlist.products) { %>
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="wishlist-card" id="wishlist-card-<%= item.productId._id %>">
 
-                    <div class="row">
-                        <% for (let item of wishlist.products) { %>
-
-                            <div class="col-lg-3 col-md-4 col-sm-6">
-                                <div class="wishlist-card">
                                     <button onclick="removeFromWishlist('<%= item.productId._id %>')" class="btn-remove-cross" title="Remove from Wishlist" aria-label="Remove">×</button>
                                     <div class="product-img-container">
                                         <a href="/productDetails/<%= item.productId._id %>">
@@ -406,6 +404,7 @@
                     </div>
                 <% } %>
             </div>
+        </div>
         </section>
     </main>
     
@@ -413,6 +412,24 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
+function showEmptyWishlist() {
+    const wishlistContent = document.getElementById('wishlist-content');
+    wishlistContent.innerHTML = `
+        <div class="empty-wishlist">
+            <i class="fas fa-heart"></i>
+            <h3>Your wishlist is empty</h3>
+            <p>Add items you love to your wishlist. Review them anytime and easily move them to the cart.</p>
+            <a href="/shop" class="btn-shop">Continue Shopping</a>
+        </div>
+    `;
+}
+
+function checkAndUpdateWishlist() {
+    const wishlistItems = document.getElementById('wishlist-items');
+    if (wishlistItems && wishlistItems.children.length === 0) {
+        showEmptyWishlist();
+    }
+}
 
 function handleSizeChange(productId) {
     const sizeSelect = document.getElementById(`size-${productId}`);
@@ -422,7 +439,9 @@ function handleSizeChange(productId) {
         showNotification('Please select a size');
     }
 }
-function addToCartFromWishlist(productId) {
+
+
+async function addToCartFromWishlist(productId) {
     const sizeSelect = document.getElementById(`size-${productId}`);
     const selectedSize = sizeSelect ? sizeSelect.value : null;
 
@@ -431,49 +450,50 @@ function addToCartFromWishlist(productId) {
         return;
     }
 
-    // Step 1: Add to Cart
-    fetch('/add-to-cart', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            productId: productId,
-            size: selectedSize,
-            quantity: 1
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status) {
-            // Step 2: Remove from Wishlist (irrespective of size)
-            fetch(`/removeFromWishlist?productId=${productId}`, {
-                method: 'DELETE'
+    try {
+      
+        const response = await fetch('/add-to-cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productId,
+                size: selectedSize,
+                quantity: 1
             })
-            .then(res => res.json())
-            .then(removeRes => {
-                if (removeRes.success) {
-                    showNotification('Added to cart and removed from wishlist!');
-                } else {
-                    showNotification('Added to cart, but could not remove from wishlist');
-                }
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
-            })
-            .catch(err => {
-                console.error('Error removing from wishlist:', err);
-                showNotification('Cart added, but wishlist removal failed');
-            });
-        } else {
+        });
+
+        const data = await response.json();
+        if (!data.success) {
             showNotification(data.message || 'Error adding product to cart');
+            return;
         }
-    })
-    .catch(error => {
+
+      
+        const productCard = document.getElementById(`wishlist-card-${productId}`);
+        if (productCard) {
+            productCard.remove(); 
+        } else {
+            console.warn(`Card with ID wishlist-card-${productId} not found`);
+        }
+
+       
+        const countElement = document.getElementById('wishlistCount');
+        if (countElement) {
+            let currentCount = parseInt(countElement.innerText.trim()) || 0;
+            if (currentCount > 0) {
+                countElement.innerText = currentCount - 1;
+            }
+        }
+
+        showNotification('Added to cart and removed from wishlist!');
+        
+    } catch (error) {
         console.error('Add to cart error:', error);
         showNotification('Something went wrong while adding to cart');
-    });
+    }
 }
+
+
 
 
 
@@ -509,20 +529,19 @@ function addToCartFromWishlist(productId) {
         const response = await axios.delete(`/removeFromWishlist?productId=${productId}`);
 
         if (response.data.success) {
-            // ✅ Wait for user confirmation before proceeding
+      
             await Swal.fire({
                 icon: 'success',
                 title: 'Removed!',
                 text: response.data.message,
-                timer: 2000, // You can remove this if you want manual close
+                timer: 2000, 
                 showConfirmButton: true
             });
 
-            // ✅ Remove wishlist card
             const productCard = document.getElementById(`wishlist-card-${productId}`);
             if (productCard) productCard.remove();
 
-            // ✅ Decrease wishlist count safely
+         
             const countElement = document.getElementById('wishlistCount');
             if (countElement) {
                 let countText = countElement.innerText.trim();
@@ -533,8 +552,8 @@ function addToCartFromWishlist(productId) {
                 }
             }
 
-            // ✅ Now reload the page AFTER Swal is closed
-            window.location.reload();
+        
+            checkAndUpdateWishlist();
 
         } else {
             Swal.fire({

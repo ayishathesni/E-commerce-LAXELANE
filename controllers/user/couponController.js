@@ -66,18 +66,15 @@ const applyCoupon = async (req, res) => {
     }
   };
 
-
-const removeCoupon = async (req, res) => {
+  const removeCoupon = async (req, res) => {
     try {
         const { couponCode } = req.body;
-        const userId = req.session.user;
-
-
-        if (!userId) {
-            console.log('User not found in session');
+        const userId = req.session.user?._id || req.session.user; 
+            if (!userId) {
+          
             return res.status(401).json({
                 success: false,
-                message: 'User not found'
+                message: 'User not authenticated'
             });
         }
 
@@ -90,7 +87,6 @@ const removeCoupon = async (req, res) => {
         }
 
         const coupon = await Coupon.findOne({ name: couponCode });
-
         if (!coupon) {
             console.log('Coupon not found:', couponCode);
             return res.status(404).json({
@@ -99,17 +95,29 @@ const removeCoupon = async (req, res) => {
             });
         }
 
-        await Coupon.updateOne({ _id: coupon._id }, { $pull: { userId: userId } });
+        if (!req.session.appliedCoupon || req.session.appliedCoupon.couponCode !== couponCode) {
+            console.log('No matching coupon applied in session');
+            return res.status(400).json({
+                success: false,
+                message: 'No matching coupon applied to remove'
+            });
+        }
 
+        const updateResult = await Coupon.updateOne(
+            { _id: coupon._id, userId: userId },
+            { $pull: { userId: userId } }
+        );
+        
         delete req.session.appliedCoupon;
         await req.session.save();
-    
+      
+
         res.json({ success: true, message: "Coupon removed successfully" });
     } catch (error) {
-        console.error('Error in removeCoupon:', error);
+        console.error('Error in removeCoupon:', error.stack);
         res.status(500).json({
             success: false,
-            message: 'Cannot remove the coupon'
+            message: `Cannot remove the coupon: ${error.message}`
         });
     }
 };

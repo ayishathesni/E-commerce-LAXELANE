@@ -395,7 +395,7 @@
 
 
   
-// Image handling functions
+
 function viewImage1(event) {
     document.getElementById("imgView1").src = URL.createObjectURL(event.target.files[0]);
 }
@@ -474,7 +474,7 @@ function viewImage(event, index) {
     reader.readAsDataURL(input.files[0]);
 }
 
-// Handle added images thumbnails
+
 function handleFileSelect(event) {
     const addedImagesContainer = document.getElementById("addedImagesContainer");
     addedImagesContainer.innerHTML = "";
@@ -504,7 +504,7 @@ function handleFileSelect(event) {
     }
 }
 
-// Form validation and submission
+
 function validateAndSubmit() {
     if (validateForm()) {
         const form = document.querySelector('form');
@@ -585,19 +585,18 @@ function validateForm() {
         isValid = false;
     }
 
-    // Validate description
+    
     if (!description.trim()) {
         displayErrorMessage('description-error', 'Please enter a description');
         isValid = false;
     }
-
-    // Validate regular price
+e
     if (!price || isNaN(price) || parseFloat(price) <= 0) {
         displayErrorMessage('regularPrice-error', 'Please enter a valid price');
         isValid = false;
     }
 
-    // Validate sale price 
+ 
     if (salePrice) {
         if (isNaN(salePrice) || parseFloat(salePrice) <= 0) {
             displayErrorMessage('salePrice-error', 'Please enter a valid sale price');
@@ -608,19 +607,18 @@ function validateForm() {
         }
     }
 
-    // Validate color
+    
     if (!color.trim()) {
         displayErrorMessage('color-error', 'Please enter a color');
         isValid = false;
     }
 
-    // Validate primary image
+  
     if (!image1 || image1.length === 0) {
         displayErrorMessage('images-error', 'Please select at least one image');
         isValid = false;
     }
 
-    // Validate sizes
     let hasSelectedSize = false;
     const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
     

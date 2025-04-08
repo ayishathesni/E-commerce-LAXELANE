@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><%= pageTitle %></title> 
+    <meta name="keywords" content="HTML5 Template">
+    <meta name="description" content="LAXELANE - eCommerce Template">
+    <meta name="author" content="p-themes">
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/icons/favicon-16x16.png">
+    <link rel="manifest" href="assets/images/icons/site.html">
+    <link rel="mask-icon" href="assets/images/icons/safari-pinned-tab.svg" color="#666666">
+    <link rel="shortcut icon" href="assets/images/icons/favicon.ico">
+    <meta name="apple-mobile-web-app-title" content="LAXELANE">
+    <meta name="application-name" content="LAXELANE">
+    <meta name="msapplication-TileColor" content="#cc9966">
+    <meta name="msapplication-config" content="assets/images/icons/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <!-- Plugins CSS File -->
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/plugins/owl-carousel/owl.carousel.css">
+    <!-- Main CSS File -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+
+<body>
+    <div class="page-wrapper">
+        <!-- Corrected include path -->
+        <%- include('../partials/user/header') %>
+
+        <main class="main">
+            <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <% breadcrumb.forEach(item => { %>
+                        <li class="breadcrumb-item <%= item.active ? 'active' : '' %>" <%= item.active ? 'aria-current="page"' : '' %>>
+                            <a href="<%= item.url %>"><%= item.name %></a>
+                        </li>
+                        <% }) %>
+                    </ol>
+                </div>
+            </nav>
+
+            <div class="container">
+                <div class="page-header page-header-big text-center" style="background-image: url('/assets/images/about-header-bg.jpg')">
+                    <h1 class="page-title text-white">About LAXELANE<span class="text-white">Who we are</span></h1>
+                </div>
+            </div>
+
+            <div class="page-content pb-0">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6 mb-3 mb-lg-0">
+                            <h2 class="title">Our Vision</h2>
+                            <p><%= visionText %></p>
+                        </div>
+                        <div class="col-lg-6">
+                            <h2 class="title">Our Mission</h2>
+                            <p><%= missionText %></p>
+                        </div>
+                    </div>
+                    <div class="mb-5"></div>
+                </div>
+
+                <div class="bg-light-2 pt-6 pb-5 mb-6 mb-lg-8">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-5 mb-3 mb-lg-0">
+                                <h2 class="title">Who We Are</h2>
+                                <p class="lead text-primary mb-3"><%= whoWeAreLead %></p>
+                                <p class="mb-2"><%= whoWeAreText %></p>
+                                <a href="#" class="btn btn-sm btn-minwidth btn-outline-primary-2">
+                                    <span>VIEW OUR NEWS</span>
+                                    <i class="icon-long-arrow-right"></i>
+                                </a>
+                            </div>
+                            <div class="col-lg-6 offset-lg-1">
+                                <div class="about-images">
+                                    <img src="/assets/images/about/img-1.jpg" alt="" class="about-img-front">
+                                    <img src="/assets/images/about/img-2.jpg" alt="" class="about-img-back">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="brands-text">
+                                <h2 class="title">Premium design brands at LAXELANE</h2>
+                                <p><%= brandsText %></p>
+                            </div>
+                        </div>
+                        <div class="col-lg-7">
+                            <div class="brands-display">
+                                <div class="row justify-content-center">
+                                    <% for(let i = 1; i <= 9; i++) { %>
+                                    <div class="col-6 col-sm-4">
+                                        <a href="#" class="brand">
+                                            <img src="/assets/images/brands/<%= i %>.png" alt="Brand Name">
+                                        </a>
+                                    </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="mt-4 mb-6">
+
+                    <h2 class="title text-center mb-4">Meet Our Team</h2>
+                    <div class="row">
+                        <% teamMembers.forEach(member => { %>
+                        <div class="col-md-4">
+                            <div class="member member-anim text-center">
+                                <figure class="member-media">
+                                    <img src="/assets/images/team/<%= member.image %>" alt="<%= member.name %>">
+                                    <figcaption class="member-overlay">
+                                        <div class="member-overlay-content">
+                                            <h3 class="member-title"><%= member.name %><span><%= member.title %></span></h3>
+                                            <p><%= member.bio %></p>
+                                            <div class="social-icons social-icons-simple">
+                                                <a href="<%= member.social.facebook %>" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                                                <a href="<%= member.social.twitter %>" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                                                <a href="<%= member.social.instagram %>" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+                                            </div>
+                                        </div>
+                                    </figcaption>
+                                </figure>
+                                <div class="member-content">
+                                    <h3 class="member-title"><%= member.name %><span><%= member.title %></span></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <div class="mb-2"></div>
+
+                <div class="about-testimonials bg-light-2 pt-6 pb-6">
+                    <div class="container">
+                        <h2 class="title text-center mb-3">What Customers Say About LAXELANE</h2>
+                        <div class="owl-carousel owl-simple owl-testimonials-photo" data-toggle="owl" 
+                            data-owl-options='{"nav": false, "dots": true, "margin": 20, "loop": false, "responsive": {"1200": {"nav": true}}}'>
+                            <% testimonials.forEach(testimonial => { %>
+                            <blockquote class="testimonial text-center">
+                                <img src="/assets/images/testimonials/<%= testimonial.image %>" alt="<%= testimonial.name %>">
+                                <p>“<%= testimonial.text %>”</p>
+                                <cite><%= testimonial.name %><span>Customer</span></cite>
+                            </blockquote>
+                            <% }) %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../partials/user/footer') %>
+    </div>
+
+    <!-- Plugins JS File -->
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="/assets/js/jquery.waypoints.min.js"></script>
+    <script src="/assets/js/superfish.min.js"></script>
+    <script src="/assets/js/owl.carousel.min.js"></script>
+    <!-- Main JS File -->
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>

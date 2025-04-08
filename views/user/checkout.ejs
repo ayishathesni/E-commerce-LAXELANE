@@ -376,7 +376,7 @@
             <div class="summary">
                 <h3 class="summary-title text-center">Your Order</h3>
                 <!-- Add this section in the Order Summary -->
-<div class="coupon-section mt-3">
+                <div class="coupon-section mt-3">
     <div class="input-group">
         <input 
             type="text" 
@@ -387,7 +387,8 @@
         <button 
             class="btn btn-outline-secondary" 
             type="button" 
-            onclick="applyCoupon()"
+            id="couponToggleButton"
+            onclick="toggleCoupon()"
         >
             Apply Coupon
         </button>
@@ -398,12 +399,6 @@
         <div class="applied-coupon-info mt-2">
             <span class="badge bg-success">
                 Coupon Applied: <%= cartData.appliedCoupon %>
-                <button 
-                    class="btn btn-sm btn-link text-white" 
-                    onclick="removeCoupon()"
-                >
-                    Remove
-                </button>
             </span>
         </div>
     <% } %>
@@ -505,7 +500,7 @@
 
 
 
-    let discountedTotal = '<%= cartData?.totalCartPrice %>'; // Default to original total
+    let discountedTotal = '<%= cartData?.totalCartPrice %>'; 
 
 function validateForm(event) {
     if (event) {
@@ -893,7 +888,7 @@ function updateAddress() {
 
 
 async function submitPayment(userId, totalPrice, walletBalance) {
-    console.log("🔹 Submit Payment Called");
+ 
 
     const finalcouponDiscountedAmount = Number(document.querySelectorAll(".summary-total td")[1].textContent.split('').slice(1).join(''))
 
@@ -913,7 +908,7 @@ async function submitPayment(userId, totalPrice, walletBalance) {
     }
 
     const paymentMethod = paymentMethodElement.value;
-    console.log("🟢 Payment Method:", paymentMethod);
+   
 
     if (paymentMethod === "Cash on Delivery" && finalcouponDiscountedAmount > 1000) {
         return Swal.fire({
@@ -936,22 +931,22 @@ async function submitPayment(userId, totalPrice, walletBalance) {
     console.log("couponDiscount for the forneend",couponDiscount)
     const finalAmount = Math.max(totalPrice - finalcouponDiscountedAmount, 0);
 
-    console.log("🟢 Final Amount:", finalAmount);
+
 
     if (paymentMethod === "Wallet Payment") {
-        console.log("🟢 Wallet Balance:", walletBalance);
+     
         if (walletBalance < finalAmount) {
-            console.warn("❌ Insufficient Wallet Balance.");
+            console.warn("Insufficient Wallet Balance.");
             return Swal.fire({
                 icon: 'error',
                 title: 'Insufficient Wallet Balance',
                 text: 'You do not have enough balance to complete this purchase. Please select another payment method.'
             });
         }
-        console.log("✅ Sufficient Wallet Balance. Proceeding...");
+        console.log("Sufficient Wallet Balance. Proceeding...");
     }
 
-    // const finalcouponDiscountedAmount = Number(document.querySelectorAll(".summary-total td")[1].textContent.split('').slice(1).join(''))
+
 
     const orderData = {
         userId,
@@ -960,7 +955,7 @@ async function submitPayment(userId, totalPrice, walletBalance) {
         totalPrice
     };
 
-    console.log("🔹 Order Data:", orderData);
+  
 
     try {
         const response = await fetch("/place-order", {
@@ -971,9 +966,9 @@ async function submitPayment(userId, totalPrice, walletBalance) {
             body: JSON.stringify(orderData),
         });
 
-        console.log("🟢 Fetch Response Status:", response.status);
+     
         const result = await response.json();
-        console.log("🔹 Place Order Response:", result);
+       
 
         if (result.success) {
             Swal.fire({
@@ -991,7 +986,7 @@ async function submitPayment(userId, totalPrice, walletBalance) {
             });
         }
     } catch (error) {
-        console.error("❌ Error in submitting payment:", error);
+        console.error(" Error in submitting payment:", error);
         Swal.fire({
             icon: 'error',
             title: 'Network Error',
@@ -1005,17 +1000,14 @@ async function handleRazorpayPayment() {
         
         const finalTotal = Number(document.querySelectorAll(".summary-total td")[1].textContent.split('').slice(1).join(''));
     
-    // Get the total price before discount from cart data
     const totalPrice = Number('<%= locals.cartData?.totalCartPrice || 0 %>');
     
-    // Calculate the actual discount
+  
     const couponDiscount = totalPrice - finalTotal;
         
         const paymentMethod = "razorpay";
 
-        console.log("🟢 Total Price:", totalPrice);
-    console.log("🟢 Final Total from UI:", finalTotal);
-    console.log("🟢 Calculated Coupon Discount:", couponDiscount);
+      
         const response = await fetch("/create-razorpay-order", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1084,28 +1076,33 @@ async function handleRazorpayPayment() {
                 contact: "<%= userData.phone %>",
             },
             theme: { color: "#7971ea" },
-            modal: {
-                ondismiss: async () => {
-                    try {
-                        await fetch("/handle-payment-cancel", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ orderId: data.orderId }),
-                        });
-                    } catch (error) {
-                        console.error("Payment cancel handling failed:", error);
-                    }
-                },
-            },
-        };
-
+        }
         const rzp = new Razorpay(options);
         rzp.open();
-
-        rzp.on("payment.failed", async (response) => {
-            console.log("Payment failed:", response.error);
-            // ... existing failure handling ...
+        rzp.on('payment.failed', async (response) => {
+  
+    console.log("Order data before failure:", data);
+    
+    const failureResponse = await fetch('/handle-payment-failure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderId: data.orderId,
+            failureReason: response.error.description
+        })
+    });
+    
+    const failureData = await failureResponse.json();
+    if (failureData.success) {
+        window.location.href = `/transaction-failure?orderId=${data.orderId}`;
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Payment Failed',
+            text: 'Failed to process payment failure. Please try again.'
         });
+    }
+});
     } catch (error) {
         console.error("Razorpay Payment Error:", error);
         await Swal.fire({
@@ -1120,14 +1117,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const payNowButton = document.getElementById("payNowButton");
     
     if (!payNowButton) {
-        console.error("❌ payNowButton not found! Check your HTML.");
+        console.error("payNowButton not found! Check your HTML.");
         return;
     }
 
-    console.log("✅ payNowButton found. Adding event listener...");
+    console.log("payNowButton found. Adding event listener...");
 
     payNowButton.addEventListener("click", () => {
-        console.log("🟢 payNowButton Clicked!");
+       
         const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
         if (!paymentMethod) {
             Swal.fire({
@@ -1149,15 +1146,27 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-// Add this at the top of your <script> tag
 
-// Updated applyCoupon function
+async function toggleCoupon() {
+    const couponButton = document.getElementById('couponToggleButton');
+    const couponInput = document.getElementById('couponInput');
+    const isApplied = couponButton.textContent.trim() === "Remove Coupon";
+
+    if (isApplied) {
+        await removeCoupon();
+    } else {
+        await applyCoupon();
+    }
+}
+
+
+
 async function applyCoupon() {
     const couponInput = document.getElementById('couponInput');
     const couponCode = couponInput.value.trim();
     const couponFeedback = document.getElementById('couponFeedback');
     const summaryTotal = document.querySelector('.summary-total td:last-child');
-    const couponDiscountRow = document.querySelector('.coupon-discount');
+    const couponButton = document.getElementById('couponToggleButton');
 
     if (!couponCode) {
         couponFeedback.innerHTML = '<span class="text-danger">Please enter a coupon code.</span>';
@@ -1179,22 +1188,22 @@ async function applyCoupon() {
         const result = await response.json();
 
         if (result.success) {
-            // Success message
+         
             couponFeedback.innerHTML = `
                 <span class="text-success">
                     ${result.message} Discount: ₹${result.discountAmount}
                 </span>
             `;
 
-            // Update applied coupon section
-            const appliedCouponSection = document.querySelector('.applied-coupon-info');
+        
+           
 
             const cashOnDeliveryTextline = document.querySelector("#text-line")
 
 
             console.log("cash one line is coming or not: ",cashOnDeliveryTextline)
 
-            // Add/Update discount row
+          
             let discountRow = document.querySelector('.coupon-discount');
             if (!discountRow) {
                 const summaryTotal = document.querySelector('.summary-total');
@@ -1209,13 +1218,24 @@ async function applyCoupon() {
                 discountRow.querySelector('td:last-child').textContent = `- ₹${result.discountAmount}.00`;
             }
 
-            // Update total
+        
             summaryTotal.textContent = `₹${result.newTotal}.00`;
 
-            // Disable coupon input after successful application
+            couponButton.textContent = "Remove Coupon";
             couponInput.disabled = true;
+              
+            const appliedCouponSection = document.querySelector('.applied-coupon-info');
+            if (!appliedCouponSection) {
+                const newCouponInfo = document.createElement('div');
+                newCouponInfo.className = 'applied-coupon-info mt-2';
+                newCouponInfo.innerHTML = `
+                    <span class="badge bg-success">
+                        Coupon Applied: ${couponCode}
+                    </span>
+                `;
+                document.querySelector('.coupon-section').appendChild(newCouponInfo);
+            }
         } else {
-            // Error message
             couponFeedback.innerHTML = `<span class="text-danger">${result.message}</span>`;
         }
     } catch (error) {
@@ -1224,43 +1244,50 @@ async function applyCoupon() {
     }
 }
 
-// Updated removeCoupon function
 async function removeCoupon() {
-    const couponCode = document.getElementById('couponInput').value.trim();
+    const couponInput = document.getElementById('couponInput');
+    const couponCode = couponInput.value.trim();
+    const couponFeedback = document.getElementById('couponFeedback');
+    const summaryTotal = document.querySelector('.summary-total td:last-child');
+    const couponButton = document.getElementById('couponToggleButton');
 
     if (!couponCode) {
-        document.getElementById('couponFeedback').innerHTML = '<span class="text-danger">No coupon applied.</span>';
+        couponFeedback.innerHTML = '<span class="text-danger">No coupon code entered to remove.</span>';
         return;
     }
 
     try {
         const response = await fetch('/remove-coupon', {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ couponCode: couponCode })
         });
 
+        if (!response.ok) {
+            throw new Error(`Server responded with status: ${response.status}`);
+        }
+
         const result = await response.json();
 
         if (result.success) {
-            document.getElementById('couponFeedback').innerHTML = `<span class="text-success">${result.message}</span>`;
-            document.querySelector('.summary-total td:last-child').innerText = `₹<%= cartData?.totalCartPrice %>.00`;
+            couponFeedback.innerHTML = `<span class="text-success">${result.message}</span>`;
+            summaryTotal.innerText = `₹<%= cartData?.totalCartPrice %>.00`;
             const discountRow = document.querySelector('.coupon-discount');
             if (discountRow) discountRow.remove();
-            discountedTotal = '<%= cartData?.totalCartPrice %>'; 
-            document.getElementById('couponInput').value = '';
-            appliedDiscount = 0;
+            discountedTotal = '<%= cartData?.totalCartPrice %>';
+            couponButton.textContent = "Apply Coupon";
+            couponInput.disabled = false;
+            couponInput.value = '';
             const appliedCouponInfo = document.querySelector('.applied-coupon-info');
             if (appliedCouponInfo) appliedCouponInfo.remove();
-            delete document.getElementById('couponInput').dataset.appliedCoupon;
         } else {
-            document.getElementById('couponFeedback').innerHTML = `<span class="text-danger">${result.message}</span>`;
+            couponFeedback.innerHTML = `<span class="text-danger">${result.message || 'Failed to remove coupon'}</span>`;
         }
     } catch (error) {
         console.error('Error removing coupon:', error);
-        document.getElementById('couponFeedback').innerHTML = '<span class="text-danger">An error occurred. Please try again.</span>';
+        couponFeedback.innerHTML = `<span class="text-danger">Error: ${error.message}. Please try again.</span>`;
     }
 }
 </script>

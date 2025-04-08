@@ -116,33 +116,55 @@ const loadShoppingPage = async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
 const loadHomepage = async (req, res) => {
   try {
-    const Categories = await Category.find({isListed: true});
-    let ProductData = await Product.find({
+    const user = req.session.user;
+    const categories = await Category.find({ isListed: true });
+    const allProducts = await Product.find({
       isBlocked: false,
-      category: {$in: Categories.map(category => category._id)},
-      quantity: {$gt: 0}
-    });
+      'sizes.quantity': { $gt: 0 }, 
+      category: { $in: categories.map(category => category._id) }
+    }).populate('category');
+
+   
+    const trendingProducts = await Product.find({
+      isBlocked: false,
+      'sizes.quantity': { $gt: 0 }
+    })
+      .sort({ createdAt: -1 }) 
+      .limit(5)
+      .populate('category');
+
+
+    const newArrivals = await Product.find({
+      isBlocked: false,
+      'sizes.quantity': { $gt: 0 }
+    })
+      .sort({ createdAt: -1 })
+      .limit(8)
+      .populate('category');
+
+   
+    const dealProducts = await Product.find({
+      isBlocked: false,
+      'sizes.quantity': { $gt: 0 },
+      productOffer: { $gt: 0 } 
+    })
+      .sort({ productOffer: -1 }) 
+      .limit(2)
+      .populate('category');
 
     res.render("user/home", {
-      user: req.session.user || null,
-      products: ProductData,
-      login: !!req.session.user 
+      user: user || null,
+      login: !!user,
+      products: allProducts,
+      trendingProducts,
+      newArrivals,
+      dealProducts,
+      categories
     });
-    
   } catch (error) {
-    console.log("Home page not found");
+    console.log("Home page error:", error);
     res.status(500).send("Server error");
   }
 };
@@ -620,6 +642,83 @@ const searchProducts = async (req, res) => {
 };
 
 
+const getAboutPage = async (req, res) => {
+  try {
+    const aboutData = {
+      pageTitle: 'About LAXELANE',
+      breadcrumb: [
+        { name: 'Home', url: '/' },
+        { name: 'Pages', url: '#' },
+        { name: 'About us', url: '/about', active: true }
+      ],
+      visionText: 'Our vision is to revolutionize online shopping with innovative design and exceptional quality.',
+      missionText: 'Our mission is to provide customers with a seamless and enjoyable shopping experience.',
+      whoWeAreLead: 'Pellentesque odio nisi, euismod pharetra a ultricies in diam.',
+      whoWeAreText: 'Sed pretium, ligula sollicitudin laoreet viverra, tortor libero sodales leo, eget blandit nunc tortor eu nibh.',
+      brandsText: 'Phasellus hendrerit. Pellentesque aliquet nibh nec urna.',
+      teamMembers: [
+        { 
+          name: 'Samanta Grey', 
+          title: 'Founder & CEO', 
+          image: 'member-1.jpg', 
+          bio: 'Sed pretium, ligula sollicitudin viverra.', 
+          social: { facebook: '#', twitter: '#', instagram: '#' } 
+        },
+        { 
+          name: 'Bruce Sutton', 
+          title: 'Sales & Marketing Manager', 
+          image: 'member-2.jpg', 
+          bio: 'Sed pretium, ligula sollicitudin viverra.', 
+          social: { facebook: '#', twitter: '#', instagram: '#' } 
+        },
+        { 
+          name: 'Janet Joy', 
+          title: 'Product Manager', 
+          image: 'member-3.jpg', 
+          bio: 'Sed pretium, ligula sollicitudin viverra.', 
+          social: { facebook: '#', twitter: '#', instagram: '#' } 
+        }
+      ],
+      testimonials: [
+        { name: 'Jenson Gregory', text: 'Great experience with LAXELANE, highly recommend!', image: 'user-1.jpg' },
+        { name: 'Victoria Ventura', text: 'LAXELANE exceeded my expectations with their service.', image: 'user-2.jpg' }
+      ]
+    };
+
+    res.render('user/about', aboutData);
+  } catch (error) {
+    console.error('Error rendering about page:', error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
+
+const loadContact = async (req, res , next) => {
+    
+  try {
+
+      const categoryData = await Category.find({ is_Listed: true });
+
+      if (req.session.user) {
+          
+          res.render("user/contact", { login: req.session.user , categoryData});
+
+      } else {
+
+          res.render("user/contact" , {categoryData});
+
+      }
+      
+  } catch (error) {
+
+      next(error,req,res);
+
+      
+  }
+
+};
+
 
 
 
@@ -646,7 +745,9 @@ module.exports={
     applyFilters,
     clearFilters,
   
-    searchProducts
+    searchProducts,
+    getAboutPage,
+   loadContact
 
 }
 
