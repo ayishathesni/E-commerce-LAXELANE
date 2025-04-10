@@ -580,6 +580,7 @@ function addAddress(userId) {
           }).then(() => {
               updateAddressList(userId); 
           });
+          window.location.reload()
       } else {
           Swal.fire({
               title: 'Failed',
@@ -776,11 +777,14 @@ function updateAddress() {
                 text: 'Address updated successfully',
                 icon: 'success'
             }).then(() => {
-              
-                let modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-                modal.hide();
-                window.location.reload();
+                const modalEl = document.getElementById('editModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        modalInstance.hide();
+        window.location.reload()
+
             });
+            window.location.reload()
+
         } else {
             Swal.fire({
                 title: 'Error',

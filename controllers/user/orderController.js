@@ -443,12 +443,12 @@ const downloadInvoice = async (req, res) => {
   
       const userAddress = await Address.findOne({
         userId,
-        'address.status': true
+        // 'address.status'
       });
   
       let shippingAddress = null;
       if (userAddress) {
-        shippingAddress = userAddress.address.find(addr => addr.status === true);
+        shippingAddress = userAddress.address.find(addr => addr);
       }
   
       if (!shippingAddress) {

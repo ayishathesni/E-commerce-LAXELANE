@@ -366,9 +366,8 @@ body::-webkit-scrollbar {
                                                          class="product-image">
                                                 </a>
                                                 <div class="product-action">
-                                                    <button class="btn-product btn-cart" data-product-id="<%= relatedProduct._id %>">
-                                                        <span>Add to Cart</span>
-                                                    </button>
+                                                    <a href="/productDetails/<%= relatedProduct._id %>" class="btn-product btn-cart"><span>ADD TO CART</span></a>
+                                                 
                                                 </div>
                                             </figure>
                                             <div class="product-body">
@@ -450,7 +449,7 @@ body::-webkit-scrollbar {
         }
     }
 
-    // Helper function for showing alerts
+   
     function showAlert(title, text, icon = "warning") {
         return Swal.fire({
             title,

@@ -1,5 +1,40 @@
 <%- include("../../views/partials/user/header") %>
+<style>
+  .btn-wishlist {
+  transition: all 0.3s ease;
+}
 
+.btn-wishlist.added {
+  background-color: CC9966; /* Green background for added state */
+  color: #fff;
+}
+
+.btn-wishlist.added:hover {
+  background-color: CC9966; /* Darker green on hover */
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: #fff;
+  z-index: 1000;
+}
+
+.toast.success {
+  background-color: #28a745;
+}
+
+.toast.info {
+  background-color: #17a2b8;
+}
+
+.toast.error {
+  background-color: #dc3545;
+}
+</style>
 <main class="main">
   <!-- Intro Slider (Static for now) -->
   <div class="intro-slider-container">
@@ -35,9 +70,9 @@
 <div class="pt-2 pb-3">
   <div class="container">
     <div class="row">
-      <% categories.slice(0, 4).forEach((category, index) => { %>
+      <% categories.slice(0, 3).forEach((category, index) => { %>
         <div class="col-sm-6">
-          <div class="banner banner-overlay">
+          <div class="banner banner-overlay" style="background-color: #222; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
             <a href="/shop?categories=<%= category.name %>">
               <img src="<%= category.image || `assets/images/demos/demo-6/banners/banner-${index + 1}.jpeg` %>" alt="<%= category.name %>">
             </a>
@@ -49,10 +84,25 @@
           </div>
         </div>
       <% }) %>
-    </div>
-    <hr class="mt-0 mb-0">
-  </div>
-</div>
+      
+      <!-- Special Offers Banner with different styling -->
+      <div class="col-sm-6">
+        <div style="padding: 15px;">
+          <div class="banner banner-overlay" style="background-color: #222; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <a href="/shop?sale=true">
+              <img src="assets/images/demos/demo-6/banners/banner-4.jpeg" alt="Special Offers" style="opacity: 0.8;">
+            </a>
+            <div class="banner-content banner-content-center" style="padding: 20px;">
+              <h4 class="banner-subtitle" style="color: #fcb941;"><a href="#" style="color: #fcb941;">Limited Time</a></h4>
+              <h3 class="banner-title text-white"><a href="#"><strong>FLASH SALE</strong></a></h3>
+              <h4 class="text-white mb-3">Up to 50% Off</h4>
+              <a href="/shop?sale=true" class="btn btn-primary banner-link" style="border-radius: 20px;">Shop Now</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
 
   <!-- Trending Section -->
   <div class="mb-5"></div>
@@ -93,10 +143,12 @@
                   <img src="/uploads/re-image/<%= product.productImage[1] || product.productImage[0] %>" alt="<%= product.productName %>" class="product-image-hover">
                 </a>
                 <div class="product-action-vertical">
-                  <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>Add to Wishlist</span></a>
+                  <a href="#" class="btn-product-icon btn-wishlist btn-expandable" onclick="addToWishlist('<%= product._id %>', event)">
+                    <span>Add to Wishlist</span>
+                  </a>
                 </div>
                 <div class="product-action">
-                  <a href="#" class="btn-product btn-cart"><span>Add to Cart</span></a>
+                  <a href="/productDetails/<%= product._id %>" class="btn-product btn-cart"><span>Add to Cart</span></a>
                 </div>
               </figure>
               <div class="product-body">
@@ -131,7 +183,7 @@
               "1200": { "items": 4, "nav": true, "dots": false }
             }
           }'>
-          <% trendingProducts.filter(p => p.category.name.toLowerCase().includes('women')).forEach(product => { %>
+          <% trendingProducts.filter(p => p.category.name.toUpperCase().includes('WOMEN')).forEach(product => { %>
             <div class="product product-7 text-center">
               <figure class="product-media">
                 <% if (product.regularPrice > product.salePrice) { %>
@@ -142,10 +194,12 @@
                   <img src="/uploads/re-image/<%= product.productImage[1] || product.productImage[0] %>" alt="<%= product.productName %>" class="product-image-hover">
                 </a>
                 <div class="product-action-vertical">
-                  <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>Add to Wishlist</span></a>
+                  <a href="#" class="btn-product-icon btn-wishlist btn-expandable" onclick="addToWishlist('<%= product._id %>', event)">
+                    <span>Add to Wishlist</span>
+                  </a>
                 </div>
                 <div class="product-action">
-                  <a href="#" class="btn-product btn-cart"><span>Add to Cart</span></a>
+                  <a href="/productDetails/<%= product._id %>" class="btn-product btn-cart"><span>Add to Cart</span></a>
                 </div>
               </figure>
               <div class="product-body">
@@ -180,7 +234,7 @@
               "1200": { "items": 4, "nav": true, "dots": false }
             }
           }'>
-          <% trendingProducts.filter(p => p.category.name.toLowerCase().includes('men')).forEach(product => { %>
+          <% trendingProducts.filter(p => p.category.name.includes('Men')).forEach(product => { %>
             <div class="product product-7 text-center">
               <figure class="product-media">
                 <% if (product.regularPrice > product.salePrice) { %>
@@ -191,10 +245,12 @@
                   <img src="/uploads/re-image/<%= product.productImage[1] || product.productImage[0] %>" alt="<%= product.productName %>" class="product-image-hover">
                 </a>
                 <div class="product-action-vertical">
-                  <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>Add to Wishlist</span></a>
+                  <a href="#" class="btn-product-icon btn-wishlist btn-expandable" onclick="addToWishlist('<%= product._id %>', event)">
+                    <span>Add to Wishlist</span>
+                  </a>
                 </div>
                 <div class="product-action">
-                  <a href="#" class="btn-product btn-cart"><span>Add to Cart</span></a>
+                  <a href="/productDetails/<%= product._id %>" class="btn-product btn-cart"><span>Add to Cart</span></a>
                 </div>
               </figure>
               <div class="product-body">
@@ -270,10 +326,12 @@
                   <img src="/uploads/re-image/<%= product.productImage[1] || product.productImage[0] %>" alt="<%= product.productName %>" class="product-image-hover">
                 </a>
                 <div class="product-action-vertical">
-                  <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>Add to Wishlist</span></a>
+                  <a href="#" class="btn-product-icon btn-wishlist btn-expandable" onclick="addToWishlist('<%= product._id %>', event)">
+                    <span>Add to Wishlist</span>
+                  </a>
                 </div>
                 <div class="product-action">
-                  <a href="#" class="btn-product btn-cart"><span>Add to Cart</span></a>
+                  <a href="/productDetails/<%= product._id %>" class="btn-product btn-cart"><span>Add to Cart</span></a>
                 </div>
               </figure>
               <div class="product-body">
@@ -298,5 +356,59 @@
     </div>
   </div>
 </main>
+
+<script>
+  function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+  
+  function addToWishlist(productId, event) {
+    event.preventDefault();
+  
+    fetch('/addWishlist', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ productId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const button = event.target.closest('.btn-wishlist');
+  
+      if (data.success) {
+        button.classList.add('added');
+        const textSpan = button.querySelector('span');
+        if (textSpan) textSpan.innerText = 'Added to Wishlist';
+  
+        // Optional: Update wishlist count in header if you have one
+        const countElement = document.getElementById('wishlistCount');
+        if (countElement) {
+          let currentCount = parseInt(countElement.innerText.trim()) || 0;
+          countElement.innerText = currentCount + 1;
+        }
+  
+        showToast('Product added to wishlist!', 'success');
+      } else {
+        if (data.message === 'Product already in wishlist') {
+          button.classList.add('added');
+          const textSpan = button.querySelector('span');
+          if (textSpan) textSpan.innerText = 'Already in Wishlist';
+          showToast('Product already in your wishlist.', 'info');
+        } else {
+          showToast(data.message || 'Failed to add to wishlist', 'error');
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Wishlist Add Error:', error.message);
+      showToast('Something went wrong. Please try again.', 'error');
+    });
+  }
+  </script>
 
 <%- include("../../views/partials/user/footer") %>

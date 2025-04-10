@@ -1,17 +1,17 @@
 
-const User=require("../../models/userSchema");
+const User = require("../../models/userSchema");
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
-const env=require("dotenv").config();
-const nodemailer=require("nodemailer");
-const bcrypt=require("bcrypt");
+const env = require("dotenv").config();
+const nodemailer = require("nodemailer");
+const bcrypt = require("bcrypt");
 
-const pageNotFound=async (req,res)=>{
-    try{
-       return res.render("user/page404");
-    }catch(error){
-      res.redirect("/pageNotFound");
-    }
+const pageNotFound = async (req, res) => {
+  try {
+    return res.render("user/page404");
+  } catch (error) {
+    res.redirect("/pageNotFound");
+  }
 }
 
 
@@ -21,7 +21,7 @@ const loadShoppingPage = async (req, res) => {
   try {
     const user = req.session.user;
     const page = parseInt(req.query.page) || 1;
-    const limit = 6;
+    const limit = 9;
 
     const categoryFilter = req.query.categories ? req.query.categories.split(',') : [];
     const colorFilter = req.query.colors ? req.query.colors.split(',') : [];
@@ -31,16 +31,16 @@ const loadShoppingPage = async (req, res) => {
     const filter = { isBlocked: false };
 
     if (categoryFilter.length > 0) {
-      const categories = await Category.find({ 
-          name: { $in: categoryFilter.map(name => new RegExp(`^${name}$`, 'i')) },
-          isListed: true 
+      const categories = await Category.find({
+        name: { $in: categoryFilter.map(name => new RegExp(`^${name}$`, 'i')) },
+        isListed: true
       });
       if (categories.length > 0) {
-          filter.category = { $in: categories.map(cat => cat._id) };
+        filter.category = { $in: categories.map(cat => cat._id) };
       } else {
-          filter.category = null;
+        filter.category = null;
       }
-  }
+    }
     if (colorFilter.length > 0) {
       filter.color = { $in: colorFilter };
     }
@@ -53,18 +53,18 @@ const loadShoppingPage = async (req, res) => {
     const totalPages = Math.ceil(totalProducts / limit);
     const skip = (page - 1) * limit;
 
-  
+
     let sortOptions = {};
     switch (sortBy) {
-     
+
       case 'price_asc':
         sortOptions = { salePrice: 1 };
         break;
       case 'price_desc':
         sortOptions = { salePrice: -1 };
         break;
-     
-    
+
+
       case 'new_arrivals':
         sortOptions = { createdAt: -1 };
         break;
@@ -122,16 +122,16 @@ const loadHomepage = async (req, res) => {
     const categories = await Category.find({ isListed: true });
     const allProducts = await Product.find({
       isBlocked: false,
-      'sizes.quantity': { $gt: 0 }, 
+      'sizes.quantity': { $gt: 0 },
       category: { $in: categories.map(category => category._id) }
     }).populate('category');
 
-   
+
     const trendingProducts = await Product.find({
       isBlocked: false,
       'sizes.quantity': { $gt: 0 }
     })
-      .sort({ createdAt: -1 }) 
+      .sort({ createdAt: -1 })
       .limit(5)
       .populate('category');
 
@@ -144,13 +144,13 @@ const loadHomepage = async (req, res) => {
       .limit(8)
       .populate('category');
 
-   
+
     const dealProducts = await Product.find({
       isBlocked: false,
       'sizes.quantity': { $gt: 0 },
-      productOffer: { $gt: 0 } 
+      productOffer: { $gt: 0 }
     })
-      .sort({ productOffer: -1 }) 
+      .sort({ productOffer: -1 })
       .limit(2)
       .populate('category');
 
@@ -171,124 +171,123 @@ const loadHomepage = async (req, res) => {
 
 
 
-function generateOtp(){
-    return Math.floor(100000 + Math.random()*900000).toString();
+function generateOtp() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-async function sendVerificationEmail(email,otp){
+async function sendVerificationEmail(email, otp) {
   console.log("Email:", process.env.NODEMAILER_EMAIL);
-console.log("Password:", process.env.NODEMAILER_PASSWORD ? "Loaded" : "Not Loaded");
-    try{
-     const transporter=nodemailer.createTransport({
-        service:'gmail',
-        port:587,
-        secure:false,
-        requireTLS:true,
-        auth:{
-            user:process.env.NODEMAILER_EMAIL,
-            pass:process.env.NODEMAILER_PASSWORD
-        }
-     })
-     const info = await transporter.sendMail({
-        from:process.env.NODEMAILER_EMAIL,
-        to:email,
-        subject:"Verify your account",
-        text:`Your OTP is ${otp}`,
-        html:`<b>Your OTP:${otp}</b>`
-     })
+  console.log("Password:", process.env.NODEMAILER_PASSWORD ? "Loaded" : "Not Loaded");
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD
+      }
+    })
+    const info = await transporter.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: email,
+      subject: "Verify your account",
+      text: `Your OTP is ${otp}`,
+      html: `<b>Your OTP:${otp}</b>`
+    })
 
-     return info.accepted.length >0;
+    return info.accepted.length > 0;
 
 
-    }catch(error){
-        console.error("Error sending email",error);
-        return false;
+  } catch (error) {
+    console.error("Error sending email", error);
+    return false;
 
-    }
+  }
 }
 
-const loadSignup=async (req,res)=>{
-  try{
-     if(req.session.user){
+const loadSignup = async (req, res) => {
+  try {
+    if (req.session.user) {
       res.redirect('/')
-     } else {
+    } else {
       return res.render("user/signup");
-     }
-  }catch(error){
+    }
+  } catch (error) {
     console.log("signup page not found");
     res.status(500).send("Server error")
   }
 }
-const Signup=async (req,res)=>{
- 
-  try{
-    const {name,phone,email,password,cPassword}=req.body
-    
-    
-    if(password !==cPassword){
-        return res.render("user/signup",{message:"Passwords do not match"});  
+const Signup = async (req, res) => {
+
+  try {
+    const { name, phone, email, password, cPassword } = req.body
+
+
+    if (password !== cPassword) {
+      return res.render("user/signup", { message: "Passwords do not match" });
     }
-    const findUser=await User.findOne({email});
-    
-    
-    if(findUser){
-        return res.render("user/signup",{message:"User already exist with this email"})
+    const findUser = await User.findOne({ email });
+
+
+    if (findUser) {
+      return res.render("user/signup", { message: "User already exist with this email" })
     }
-    const otp=generateOtp();
-    
-    
-    const emailSent = await sendVerificationEmail(email,otp);
-    
-    
-    if(!emailSent){
-        return res.json("email-error")
+    const otp = generateOtp();
+
+
+    const emailSent = await sendVerificationEmail(email, otp);
+
+
+    if (!emailSent) {
+      return res.json("email-error")
     }
     req.session.userOtp = otp;
-    req.session.userData= {name,phone,email,password};
+    req.session.userData = { name, phone, email, password };
 
     res.render("user/verify-otp");
-   console.log("OTP Sent",otp);
-   
+    console.log("OTP Sent", otp);
 
-    }catch(error){
-     console.error("signup error",error);
-     res.redirect("/pageNotFound")
-    }
+  } catch (error) {
+    console.error("signup error", error);
+    res.redirect("/pageNotFound")
+  }
 }
 
-const securePassword = async (password)=>{
+const securePassword = async (password) => {
   try {
-    const passwordHash=await bcrypt.hash(password,10)
+    const passwordHash = await bcrypt.hash(password, 10)
     return passwordHash;
   } catch (error) {
     
   }
 }
 
-const verifyOtp=async (req,res)=>{
-  try{
-    const {otp}=req.body;
-     console.log(otp);
-     if(otp===req.session.userOtp){
-      const user=req.session.userData
-      const passwordHash=await securePassword(user.password);
-      const saveUserData=new User({
-        name:user.name,
-        email:user.email,
-        phone:user.phone,
-        password:passwordHash,
-        googleId:user.email
+const verifyOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    console.log(otp);
+    if (otp === req.session.userOtp) {
+      const user = req.session.userData
+      const passwordHash = await securePassword(user.password);
+      const saveUserData = new User({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        password: passwordHash,
+        googleId: user.email
 
       })
       await saveUserData.save();
-      req.session.user=saveUserData.id;
-      res.json({success:true,redirectUrl:"/"})
-     }else{
-      res.status(400).json({success:false,message:"Invalid Otp,Please try again"})
-     }
-  }catch(error){
-    console.log("Error Verifying OTP",error);
-    res.status(500).json({success:false,message:"An error occured"})
+      req.session.user = saveUserData.id;
+      res.json({ success: true, redirectUrl: "/" })
+    } else {
+      res.status(400).json({ success: false, message: "Invalid Otp,Please try again" })
+    }
+  } catch (error) {
+    console.log("Error Verifying OTP", error);
+    res.status(500).json({ success: false, message: "An error occured" })
   }
 }
 
@@ -337,7 +336,7 @@ const login = async (req, res) => {
       return res.redirect('/login');
     }
 
-    req.session.user = findUser;  
+    req.session.user = findUser;
     res.redirect("/");
   } catch (error) {
     req.flash('error', 'Login failed. Please try again later');
@@ -347,7 +346,7 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    req.session.user = null; 
+    req.session.user = null;
     return res.redirect("/login");
   } catch (error) {
     console.log("Logout error", error);
@@ -356,11 +355,11 @@ const logout = async (req, res) => {
 };
 
 
-const resendOtp = async(req, res) => {
+const resendOtp = async (req, res) => {
   try {
-    const {email} = req.session.userData;
-    if(!email){
-      return res.status(400).json({success: false, message: "Email not found in session"});
+    const { email } = req.session.userData;
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email not found in session" });
     }
     const otp = generateOtp();
     req.session.userOtp = otp;
@@ -369,16 +368,16 @@ const resendOtp = async(req, res) => {
 
     console.log("emailSent from resend otp", emailSent);
 
-    if(emailSent){
+    if (emailSent) {
       console.log("Resend OTP:", otp);
-      return res.status(200).json({success: true, message: "OTP Resent Successfully"});
+      return res.status(200).json({ success: true, message: "OTP Resent Successfully" });
     } else {
-      return res.status(500).json({success: false, message: "Failed to resend OTP. Please try again"});
+      return res.status(500).json({ success: false, message: "Failed to resend OTP. Please try again" });
     }
-    
+
   } catch (error) {
     console.log("Error resending OTP", error);
-    res.status(500).json({success: false, message: "Internal Server Error. Please try again"});
+    res.status(500).json({ success: false, message: "Internal Server Error. Please try again" });
   }
 }
 
@@ -392,9 +391,9 @@ const filterProduct = async (req, res) => {
     const user = req.session.user;
     const category = req.query.category;
     const brand = req.query.brand;
-    
+
     const findCategory = category ? await Category.findOne({ _id: category }) : null;
-    const findBrand = brand ? await Brand.findOne({ brandName: brand }) : null; 
+    const findBrand = brand ? await Brand.findOne({ brandName: brand }) : null;
 
     const brands = await Brand.find({}).lean();
     const query = {
@@ -444,7 +443,7 @@ const filterProduct = async (req, res) => {
       totalPages,
       currentPage,
       selectedCategory: category || null,
-      selectedBrand: brand || null, 
+      selectedBrand: brand || null,
     });
 
   } catch (error) {
@@ -459,31 +458,31 @@ const filterByPrice = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
 
-    const filter = { 
+    const filter = {
       isBlocked: false,
       salePrice: { $lte: maxPrice }
     };
-    
+
     if (req.query.categories) {
       const categoryNames = req.query.categories.split(',');
       const categories = await Category.find({ name: { $in: categoryNames } });
       filter.category = { $in: categories.map(cat => cat._id) };
     }
-    
+
     if (req.query.colors) {
       filter.color = { $in: req.query.colors.split(',') };
     }
-    
+
     const totalProducts = await Product.countDocuments(filter);
     const totalPages = Math.ceil(totalProducts / limit);
     const skip = (page - 1) * limit;
-    
+
     const products = await Product.find(filter)
       .populate('category')
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
-    
+
     if (req.xhr) {
       return res.json({
         success: true,
@@ -492,7 +491,7 @@ const filterByPrice = async (req, res) => {
         currentPage: page
       });
     } else {
-    
+
       const queryString = new URLSearchParams(req.query).toString();
       return res.redirect(`/shop?${queryString}`);
     }
@@ -509,7 +508,7 @@ const filterByPrice = async (req, res) => {
 const filterByCategory = async (req, res) => {
   try {
     const categoryNames = req.query.categories ? req.query.categories.split(',') : [];
-    
+
     const queryParams = new URLSearchParams(req.query);
     return res.redirect(`/shop?${queryParams.toString()}`);
   } catch (error) {
@@ -521,7 +520,7 @@ const filterByCategory = async (req, res) => {
 const filterByColor = async (req, res) => {
   try {
     const colorNames = req.query.colors ? req.query.colors.split(',') : [];
-    
+
     const queryParams = new URLSearchParams(req.query);
     return res.redirect(`/shop?${queryParams.toString()}`);
   } catch (error) {
@@ -537,16 +536,16 @@ const applyFilters = async (req, res) => {
     const colors = req.query.colors ? req.query.colors.split(',') : [];
     const maxPrice = req.query.maxPrice ? parseInt(req.query.maxPrice) : 5000;
     const page = parseInt(req.query.page) || 1;
-    
- 
+
+
     const queryParams = new URLSearchParams();
-    
+
     if (categories.length > 0) queryParams.set('categories', categories.join(','));
     if (colors.length > 0) queryParams.set('colors', colors.join(','));
     if (maxPrice) queryParams.set('maxPrice', maxPrice.toString());
     queryParams.set('page', page.toString());
-    
-  
+
+
     return res.redirect(`/shop?${queryParams.toString()}`);
   } catch (error) {
     console.error("Error applying filters:", error);
@@ -561,7 +560,7 @@ const clearFilters = async (req, res) => {
 
 const searchProducts = async (req, res) => {
   try {
-   
+
     const searchQuery = req.query.q ? req.query.q.trim() : '';
     console.log("Search Query:", searchQuery);
 
@@ -580,11 +579,11 @@ const searchProducts = async (req, res) => {
       filter.productName = { $regex: new RegExp(searchQuery, 'i') };
     }
 
- 
+
     const searchResults = await Product.find({
-  productName: { $regex: new RegExp(searchQuery, 'i') },
-  isBlocked: false
-});
+      productName: { $regex: new RegExp(searchQuery, 'i') },
+      isBlocked: false
+    });
 
     console.log("Matched Products:", searchResults.length);
 
@@ -657,26 +656,26 @@ const getAboutPage = async (req, res) => {
       whoWeAreText: 'Sed pretium, ligula sollicitudin laoreet viverra, tortor libero sodales leo, eget blandit nunc tortor eu nibh.',
       brandsText: 'Phasellus hendrerit. Pellentesque aliquet nibh nec urna.',
       teamMembers: [
-        { 
-          name: 'Samanta Grey', 
-          title: 'Founder & CEO', 
-          image: 'member-1.jpg', 
-          bio: 'Sed pretium, ligula sollicitudin viverra.', 
-          social: { facebook: '#', twitter: '#', instagram: '#' } 
+        {
+          name: 'Samanta Grey',
+          title: 'Founder & CEO',
+          image: 'member-1.jpg',
+          bio: 'Sed pretium, ligula sollicitudin viverra.',
+          social: { facebook: '#', twitter: '#', instagram: '#' }
         },
-        { 
-          name: 'Bruce Sutton', 
-          title: 'Sales & Marketing Manager', 
-          image: 'member-2.jpg', 
-          bio: 'Sed pretium, ligula sollicitudin viverra.', 
-          social: { facebook: '#', twitter: '#', instagram: '#' } 
+        {
+          name: 'Bruce Sutton',
+          title: 'Sales & Marketing Manager',
+          image: 'member-2.jpg',
+          bio: 'Sed pretium, ligula sollicitudin viverra.',
+          social: { facebook: '#', twitter: '#', instagram: '#' }
         },
-        { 
-          name: 'Janet Joy', 
-          title: 'Product Manager', 
-          image: 'member-3.jpg', 
-          bio: 'Sed pretium, ligula sollicitudin viverra.', 
-          social: { facebook: '#', twitter: '#', instagram: '#' } 
+        {
+          name: 'Janet Joy',
+          title: 'Product Manager',
+          image: 'member-3.jpg',
+          bio: 'Sed pretium, ligula sollicitudin viverra.',
+          social: { facebook: '#', twitter: '#', instagram: '#' }
         }
       ],
       testimonials: [
@@ -694,27 +693,27 @@ const getAboutPage = async (req, res) => {
 
 
 
-const loadContact = async (req, res , next) => {
-    
+const loadContact = async (req, res, next) => {
+
   try {
 
-      const categoryData = await Category.find({ is_Listed: true });
+    const categoryData = await Category.find({ is_Listed: true });
 
-      if (req.session.user) {
-          
-          res.render("user/contact", { login: req.session.user , categoryData});
+    if (req.session.user) {
 
-      } else {
+      res.render("user/contact", { login: req.session.user, categoryData });
 
-          res.render("user/contact" , {categoryData});
+    } else {
 
-      }
-      
+      res.render("user/contact", { categoryData });
+
+    }
+
   } catch (error) {
 
-      next(error,req,res);
+    next(error, req, res);
 
-      
+
   }
 
 };
@@ -727,27 +726,27 @@ const loadContact = async (req, res , next) => {
 
 
 
-module.exports={
-    loadHomepage,
-    pageNotFound,
-    loadSignup,
-    Signup,
-    verifyOtp,
-    resendOtp,
-    loadLogin,
-    login,
-    logout,
-    loadShoppingPage,
-    filterProduct,
-    filterByPrice,
-    filterByCategory,
-    filterByColor,
-    applyFilters,
-    clearFilters,
-  
-    searchProducts,
-    getAboutPage,
-   loadContact
+module.exports = {
+  loadHomepage,
+  pageNotFound,
+  loadSignup,
+  Signup,
+  verifyOtp,
+  resendOtp,
+  loadLogin,
+  login,
+  logout,
+  loadShoppingPage,
+  filterProduct,
+  filterByPrice,
+  filterByCategory,
+  filterByColor,
+  applyFilters,
+  clearFilters,
+
+  searchProducts,
+  getAboutPage,
+  loadContact
 
 }
 

@@ -612,6 +612,7 @@ function validateForm(event) {
           }).then(() => {
               updateAddressList(userId); 
           });
+          window.location.reload()
       } else {
           Swal.fire({
               title: 'Failed',

@@ -300,9 +300,9 @@
         return true;
     }
 
-    const bestSellingProducts = '<%- JSON.stringify(bestSellingProducts || []) %>';
-    const bestCategories = '<%- JSON.stringify(bestCategories || []) %>';
-    const salesData = '<%- JSON.stringify(salesData || []) %>';
+    const bestSellingProducts = <%- JSON.stringify(bestSellingProducts || []) %>;
+    const bestCategories = <%- JSON.stringify(bestCategories || []) %>;
+    const salesData = <%- JSON.stringify(salesData || []) %>;
     
     
     console.log('Chart data loaded:', { 
