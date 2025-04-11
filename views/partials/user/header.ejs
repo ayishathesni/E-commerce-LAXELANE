@@ -81,6 +81,40 @@
         z-index:500;
        }
 
+   
+@media (max-width: 767px) {
+  .header-right li {
+    list-style: none;
+    margin-left: 8px;
+    margin-right: 8px; 
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+ 
+  .header-right li + li {
+    margin-left: 12px; 
+  }
+  
+  .site-menu, .site-menu-link {
+    font-size: 0.85rem;
+    padding: 3px 6px;
+    white-space: nowrap;
+  }
+}
+
+
+.header-right li {
+  list-style: none;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px; 
+}
+
+
+.header-right li + li {
+  margin-left: 15px;
+}
 
     </style>
 </head>
@@ -117,7 +151,7 @@
                             <i class="icon-heart-o"></i>
                             <span class="wishlist-count" id="wishlistCount"></span>
 
-                            <span class="wishlist-txt">My Wishlist</span>
+                           
                         </a>
                     
                        
@@ -165,14 +199,7 @@
 
     
                                 </li>
-                                <!-- <li class="menu-item-has-children">
-                                    <a href="/shop" class="sf-with-ul">Category ▾</a>
-                                    <ul class="sub-menu">
-                                      <li><a href="/shop?category=men">Men</a></li>
-                                      <li><a href="/shop?category=women">Women</a></li>
-                                      <li><a href="/shop?category=kids">Kids</a></li>
-                                    </ul>
-                                  </li> -->
+                                
                                   
                                 <li>
                                     <a href="/about" class="sf-with-ul">About</a>
