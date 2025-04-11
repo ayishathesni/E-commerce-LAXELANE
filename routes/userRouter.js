@@ -27,7 +27,7 @@ router.get('/clear-filters', userController.clearFilters);
 router.get("/search",userController.searchProducts);
 
 //product-detail
-router.get('/productDetails/:id',productController.productDetails)
+router.get('/productDetails/:id',userAuth,productController.productDetails)
 
 //signup
 router.get("/signup",userController.loadSignup);
