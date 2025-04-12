@@ -84,7 +84,10 @@ const viewOrderDetails = async (req, res, next) => {
   };
   
   
-  const cancelSingleProduct = async (req, res) => {
+
+
+
+const cancelSingleProduct = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { cancelReason, productId, size } = req.body;
@@ -132,22 +135,18 @@ const viewOrderDetails = async (req, res, next) => {
             total + (orderItem.price * orderItem.quantity), 0
         );
 
-        let refundAmount = itemTotal;
-        
-      
-        if (order.discount > 0 && coupon) {
+        let refundAmount = order.paymentMethod === 'Cash on Delivery' ? 0 : itemTotal;
+
+        if (order.discount > 0 && coupon && order.paymentMethod !== 'Cash on Delivery') {
             const minimumPrice = coupon.minimumPrice;
-            const offerPrice = coupon.offerPrice; 
-            
-          
+            const offerPrice = coupon.offerPrice;
+
             const itemDiscountPortion = (itemTotal / originalTotal) * offerPrice;
 
             if (remainingTotal < minimumPrice) {
-              
                 refundAmount = itemTotal - offerPrice;
-                order.discount = 0; 
+                order.discount = 0;
             } else {
-             
                 refundAmount = itemTotal - Math.min(itemDiscountPortion, itemTotal);
                 order.discount = Math.max(0, offerPrice - itemDiscountPortion);
             }
@@ -202,7 +201,10 @@ const viewOrderDetails = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            message: 'Product cancelled successfully',
+            message: order.paymentMethod === 'Cash on Delivery'
+                ? 'Product cancelled successfully (COD - No refund needed).'
+                : 'Product cancelled successfully.',
+            paymentMethod: order.paymentMethod,
             refundDetails: {
                 itemPrice: itemTotal,
                 refundAmount,
@@ -228,6 +230,8 @@ const viewOrderDetails = async (req, res, next) => {
 };
 
 
+
+
 const cancelOrder = async (req, res) => {
     try {
         const { orderId, reason } = req.body;
@@ -247,20 +251,22 @@ const cancelOrder = async (req, res) => {
             });
         }
 
-        let refundAmount = order.finalAmount;
+        let refundAmount = order.paymentMethod === 'Cash on Delivery' ? 0 : order.finalAmount;
         let couponDiscount = order.discount || 0;
-        let meetsMinimumAmount = order.finalAmount - couponDiscount >= (order.couponMinPrice || 0);
 
-        if (!meetsMinimumAmount && couponDiscount > 0) {
-            refundAmount -= couponDiscount; 
-            couponDiscount = 0; 
+        if (order.paymentMethod !== 'Cash on Delivery' && couponDiscount > 0) {
+            const meetsMinimumAmount = order.finalAmount - couponDiscount >= (order.couponMinPrice || 0);
+            if (!meetsMinimumAmount) {
+                refundAmount -= couponDiscount;
+                couponDiscount = 0;
+            }
         }
 
         order.status = 'Cancelled';
         order.cancelReason = reason || 'No reason provided';
         order.cancelledAt = new Date();
-        order.finalAmount = 0; 
-        order.discount = couponDiscount; 
+        order.finalAmount = 0;
+        order.discount = couponDiscount;
 
         order.orderedItems.forEach(item => {
             item.status = 'Cancelled';
@@ -284,7 +290,7 @@ const cancelOrder = async (req, res) => {
                 console.error("User not found for refund:", order.userId);
                 return res.status(500).json({ success: false, message: 'User not found for refund.' });
             }
-   
+
             console.log("Wallet Before:", user.wallet);
             user.wallet += refundAmount;
             user.walletHistory.push({
@@ -312,10 +318,11 @@ const cancelOrder = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: order.paymentMethod !== 'Cash on Delivery'
-                ? 'Order cancelled and amount refunded successfully.'
-                : 'Order cancelled successfully (COD - No refund needed).',
-            refundAmount: refundAmount > 0 && order.paymentMethod !== 'Cash on Delivery' ? refundAmount : null
+            message: order.paymentMethod === 'Cash on Delivery'
+                ? 'Order cancelled successfully (COD - No refund needed).'
+                : 'Order cancelled and amount refunded successfully.',
+            paymentMethod: order.paymentMethod,
+            refundAmount: refundAmount
         });
 
     } catch (error) {
@@ -443,7 +450,7 @@ const downloadInvoice = async (req, res) => {
   
       const userAddress = await Address.findOne({
         userId,
-        // 'address.status'
+       
       });
   
       let shippingAddress = null;
