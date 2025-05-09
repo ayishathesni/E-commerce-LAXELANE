@@ -539,7 +539,7 @@ const createRazorpayOrder = async (req, res) => {
       finalAmount,
       address: addressDoc._id,
       status: "Pending",
-      paymentMethod: "razorpay",
+      paymentMethod: "Online Payment",
       couponApplied: couponDiscount > 0,
     });
 
@@ -554,7 +554,7 @@ const createRazorpayOrder = async (req, res) => {
       finalAmount,
     });
   } catch (error) {
-    console.error("Razorpay Order Creation Error:", error.stack);
+    console.error("Razorpay Order Creation Error:", error);
     res.status(500).json({ success: false, message: "Failed to create Razorpay order", error: error.message });
   }
 };
@@ -599,7 +599,7 @@ const verifyRazorpayPayment = async (req, res) => {
     }
 
     order.status = "Pending";
-    order.paymentMethod = "razorpay";
+    order.paymentMethod = "Online Payment";
     order.razorpayPaymentId = razorpayPaymentId;
     order.paymentDetails = {
       razorpayOrderId,
@@ -693,7 +693,7 @@ const handlePaymentDismissal = async (req, res) => {
             status: 'Failed'
           }
         },
-        paymentMethod: 'razorpay'
+        paymentMethod: 'Online Payment'
       },
       { new: true }
     );
@@ -735,7 +735,7 @@ const handlePaymentFailure = async (req, res) => {
         { _id: orderId },
         {
           status: 'Failed',
-          paymentMethod: 'razorpay',
+          paymentMethod: 'Online Payment',
           $set: {
             'orderedItems.$[].status': 'Failed'
           }
@@ -750,7 +750,7 @@ const handlePaymentFailure = async (req, res) => {
         { orderId: orderId },
         {
           status: 'Failed',
-          paymentMethod: 'razorpay',
+          paymentMethod: 'Online Payment',
           $set: {
             'orderedItems.$[].status': 'Failed'
           }
@@ -849,7 +849,7 @@ const retryPayment = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      paymentMethod: 'razorpay',
+      paymentMethod: 'Online Payment',
       razorpayOptions,
     });
   } catch (error) {

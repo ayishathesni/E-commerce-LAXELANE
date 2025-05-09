@@ -107,7 +107,7 @@ const orderSchema = new Schema({
     paymentMethod: {
         type: String,
         required: false,
-        enum: ['Cash on Delivery', 'razorpay', 'Wallet Payment']
+        enum: ['Cash on Delivery', 'Online Payment', 'Wallet Payment']
     },
     createdOn: {
         type: Date,

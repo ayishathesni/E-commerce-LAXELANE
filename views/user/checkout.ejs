@@ -454,8 +454,8 @@
             
 
         <div class="card-header mb-3 d-flex align-items-center">
-            <input type="radio" id="payment_razorpay" name="payment" value="razorpay" class="me-2">
-            <label class="mb-0" for="payment_razorpay">Razorpay</label>
+            <input type="radio" id="payment_razorpay" name="payment" value="Online Payment" class="me-2">
+            <label class="mb-0" for="payment_razorpay">Online Payment</label>
         </div>
 
         <div class="card-header mb-3 d-flex align-items-center">
@@ -1006,7 +1006,7 @@ async function handleRazorpayPayment() {
   
     const couponDiscount = totalPrice - finalTotal;
         
-        const paymentMethod = "razorpay";
+        const paymentMethod = "Online Payment";
 
       
         const response = await fetch("/create-razorpay-order", {
@@ -1136,7 +1136,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (paymentMethod === "razorpay") {
+        if (paymentMethod === "Online Payment") {
             handleRazorpayPayment();
         } else {
             submitPayment(

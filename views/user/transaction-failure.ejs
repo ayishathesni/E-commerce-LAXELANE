@@ -150,7 +150,7 @@
                 const data = await response.json();
                 console.log('Response data:', data);
 
-                if (data.success && data.paymentMethod === 'razorpay') {
+                if (data.success && data.paymentMethod === 'Online Payment') {
                     const rzp = new Razorpay({
                         ...data.razorpayOptions,
                         handler: async (response) => {

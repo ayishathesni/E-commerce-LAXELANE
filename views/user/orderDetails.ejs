@@ -770,7 +770,7 @@
 
         const data = await response.json();
 
-        if (data.success && data.paymentMethod === 'razorpay') {
+        if (data.success && data.paymentMethod === 'Online Payment') {
           if (typeof Razorpay === 'undefined') {
             await new Promise((resolve, reject) => {
               const script = document.createElement('script');
