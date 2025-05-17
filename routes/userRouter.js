@@ -45,8 +45,7 @@ router.get("/auth/google/callback",
     }), 
     (req, res) => {
       req.session.user = req.user;  
-      console.log(req.session.user , 'akakak')
-      res.redirect('/');
+      res.redirect('/shop');
     }
   );
 
