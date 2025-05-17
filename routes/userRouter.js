@@ -48,6 +48,7 @@ router.get("/auth/google/callback",
       res.redirect('/');
     }
   );
+
   
 //login
 router.get("/login",userController.loadLogin);
