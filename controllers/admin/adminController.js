@@ -22,9 +22,9 @@ const signUpAdmin = async (req, res) => {
 
     console.log(name, email, password)
 
-    const hashed = await bcrypt.hash(password,10);
+    const hashed = await bcrypt.hash(password, 10);
 
-    console.log(hashed,'hhhhhhh')
+    console.log(hashed, 'hhhhhhh')
 
     const adminAdd = new User({
 
@@ -34,6 +34,8 @@ const signUpAdmin = async (req, res) => {
       isAdmin: true
 
     })
+
+    await adminAdd.save()
 
     console.log(adminAdd, 'data')
 
