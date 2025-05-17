@@ -14,38 +14,6 @@ const pageerror = async (req, res) => {
   res.render("admin-error")
 }
 
-const signUpAdmin = async (req, res) => {
-
-  try {
-
-    const { name, email, password } = req.body
-
-    console.log(name, email, password)
-
-    const hashed = await bcrypt.hash(password, 10);
-
-    console.log(hashed, 'hhhhhhh')
-
-    const adminAdd = new User({
-
-      name: name,
-      email: email,
-      password: hashed,
-      isAdmin: true
-
-    })
-
-    await adminAdd.save()
-
-    console.log(adminAdd, 'data')
-
-
-
-  } catch (error) {
-
-  }
-
-}
 
 
 const loadLogin = async (req, res) => {
@@ -598,7 +566,6 @@ module.exports = {
   generateSalesReport,
   downloadExcelReport,
   downloadPDFReport,
-  signUpAdmin
 
 
 }

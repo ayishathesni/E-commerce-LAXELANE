@@ -18,8 +18,6 @@ router.post("/pageerror", adminController.pageerror);
 
 //Login &dashboard
 
-router.post("/addAdmin", adminController.signUpAdmin)
-
 
 router.get("/login", adminController.loadLogin);
 router.post("/login", adminController.login);
